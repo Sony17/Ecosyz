@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Idea - Revolutionary Open Innovation Platform | Ecosyz</title>
+    <meta name="description" content="Transform innovation with Open Idea - the world's most advanced open-source platform. Featuring ORAA sustainable fashion platform and cutting-edge AI technology.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            background: #000000;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Enhanced Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(30px);
+            z-index: 1000;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 32px;
+            font-weight: 900;
+            color: #4caf50;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+        }
+
+        .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #2e7d32, #4caf50, #81c784, #a5d6a7);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 0 30px rgba(76, 175, 80, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .flower-of-life {
+            width: 38px;
+            height: 38px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .flower-of-life svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 45px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            padding: 12px 24px;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+
+        .nav-links a:hover {
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
+        }
+
+        .whitepaper-btn {
+            background: linear-gradient(135deg, #4caf50, #2e7d32, #1b5e20);
+            color: white !important;
+            padding: 14px 30px !important;
+            border-radius: 35px;
+            font-weight: 800;
+            box-shadow: 
+                0 0 25px rgba(76, 175, 80, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .whitepaper-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .whitepaper-btn:hover::before {
+            left: 100%;
+        }
+
+        .whitepaper-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 0 35px rgba(76, 175, 80, 0.7),
+                0 8px 25px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #2e7d32, #1b5e20, #0d4714) !important;
+        }
+
+        /* Revolutionary Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 120px;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(76, 175, 80, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(129, 199, 132, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 40%, rgba(46, 125, 50, 0.08) 0%, transparent 60%),
+                linear-gradient(135deg, #000000 0%, #0a0f0a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(76,175,80,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.4;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(10px) translateY(10px); }
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3.5rem, 7vw, 6rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #4caf50 30%, #81c784 60%, #a5d6a7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 35px;
+            line-height: 1.05;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+            animation: titleGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 30px rgba(76, 175, 80, 0.3); }
+            100% { text-shadow: 0 0 50px rgba(76, 175, 80, 0.5), 0 0 80px rgba(76, 175, 80, 0.2); }
+        }
+
+        .hero-tagline {
+            font-size: 1.8rem;
+            color: #4caf50;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .hero-tagline::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            border-radius: 2px;
+        }
+
+        .hero-description {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 50px;
+            line-height: 1.8;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .metrics-row {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .metric {
+            text-align: center;
+            position: relative;
+            padding: 25px;
+            background: rgba(76, 175, 80, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+        }
+
+        .metric:hover {
+            transform: translateY(-8px) scale(1.05);
+            background: rgba(76, 175, 80, 0.1);
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.2);
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #4caf50;
+            display: block;
+            text-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 20px 40px;
+            border: none;
+            border-radius: 35px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4caf50, #2e7d32, #1b5e20);
+            color: white;
+            box-shadow: 
+                0 0 30px rgba(76, 175, 80, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 
+                0 0 40px rgba(76, 175, 80, 0.7),
+                0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+            box-shadow: inset 0 0 0 0 rgba(76, 175, 80, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 
+                0 0 30px rgba(76, 175, 80, 0.3),
+                0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            opacity: 0.9;
+        }
+
+        .tech-card {
+            background: rgba(76, 175, 80, 0.08);
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            background: rgba(76, 175, 80, 0.15);
+            box-shadow: 
+                0 20px 40px rgba(76, 175, 80, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(76, 175, 80, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover .tech-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .tech-title {
+            font-size: 1.1rem;
+            color: #4caf50;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Enhanced ORAA Showcase */
+        .oraa-showcase {
+            padding: 150px 0;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.08) 0%, rgba(0, 0, 0, 1) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .oraa-showcase::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(129, 199, 132, 0.08) 0%, transparent 50%);
+        }
+
+        .oraa-header {
+            text-align: center;
+            margin-bottom: 100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .oraa-header h2 {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4caf50, #81c784, #a5d6a7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 25px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .oraa-subtitle {
+            font-size: 1.5rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .oraa-header p {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .oraa-demo {
+            background: rgba(76, 175, 80, 0.05);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 30px;
+            padding: 80px;
+            text-align: center;
+            backdrop-filter: blur(30px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .oraa-demo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #81c784, #a5d6a7);
+        }
+
+        .oraa-logo-large {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32, #1b5e20);
+            border-radius: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 50px;
+            font-size: 90px;
+            box-shadow: 
+                0 0 60px rgba(76, 175, 80, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .oraa-logo-large::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        .oraa-logo-large:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 0 80px rgba(76, 175, 80, 0.6);
+        }
+
+        .oraa-info h3 {
+            font-size: 2.5rem;
+            color: #4caf50;
+            margin-bottom: 25px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .oraa-fashion-subtitle {
+            font-size: 1.6rem;
+            color: #81c784;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .oraa-info p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .oraa-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+            margin-bottom: 60px;
+        }
+
+        .oraa-feature-card {
+            background: rgba(76, 175, 80, 0.08);
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .oraa-feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .oraa-feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(76, 175, 80, 0.12);
+            box-shadow: 0 25px 50px rgba(76, 175, 80, 0.2);
+        }
+
+        .oraa-feature-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px rgba(76, 175, 80, 0.5));
+            transition: all 0.3s ease;
+        }
+
+        .oraa-feature-card:hover .oraa-feature-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .oraa-feature-title {
+            font-size: 1.4rem;
+            color: #4caf50;
+            margin-bottom: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .oraa-feature-desc {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        /* Enhanced Platform Features */
+        .platform-features {
+            padding: 150px 0;
+            background: rgba(0, 0, 0, 1);
+            position: relative;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .features-header h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .features-header p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 45px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(46, 125, 50, 0.05) 100%);
+            border: 1px solid rgba(76, 175, 80, 0.25);
+            border-radius: 25px;
+            padding: 50px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #81c784, #a5d6a7);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 30px 70px rgba(76, 175, 80, 0.2);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.12) 0%, rgba(46, 125, 50, 0.08) 100%);
+        }
+
+        .feature-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-number {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 0 35px rgba(76, 175, 80, 0.7);
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            color: #4caf50;
+            margin-bottom: 25px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        } 0.3);
+        }
+
+        .whitepaper-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
+            background: linear-gradient(135deg, #2e7d32, #1b5e20) !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 120px;
+            background: radial-gradient(ellipse at center, rgba(76, 175, 80, 0.1) 0%, rgba(10, 15, 10, 1) 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(129, 199, 132, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(46, 125, 50, 0.05) 0%, transparent 50%);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #4caf50 50%, #81c784 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            line-height: 1.1;
+        }
+
+        .hero-tagline {
+            font-size: 1.5rem;
+            color: #4caf50;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .metrics-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #4caf50;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 35px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.4);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px rgba(76, 175, 80, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            opacity: 0.8;
+        }
+
+        .tech-card {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+            background: rgba(76, 175, 80, 0.15);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
+        }
+
+        .tech-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .tech-title {
+            font-size: 1rem;
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        /* ORAA Showcase */
+        .oraa-showcase {
+            padding: 120px 0;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.05) 0%, rgba(10, 15, 10, 1) 100%);
+            position: relative;
+        }
+
+        .oraa-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .oraa-header h2 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4caf50, #81c784);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .oraa-header p {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .oraa-demo {
+            background: rgba(76, 175, 80, 0.05);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 25px;
+            padding: 60px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .oraa-logo-large {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border-radius: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            font-size: 72px;
+            box-shadow: 0 0 50px rgba(76, 175, 80, 0.3);
+        }
+
+        .oraa-info h3 {
+            font-size: 2rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .oraa-info p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .oraa-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .oraa-feature-card {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .oraa-feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .oraa-feature-title {
+            font-size: 1.2rem;
+            color: #4caf50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .oraa-feature-desc {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        /* Platform Features */
+        .platform-features {
+            padding: 120px 0;
+            background: rgba(10, 15, 10, 1);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .features-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .features-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(46, 125, 50, 0.05) 100%);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(76, 175, 80, 0.15);
+        }
+
+        .feature-number {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            color: #4caf50;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 120px 0;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(10, 15, 10, 1) 100%);
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        .contact-info h2 {
+            font-size: 3rem;
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-weight: 800;
+        }
+
+        .contact-info p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 50px;
+            line-height: 1.7;
+        }
+
+        .contact-methods {
+            display: grid;
+            gap: 25px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            padding: 25px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-method:hover {
+            background: rgba(76, 175, 80, 0.15);
+            transform: translateX(10px);
+        }
+
+        .contact-method-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .contact-method-info h4 {
+            color: #4caf50;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .contact-method-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .contact-form {
+            background: rgba(76, 175, 80, 0.05);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            border-radius: 25px;
+            padding: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-form h3 {
+            color: #4caf50;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #4caf50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 18px;
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.15);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(5, 10, 5, 1);
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+
+        .footer-section h3 {
+            color: #4caf50;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .footer-section p,
+        .footer-section li {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #4caf50;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(76, 175, 80, 0.1);
+            padding-top: 40px;
+            text-align: center;
+        }
+
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 50px;
+                text-align: center;
+            }
+
+            .metrics-row {
+                justify-content: center;
+                gap: 30px;
+            }
+
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-cta {
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <div class="flower-of-life">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="8" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="2"/>
+                                <circle cx="50" cy="34" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                                <circle cx="63.86" cy="42" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                                <circle cx="63.86" cy="58" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                                <circle cx="50" cy="66" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                                <circle cx="36.14" cy="58" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                                <circle cx="36.14" cy="42" r="8" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <span>Open Idea</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#platform">Platform</a>
+                    <a href="#oraa">ORAA</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#" class="whitepaper-btn" onclick="downloadWhitepaper()">📄 Whitepaper</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <h1>The Future of Open Innovation</h1>
+                    <p class="hero-tagline">Connecting Minds. Accelerating Discovery.</p>
+                    <p class="hero-description">Revolutionary platform unifying global open-source knowledge. From research papers to code repositories, from datasets to hardware designs - everything you need to innovate is here.</p>
+                    
+                    <div class="metrics-row">
+                        <div class="metric">
+                            <span class="metric-value">10M+</span>
+                            <span class="metric-label">Resources</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">50K+</span>
+                            <span class="metric-label">Innovators</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">$2M</span>
+                            <span class="metric-label">Raised</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-cta">
+                        <a href="#contact" class="btn btn-primary">Join Now</a>
+                        <a href="#oraa" class="btn btn-secondary">Explore ORAA</a>
+                    </div>
+                </div>
+
+                <div class="hero-visual">
+                    <div class="tech-grid">
+                        <div class="tech-card float">
+                            <div class="tech-icon">🧬</div>
+                            <div class="tech-title">Research</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">💻</div>
+                            <div class="tech-title">Code</div>
+                        </div>
+                        <div class="tech-card float">
+                            <div class="tech-icon">📊</div>
+                            <div class="tech-title">Data</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">🔧</div>
+                            <div class="tech-title">Hardware</div>
+                        </div>
+                        <div class="tech-card float">
+                            <div class="tech-icon">🤖</div>
+                            <div class="tech-title">AI</div>
+                        </div>
+                        <div class="tech-card">
+                            <div class="tech-icon">🌐</div>
+                            <div class="tech-title">Global</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ORAA Showcase -->
+    <section id="oraa" class="oraa-showcase">
+        <div class="container">
+            <div class="oraa-header">
+                <h2>Introducing ORAA</h2>
+                <p>Open Research & Analytics Architecture - Our flagship open-source project revolutionizing collaborative research</p>
+            </div>
+
+            <div class="oraa-demo">
+                <div class="oraa-logo-large pulse">🔬</div>
+                <div class="oraa-info">
+                    <h3>ORAA v1.0 - Now in Beta</h3>
+                    <p>Advanced research collaboration platform with real-time analytics, AI-powered insights, and seamless integration with global research databases.</p>
+                </div>
+
+                <div class="oraa-features-grid">
+                    <div class="oraa-feature-card">
+                        <div class="oraa-feature-icon">🤝</div>
+                        <div class="oraa-feature-title">Team Collaboration</div>
+                        <div class="oraa-feature-desc">Multi-user workspaces with version control</div>
+                    </div>
+                    <div class="oraa-feature-card">
+                        <div class="oraa-feature-icon">🔗</div>
+                        <div class="oraa-feature-title">API Integration</div>
+                        <div class="oraa-feature-desc">Connect with 100+ research databases</div>
+                    </div>
+                    <div class="oraa-feature-card">
+                        <div class="oraa-feature-icon">🎯</div>
+                        <div class="oraa-feature-title">AI Insights</div>
+                        <div class="oraa-feature-desc">Machine learning powered recommendations</div>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <a href="#" class="btn btn-primary" onclick="viewORAADemo()">Live Demo</a>
+                    <a href="#" class="btn btn-secondary" onclick="accessORAAGithub()">GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Features -->
+    <section id="platform" class="platform-features">
+        <div class="container">
+            <div class="features-header">
+                <h2>Platform Capabilities</h2>
+                <p>Everything you need to accelerate innovation in one unified platform</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-number">1</div>
+                    <h3>Unified Search</h3>
+                    <p>AI-powered search across millions of open resources. Find research papers, code repositories, datasets, and hardware designs instantly with semantic understanding and intelligent recommendations.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-number">2</div>
+                    <h3>Project Building</h3>
+                    <p>Create and manage projects with integrated tools for collaboration, version control, and deployment. Build on existing work or start from scratch with our comprehensive development environment.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-number">3</div>
+                    <h3>Community Network</h3>
+                    <p>Connect with researchers, developers, and innovators worldwide. Join specialized groups, participate in challenges, and contribute to the global knowledge base.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-number">4</div>
+                    <h3>Enterprise Integration</h3>
+                    <p>Seamlessly integrate with existing enterprise systems. Advanced security, compliance features, and custom deployment options for organizations of any size.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-number">5</div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Comprehensive analytics and insights into project performance, collaboration metrics, and innovation trends. Make data-driven decisions with real-time dashboards.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-number">6</div>
+                    <h3>AI Assistance</h3>
+                    <p>Built-in AI assistant for code review, research synthesis, and project recommendations. Accelerate your work with intelligent automation and insights.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h2>Let's Build the Future Together</h2>
+                    <p>Ready to revolutionize open innovation? Whether you're an investor, partner, or innovator, we want to hear from you. Join us in creating the world's most comprehensive open innovation platform.</p>
+
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="contact-method-icon">📧</div>
+                            <div class="contact-method-info">
+                                <h4>General Inquiries</h4>
+                                <p>hello@ecosyz.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">💼</div>
+                            <div class="contact-method-info">
+                                <h4>Business & Partnerships</h4>
+                                <p>business@ecosyz.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">🚀</div>
+                            <div class="contact-method-info">
+                                <h4>Investor Relations</h4>
+                                <p>investors@ecosyz.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">💻</div>
+                            <div class="contact-method-info">
+                                <h4>Technical Support</h4>
+                                <p>support@ecosyz.com</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-method">
+                            <div class="contact-method-icon">🌍</div>
+                            <div class="contact-method-info">
+                                <h4>Headquarters</h4>
+                                <p>Innovation Hub, Lucknow, India</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h3>Send us a message</h3>
+                    <form onsubmit="handleFormSubmit(event)">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="company">Company/Organization</label>
+                            <input type="text" id="company" name="company" placeholder="Your company">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" placeholder="What's this about?" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" placeholder="Tell us more about your project or inquiry..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Open Idea</h3>
+                    <p>The world's premier open innovation platform, connecting minds and accelerating breakthrough discoveries through collaborative research and development.</p>
+                    <p><strong>Powered by Ecosyz</strong></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Platform</h3>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">ORAA Project</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Whitepaper</a></li>
+                        <li><a href="#">Case Studies</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Investors</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Discord</a></li>
+                        <li><a href="#">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Open Idea by Ecosyz. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Cookie Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Navigation background on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(10, 15, 10, 0.98)';
+                nav.style.boxShadow = '0 2px 30px rgba(76, 175, 80, 0.2)';
+            } else {
+                nav.style.background = 'rgba(10, 15, 10, 0.95)';
+                nav.style.boxShadow = 'none';
+            }
+        });
+
+        // Functions
+        function downloadWhitepaper() {
+            alert('📄 Whitepaper download initiated! Our comprehensive technical documentation and business plan will be sent to your email. Contact investors@ecosyz.com for immediate access.');
+        }
+
+        function viewORAADemo() {
+            alert('🚀 ORAA Live Demo launching! Contact hello@ecosyz.com to schedule a personalized demonstration of our research platform.');
+        }
+
+        function accessORAAGithub() {
+            alert('💻 Redirecting to ORAA GitHub repository. The open-source project will be available at github.com/ecosyz/oraa with full documentation and contribution guidelines.');
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            alert('✅ Message sent successfully! Our team will respond within 24 hours. For urgent matters, contact hello@ecosyz.com directly.');
+        }
+
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Initialize animations
+        document.querySelectorAll('.feature-card, .oraa-feature-card, .contact-method').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.8s ease';
+            observer.observe(el);
+        });
+
+        // Add some interactive hover effects
+        document.querySelectorAll('.tech-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.background = 'rgba(76, 175, 80, 0.2)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.background = 'rgba(76, 175, 80, 0.1)';
+            });
+        });
+    </script>
+</body>
+</html>
+                        <div class="oraa-feature-icon">⚡</div>
+                        <div class="oraa-feature-title">Real-time Analytics</div>
+                        <div class="oraa-feature-desc">Live data processing and visualization</div>
+                    </div>
+                    <div class="oraa-feature-card">
