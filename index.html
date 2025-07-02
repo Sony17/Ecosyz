@@ -7,15 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-text {
-            background: linear-gradient(90deg, #3b82f6, #10b981, #6366f1);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+       .gradient-text {
+        background: linear-gradient(90deg, #10b981, #059669, #047857);
+        -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
         .hero-gradient {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0fdf4 100%);
-        }
+            background: linear-gradient(135deg,
+            #ecfdf5 0%,
+            #d1fae5 50%,
+            #a7f3d0 100%);        }
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -37,20 +39,20 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="#" class="flex-shrink-0 flex items-center">
-                        <img class="h-8 w-auto" src="https://i.imgur.com/0OGkwxB.png" alt="Open Idea">
+                        <img class="h-8 w-auto" src="images/eco.png" alt="Open Idea">
                         <span class="ml-2 text-xl font-bold gradient-text">Open Idea</span>
                     </a>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
-                    <a href="#resources" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Open Resources</a>
-                    <a href="#create" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Create</a>
-                    <a href="#whitepaper" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Whitepaper</a>
-                    <button class="p-2 rounded-full text-gray-600 hover:text-gray-900">
+                    <a href="open_resources.html" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Open Resources</a>
+                    <a href="#project" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Projects</a>
+                    <a href="#whitepaper" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Whitepaper</a>
+                    <button class="p-2 rounded-full text-gray-600 hover:text-green-900">
                         <i class="fas fa-moon"></i>
                     </button>
                 </div>
                 <div class="-mr-2 flex items-center md:hidden">
-                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500">
                         <span class="sr-only">Open main menu</span>
                         <i class="fas fa-bars"></i>
                     </button>
@@ -79,18 +81,18 @@
                     </p>
                     <div class="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="#beta" class="px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-8">
+                            <a href="#beta" class="px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 md:py-4 md:text-lg md:px-8">
                                 Join the Beta
                             </a>
-                            <a href="#access" class="px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-8">
+                            <a href="#access" class="px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-green-00 hover:bg-green-400 md:py-4 md:text-lg md:px-8">
                                 Get Early Access
                             </a>
                         </div>
                     </div>
                 </div>
                 <div class="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-                    <div class="relative mx-auto w-full rounded-lg shadow-lg lg:max-w-md">
-                        <img class="w-full animate-float" src="https://i.imgur.com/0OGkwxB.png" alt="Open Innovation">
+                    <div class="relative mx-auto w-full rounded-lg lg:max-w-md">
+                        <img class="w-full animate-float" src="images/eco.png" alt="Open Innovation">
                     </div>
                 </div>
             </div>
@@ -763,17 +765,17 @@
             </div>
             <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <div class="flex items-center">
-                    <img class="h-8 w-auto" src="https://i.imgur.com/0OGkwxB.png" alt="ECOSYZ">
+                    <img class="h-8 w-auto" src="images/eco.png" alt="ECOSYZ">
                     <span class="ml-2 text-xl font-bold text-white">ECOSYZ</span>
                 </div>
                 <p class="mt-4 md:mt-0 text-base text-gray-400">
                     Empowering Open, Sustainable Innovation
                 </p>
                 <div class="mt-4 md:mt-0 flex space-x-6">
-                    <a href="https://discord.gg/ecosyz" class="text-gray-400 hover:text-white">
+                    <a href="https://discord.gg/4weahHXQYY" class="text-gray-400 hover:text-white">
                         <i class="fab fa-discord text-xl"></i>
                     </a>
-                    <a href="https://linkedin.com/company/ecosyz" class="text-gray-400 hover:text-white">
+                    <a href="https://www.linkedin.com/company/ecosyz/" class="text-gray-400 hover:text-white">
                         <i class="fab fa-linkedin text-xl"></i>
                     </a>
                     <a href="https://twitter.com/ecosyz" class="text-gray-400 hover:text-white">
