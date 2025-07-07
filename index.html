@@ -47,7 +47,7 @@
                     <a href="open_resources.html" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Open Resources</a>
                     <a href="#project" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Projects</a>
                     <a href="#whitepaper" class="text-green-900 hover:text-green-600 px-3 py-2 text-sm font-medium">Whitepaper</a>
-                    <button class="p-2 rounded-full text-gray-600 hover:text-green-900">
+                    <button id="dark-mode-toggle" class="p-2 rounded-full text-gray-600 hover:text-green-900">
                         <i class="fas fa-moon"></i>
                     </button>
                 </div>
@@ -809,7 +809,7 @@
         });
 
         // Toggle dark mode
-        const darkModeToggle = document.querySelector('nav button');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
         darkModeToggle.addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             const icon = darkModeToggle.querySelector('i');
