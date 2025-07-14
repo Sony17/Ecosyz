@@ -1,0 +1,53 @@
+# Dependency directories
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Next.js build output
+.next/
+out/
+dist/
+
+# Vercel deployment
+.vercel/
+
+# Optional: TypeScript
+*.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+
+# Mac system files
+*.DS_Store
+
+# Coverage directory used by testing tools
+coverage/
+
+# Misc
+*.log
+*.tgz
+*.swp
+
+# Optional: Local .env files (for safety)
+.envrc
+.env.test
+
+# Optional: Build artifacts
+build/
+tmp/
+temp/
+.cache/
