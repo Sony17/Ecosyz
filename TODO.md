@@ -13,8 +13,6 @@
 - [ ] **[Frontend][Backend][Growth] Get Early Access Flow**  
       Create a seamless early access registration/onboarding flow.
 
-- [ ] **[Frontend][Backend] Join Waitlist**  
-      Allow users to join the waitlist with a simple onboarding process.
 
 - [ ] **[Frontend][Growth] Newsletter Subscription**  
       Add and connect a newsletter sign-up form.
