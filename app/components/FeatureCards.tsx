@@ -2,7 +2,7 @@
 
 export default function FeatureCards() {
   return (
-    <section className="py-20 bg-gradient-to-br from-[#10171a] via-[#0f2220] to-[#0d1619] text-white relative">
+<section className="py-20 bg-gradient-to-br from-[#10171a] via-[#0f2220] to-[#0d1619] text-white relative">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-radial from-emerald-500/20 to-transparent blur-3xl" />
       </div>
