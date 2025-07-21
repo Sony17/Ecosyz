@@ -19,13 +19,13 @@ export default function WhitepaperPage() {
         Democratizing Innovation Through Unified Open Knowledge
       </p>
       <div className="mt-8 flex justify-center space-x-4">
-       <a
-  href="https://raw.githubusercontent.com/Sony17/Ecosyz/main/Open%20Idea.pdf"
-  download="Open_Idea_Whitepaper.pdf"
-  className="px-6 py-3 rounded-md bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold shadow hover:scale-105 transition"
->
-  Download PDF
-</a>
+        <a
+          href="https://github.com/Sony17/Ecosyz/blob/main/Open%20Idea.pdf?raw=true"
+          download="Open_Idea_Whitepaper.pdf"
+          className="px-6 py-3 rounded-md bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold shadow hover:scale-105 transition"
+        >
+          Download PDF
+        </a>
       </div>
     </div>
   </section>
