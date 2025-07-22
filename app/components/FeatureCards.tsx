@@ -2,20 +2,25 @@
 
 export default function FeatureCards() {
   return (
-<section className="py-20 bg-gradient-to-br from-[#10171a] via-[#0f2220] to-[#0d1619] text-white relative">
+    <section className="bg-gradient-to-br from-[#0c2321] via-[#121f22] to-[#0a1016] py-20 text-white relative">
+      {/* Optional spotlight gradient for visual pop, keep if you like */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-radial from-emerald-500/20 to-transparent blur-3xl" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-transparent bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text mb-4 animate-glow">
-            Unifying open research, code, data, and designs
-          </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-teal-100/80 font-medium">
-            Discover every open resource you need—research, code, datasets, designs, and more—in one powerful search. Turn inspiration into action: start projects, remix ideas, and join a thriving community of innovators, makers, and thinkers. Accelerate your vision. Multiply your impact.
-          </p>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 tracking-tight max-w-2xl mx-auto text-center leading-tight uppercase">
+    Unifying open research, code, data, designs
+
+</h2>
+
+<p className="mt-4 max-w-2xl mx-auto text-lg text-teal-100/80 font-medium ">
+  Discover every open resource—research, code, datasets, designs, and more—all in one place. Start projects, remix ideas, and connect with innovators to accelerate your impact.
+</p>
+
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* --- Cards stay the same --- */}
           <div className="p-8 rounded-xl border border-emerald-400/40 bg-[#172024] hover:shadow-[0_0_24px_#12ffb890] transition text-center">
             <div className="mx-auto mb-4 flex items-center justify-center h-12 w-12 rounded-full bg-blue-600/70 text-cyan-300 shadow">
               <i className="fas fa-search text-2xl"></i>

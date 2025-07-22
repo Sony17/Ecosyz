@@ -11,9 +11,9 @@ export default function WhitepaperPage() {
   <section className="hero-gradient py-20 relative">
     <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[300px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none"/>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
         <span className="block">Open Idea</span>
-        <span className="block bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow drop-shadow-lg">Whitepaper</span>
+        <span >Whitepaper</span>
       </h1>
       <p className="mt-4 text-xl text-teal-100/90 sm:text-2xl sm:max-w-xl sm:mx-auto md:mt-5">
         Democratizing Innovation Through Unified Open Knowledge
@@ -60,7 +60,8 @@ export default function WhitepaperPage() {
   {/* 1. Mission and Vision */}
   <section id="mission" className="py-16">
     <div className="max-w-5xl mx-auto px-4 sm:px-6">
-      <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow mb-8">1. Mission and Vision</h2>
+                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center">1. Mission and Vision</h2>
+
       <div className="bg-[#182925]/80 p-6 rounded-xl mb-6 shadow-lg border border-emerald-400/20">
         <p className="text-lg font-medium text-teal-100/90">Open Idea's mission is to democratize innovation by providing an open, AI-powered platform where impactful projects across all domains can launch, connect, and thrive together.</p>
       </div>

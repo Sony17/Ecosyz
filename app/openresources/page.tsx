@@ -24,9 +24,9 @@ const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none" />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="mt-2 text-4xl sm:text-5xl font-extrabold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-400 bg-clip-text text-transparent animate-glow drop-shadow-lg">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
               Open Resources
-            </p>
+            </h2>
             <p className="mt-6 text-xl text-teal-100/90 max-w-2xl mx-auto font-medium">
               Freely accessible, reusable, and modifiable assets to power your next big idea.
             </p>

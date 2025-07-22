@@ -13,7 +13,7 @@ export default function Projects() {
 
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="text-center mb-16">
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-400 bg-clip-text text-transparent animate-glow mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
               Explore Open Projects
             </h1>
             <p className="text-lg text-teal-100/80 font-medium max-w-2xl mx-auto">

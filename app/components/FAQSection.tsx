@@ -20,23 +20,24 @@ const faqs = [
 ];
 
 export default function FAQSection() {
-const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <div>
       <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-40 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-      <section className="py-20 bg-gradient-to-br from-[#142622] via-[#152624] to-[#1b2a26] text-white relative">
+      <section className="pt-8 pb-20 bg-gradient-to-br from-[#142622] via-[#152624] to-[#1b2a26] text-white relative">
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-12">
-            <p className="mt-2 text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-300 via-teal-400 to-cyan-300 bg-clip-text animate-glow">
+          <div className="lg:text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text tracking-tight text-center mb-3">
               Frequently Asked Questions
-            </p>
+            </h2>
           </div>
           <div className="space-y-6">
             {faqs.map((faq, idx) => (
               <div
                 key={idx}
-                className="rounded-lg border border-teal-400/30 bg-[#182925]/80 shadow hover:shadow-[0_0_14px_#30ffb08f] transition"
+                className="rounded-lg border border-teal-400/30 bg-[#182925]/80 shadow transition-all duration-200
+                  hover:border-emerald-400 hover:shadow-[0_0_20px_#10b98190] hover:scale-102"
               >
                 <button
                   className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
