@@ -8,7 +8,7 @@ export default function CommunitySection() {
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text tracking-tight text-center mb-3">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             Our DNA and Community
           </h2>
           <p className="mt-2 max-w-2xl mx-auto text-base sm:text-lg text-teal-100/80 font-medium text-center">

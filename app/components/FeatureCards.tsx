@@ -9,7 +9,7 @@ export default function FeatureCards() {
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center mb-16">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 tracking-tight max-w-2xl mx-auto text-center leading-tight uppercase">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
     Unifying open research, code, data, designs
 
 </h2>

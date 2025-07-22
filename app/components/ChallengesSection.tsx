@@ -8,7 +8,7 @@ export default function ChallengesSection() {
       <div className="absolute left-[-150px] bottom-[-120px] w-[350px] h-[200px] bg-gradient-radial from-emerald-400/20 to-transparent blur-3xl pointer-events-none" />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             WHAT’S BROKEN TODAY
           </h2>
         </div>

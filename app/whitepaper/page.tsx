@@ -12,8 +12,10 @@ export default function WhitepaperPage() {
     <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[300px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none"/>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
-        <span className="block">Open Idea</span>
-        <span >Whitepaper</span>
+                 
+
+        <span className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">Open Idea</span>
+        <span > Whitepaper</span>
       </h1>
       <p className="mt-4 text-xl text-teal-100/90 sm:text-2xl sm:max-w-xl sm:mx-auto md:mt-5">
         Democratizing Innovation Through Unified Open Knowledge
@@ -60,7 +62,7 @@ export default function WhitepaperPage() {
   {/* 1. Mission and Vision */}
   <section id="mission" className="py-16">
     <div className="max-w-5xl mx-auto px-4 sm:px-6">
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center">1. Mission and Vision</h2>
+      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">1. Mission and Vision</h1>
 
       <div className="bg-[#182925]/80 p-6 rounded-xl mb-6 shadow-lg border border-emerald-400/20">
         <p className="text-lg font-medium text-teal-100/90">Open Idea's mission is to democratize innovation by providing an open, AI-powered platform where impactful projects across all domains can launch, connect, and thrive together.</p>
@@ -87,12 +89,81 @@ export default function WhitepaperPage() {
       </div>
     </div>
   </section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+{/* Fragmentation Problem Section */}
+<section id="problem" className="py-20 bg-gradient-to-br from-[#121b1a] via-[#172524] to-[#121819] text-white">
+  <div className="max-w-5xl mx-auto px-4 sm:px-6">
+    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-8 uppercase">
+      2. The Fragmentation Problem in Open Knowledge
+    </h2>
+
+    <div className="bg-[#172921]/80 border-l-4 border-cyan-400 p-6 rounded-xl shadow mb-8">
+      <p className="text-lg font-medium text-teal-100/90">
+        Open source and open knowledge are growing exponentially – GitHub's 2024 data shows over 518 million projects (25% YoY growth) and nearly 1 billion contributions to open source, alongside a surge in AI projects.
+      </p>
+    </div>
+
+    <p className="mb-6 text-teal-100/80">
+      This explosive growth of open content highlights the opportunity – and challenge – of harnessing dispersed knowledge. Despite the tremendous growth of open-access publications, open-source software, open data, and other open resources, the landscape is highly fragmented. Valuable knowledge is scattered across siloed platforms and formats, making it difficult for innovators to find what they need and connect the dots.
+    </p>
+
+    <h3 className="text-2xl font-semibold text-cyan-200 mb-6">Key Pain Points:</h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* 1. Scattered Resources */}
+      <div className="rounded-xl border border-emerald-400/20 bg-[#152521]/80 p-6 shadow hover:shadow-[0_0_16px_#30ffe07c] transition">
+        <div className="flex items-center mb-3">
+          <span className="bg-emerald-700/30 p-2 rounded-full mr-3">
+            <i className="fas fa-random text-emerald-300"></i>
+          </span>
+          <h4 className="text-lg font-medium text-emerald-200">Scattered Resources</h4>
+        </div>
+        <p className="text-teal-100/80">
+          Open knowledge is spread across countless repositories, journals, and websites. Researchers must search one site for papers, another for code, another for datasets, etc.
+        </p>
+      </div>
+      {/* 2. Heterogeneous Data */}
+      <div className="rounded-xl border border-cyan-400/20 bg-[#162729]/80 p-6 shadow hover:shadow-[0_0_16px_#38bdf87c] transition">
+        <div className="flex items-center mb-3">
+          <span className="bg-cyan-700/30 p-2 rounded-full mr-3">
+            <i className="fas fa-database text-cyan-300"></i>
+          </span>
+          <h4 className="text-lg font-medium text-cyan-200">Heterogeneous Data</h4>
+        </div>
+        <p className="text-teal-100/80">
+          Each domain uses different formats and metadata standards. Software projects, research papers, datasets, and hardware designs all describe content differently.
+        </p>
+      </div>
+      {/* 3. Licensing Barriers */}
+      <div className="rounded-xl border border-purple-400/20 bg-[#18192b]/80 p-6 shadow hover:shadow-[0_0_16px_#a48cff7c] transition">
+        <div className="flex items-center mb-3">
+          <span className="bg-purple-700/30 p-2 rounded-full mr-3">
+            <i className="fas fa-balance-scale text-purple-300"></i>
+          </span>
+          <h4 className="text-lg font-medium text-purple-200">Licensing Barriers</h4>
+        </div>
+        <p className="text-teal-100/80">
+          Even "open" resources come with varied licenses (MIT, GPL, Creative Commons, etc.) and conditions. Combining a public dataset with an open-source algorithm can trigger legal uncertainty.
+        </p>
+      </div>
+    </div>
+
+    <div className="mt-8 bg-[#162322]/90 p-6 rounded-lg border border-cyan-400/10 shadow text-teal-100/90 italic text-lg">
+      "Although nearly 38% of global research articles are now published open access (up from just 11% a decade ago), much of that knowledge isn't reaching software developers or entrepreneurs who could apply it."
+    </div>
+
+    <p className="mt-6 text-teal-100/80">
+      These fragmentation issues mean lost opportunities – innovations that could happen if disparate knowledge were easier to find and integrate often don't happen. In short, open knowledge is abundant but disjointed, limiting its potential impact.
+    </p>
+  </div>
+</section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+
 {/* Solution Section */}
 <section id="solution" className="py-20 bg-gradient-to-br from-[#101b1d] via-[#112124] to-[#11181c] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow">
-      3. Open Idea: A Unified Solution
-    </h2>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase"> 3. Open Idea: A Unified Solution</h1>
+
+    
     <p className="mb-6 text-teal-100/90">
       Open Idea addresses the fragmentation head-on by serving as a unified, AI-powered platform for all open resources. It acts as a one-stop hub where users can seamlessly discover and utilize open knowledge across domains, transforming isolated information into integrated action.
     </p>
@@ -144,12 +215,16 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+
 {/* How the System Works */}
 <section id="system" className="py-20 bg-gradient-to-br from-[#10241d] via-[#16252a] to-[#182025] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow">
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
       4. How the System Works
     </h2>
+
     <p className="mb-6 text-teal-100/90">
       Open Idea's platform workflow combines powerful search technology, AI-driven enrichment, and collaborative project workspaces. From a user's perspective, the journey on Open Idea might look like this:
     </p>
@@ -185,12 +260,16 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+
 {/* User Types & Use Cases */}
 <section id="users" className="py-20 bg-gradient-to-br from-[#11212a] via-[#132921] to-[#181822] text-white">
   <div className="max-w-7xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow">
-      5. User Types and Use Cases
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+   5. User Types and Use Cases
     </h2>
+       
+
     <p className="mb-8 text-teal-100/90">
       Open Idea is designed to serve a broad spectrum of users—essentially anyone driven to create or learn using open resources.
     </p>
@@ -250,11 +329,13 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+
 {/* Technology Stack */}
 <section id="technology" className="py-20 bg-gradient-to-br from-[#132926] via-[#192129] to-[#181e24] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow">
-      6. Technology Stack and Architecture
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+   6. Technology Stack and Architecture
     </h2>
     <p className="mb-8 text-teal-100/90">
       Open Idea’s tech stack is open, modular, and scalable—reflecting our mission to embrace open-source and adapt to diverse content.
@@ -286,12 +367,13 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Monetization Strategy */}
 <section id="monetization" className="py-20 bg-gradient-to-br from-[#131f21] via-[#152624] to-[#0f191c] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow mb-8">
-      7. Monetization Strategy
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+   7. Monetization Strategy
     </h2>
     <p className="mb-4 text-teal-100/90">
       As an open-oriented platform, Open Idea will always provide core discovery and collaboration features for free to maximize community participation. However, to sustain and grow the platform, a sustainable monetization strategy is planned, focused on value-added services and partnerships rather than paywalling knowledge.
@@ -335,14 +417,13 @@ export default function WhitepaperPage() {
   </div>
 </section>
 
-  {/* Insert a divider */}
-  <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-30 my-8" />
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Roadmap and Milestones */}
 <section id="roadmap" className="py-20 bg-gradient-to-br from-[#12271c] via-[#152624] to-[#1a2926] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow mb-8">
-      8. Roadmap and Milestones
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+        8. Roadmap and Milestones
     </h2>
     <p className="mb-4 text-teal-100/90">
       Open Idea is in early-stage development, and the path from a mini-MVP to the fully realized platform is mapped out in iterative phases. Each phase of the roadmap focuses on delivering key features, testing with users, and expanding the open resource base.
@@ -387,11 +468,14 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
+
 {/* Call to Action */}
 <section id="action" className="py-20 bg-gradient-to-br from-[#152624] via-[#12362f] to-[#1b2a26] text-white">
   <div className="max-w-7xl mx-auto px-4 sm:px-6">
-    <h2 className="text-3xl font-bold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow mb-8">
-      9. Call to Action
+  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+        9. Call to Action
     </h2>
     <p className="mb-4 text-teal-100/90">
       Open Idea is more than just a product—it's a movement to unlock the world's knowledge for collective progress. We invite you to join us on this journey:
@@ -441,13 +525,14 @@ export default function WhitepaperPage() {
     </div>
   </div>
 </section>
+<div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
   {/* Final CTA */}
   <section className="py-16 bg-gradient-to-br from-[#12281e] via-[#162624] to-[#152620] text-white">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h2 className="text-3xl font-extrabold bg-gradient-to-r from-emerald-300 via-cyan-400 to-teal-300 bg-clip-text text-transparent animate-glow mb-3">
-        Ready to Join the Open Innovation Movement?
-      </h2>
+  <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
+   Ready to Join the Open Innovation Movement?
+      </h1>
       <p className="mt-4 max-w-2xl mx-auto text-xl text-teal-100/90">
         Be part of shaping the future of collaborative problem-solving.
       </p>
@@ -460,7 +545,7 @@ export default function WhitepaperPage() {
         </a>
       </div>
     </div>
-  </section>
+  </section> 
 </div>
       </main>
       <Footer />

@@ -28,7 +28,7 @@ export default function FAQSection() {
       <section className="pt-8 pb-20 bg-gradient-to-br from-[#142622] via-[#152624] to-[#1b2a26] text-white relative">
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text tracking-tight text-center mb-3">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
               Frequently Asked Questions
             </h2>
           </div>
