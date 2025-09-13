@@ -1,0 +1,24 @@
+[
+  {
+    "id": "1",
+    "type": "paper",
+    "title": "A Study on Open Science",
+    "authors": ["Alice Smith"],
+    "year": 2022,
+    "source": "openalex",
+    "url": "https://openalex.org/1",
+    "license": "MIT",
+    "meta": { "doi": "10.1234/abcde" }
+  },
+  {
+    "id": "2",
+    "type": "paper",
+    "title": "A Study on Open Science",
+    "authors": ["Alice Smith"],
+    "year": 2022,
+    "source": "arxiv",
+    "url": "https://arxiv.org/abs/1",
+    "license": "",
+    "meta": { "doi": "10.1234/abcde" }
+  }
+]

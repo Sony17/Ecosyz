@@ -1,0 +1,24 @@
+[
+  {
+    "id": "5",
+    "type": "dataset",
+    "title": "Climate Data",
+    "authors": ["Carol"],
+    "year": 2020,
+    "source": "zenodo",
+    "url": "https://zenodo.org/record/5",
+    "license": "CC-BY-4.0",
+    "meta": { "doi": "10.5678/zenodo.5" }
+  },
+  {
+    "id": "6",
+    "type": "dataset",
+    "title": "Climate Data",
+    "authors": ["Carol"],
+    "year": 2020,
+    "source": "ckan",
+    "url": "https://datahub.io/5",
+    "license": "",
+    "meta": { "doi": "10.5678/zenodo.5" }
+  }
+]

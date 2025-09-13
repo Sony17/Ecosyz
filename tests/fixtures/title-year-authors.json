@@ -1,0 +1,24 @@
+[
+  {
+    "id": "7",
+    "type": "paper",
+    "title": "Deep Learning for Science",
+    "authors": ["Dana"],
+    "year": 2023,
+    "source": "openalex",
+    "url": "https://openalex.org/7",
+    "license": "MIT",
+    "meta": {}
+  },
+  {
+    "id": "8",
+    "type": "paper",
+    "title": "Deep Learning for Science",
+    "authors": ["Dana"],
+    "year": 2023,
+    "source": "arxiv",
+    "url": "https://arxiv.org/abs/7",
+    "license": "",
+    "meta": {}
+  }
+]
