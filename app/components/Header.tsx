@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { Container } from "./ui/Container";
 
 const NAV_LINKS = [
   { href: "/openresources", label: "Resources" },
@@ -51,7 +52,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-black/40 border-b border-white/10 h-14">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6">
+      <Container>
         <div className="h-14 flex items-center justify-between relative">
           {/* Brand left */}
           <Link href="/" className="flex items-center gap-2 shrink-0 focus:outline-none focus:ring-2 focus:ring-emerald-400/60">
@@ -102,7 +103,7 @@ export default function Header() {
             </svg>
           </button>
         </div>
-      </div>
+  </Container>
       {/* Mobile nav panel */}
       <div
         id="mobile-nav"

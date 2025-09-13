@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Container } from '../components/ui/Container';
 
 const FILTERS = [
   { label: 'All', value: 'all' },
@@ -47,9 +48,10 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0c2321] via-[#121f22] to-[#0a1016]">
+    <div className="min-h-screen bg-zinc-950 text-white">
       <Header />
-      <main className="max-w-4xl mx-auto py-12 px-4">
+      <Container>
+        <main className="py-12">
         <h1 className="text-4xl font-extrabold tracking-tight text-white mb-8">Federated Search</h1>
         {/* Tabs for resource types */}
         <div className="flex gap-2 mb-6">
@@ -137,7 +139,8 @@ export default function SearchPage() {
             </div>
           ))}
         </div>
-      </main>
+        </main>
+      </Container>
       <Footer />
     </div>
   );

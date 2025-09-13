@@ -1,14 +1,14 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Container } from '../components/ui/Container';
 
 export default function CommunityPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-zinc-950 text-white">
       <Header />
-      <main className="flex-grow p-8">
-        <div className="min-h-screen  text-white">
-     
-      <div className="max-w-6xl mx-auto px-4 py-16">
+      <Container>
+        <main className="flex-grow py-16">
+          <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             Join Our Community
@@ -43,9 +43,9 @@ export default function CommunityPage() {
             Join Discord
           </a>
         </div>
-      </div>
-    </div>
-      </main>
+        </div>
+        </main>
+      </Container>
       <Footer />
     </div>
   );
