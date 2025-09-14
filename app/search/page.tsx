@@ -56,8 +56,9 @@ export default function SearchPage() {
       if (!res.ok) throw new Error('Summarization failed');
       const data = await res.json();
       const summary = data.summary || 'No summary available';
-      // Attach summary to the item in-place
-      setResults(prev => prev.map(r => (r.id === item.id ? { ...r, summary } : r)));
+      // Attach summary to the matching item (by id/url/title fallback)
+      const key = item.id || item.url || item.title;
+      setResults(prev => prev.map(r => ((r.id || r.url || r.title) === key ? { ...r, summary } : r)));
     } catch (e: any) {
       alert(e.message || 'Failed to summarize');
     } finally {
