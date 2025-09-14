@@ -23,6 +23,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [summarizing, setSummarizing] = useState<string | null>(null);
   const TABS = [
     { label: 'All', value: 'all' },
     { label: 'Papers', value: 'paper' },
@@ -44,6 +45,23 @@ export default function SearchPage() {
       setError(e.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function summarizeItem(item: any) {
+    try {
+      setSummarizing(item.id || item.url || item.title);
+      const payload = item.description?.length ? { text: item.description } : { url: item.url };
+      const res = await fetch('/api/summarize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error('Summarization failed');
+      const data = await res.json();
+      const summary = data.summary || 'No summary available';
+      // Attach summary to the item in-place
+      setResults(prev => prev.map(r => (r.id === item.id ? { ...r, summary } : r)));
+    } catch (e: any) {
+      alert(e.message || 'Failed to summarize');
+    } finally {
+      setSummarizing(null);
     }
   }
 
@@ -130,10 +148,20 @@ export default function SearchPage() {
                 </div>
               )}
               <div className="text-sm text-gray-400 line-clamp-2 mb-2">{r.description}</div>
+              {r.summary && (
+                <div className="mt-2 p-3 rounded bg-emerald-900/20 border border-emerald-800 text-emerald-100 text-sm">
+                  <div className="font-semibold mb-1">Summary</div>
+                  <p className="whitespace-pre-wrap leading-relaxed">{r.summary}</p>
+                </div>
+              )}
               <div className="flex gap-2 mt-2">
                 <a href={r.url} target="_blank" rel="noopener" className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition">Open</a>
                 <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
-                <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Summarize</button>
+                <button
+                  className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold hover:bg-gray-800"
+                  onClick={() => summarizeItem(r)}
+                  disabled={!!summarizing}
+                >{summarizing && (summarizing === (r.id || r.url || r.title)) ? 'Summarizing...' : 'Summarize'}</button>
               </div>
               <span className="absolute right-4 top-4 text-xs text-gray-700">{r.score !== undefined ? `Score: ${r.score.toFixed(2)}` : ''}</span>
             </div>
