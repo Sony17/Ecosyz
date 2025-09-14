@@ -19,8 +19,9 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Documentation
 
-Additional guides covering setup, contributing, and design choices are
-available in the [docs](.github/docs/README.md) directory.
+- Summarization design and API: see [`docs/summarization.md`](docs/summarization.md)
+- Additional guides covering setup, contributing, and design choices are
+	available in the [docs](.github/docs/README.md) directory.
 
 ## Contributing
 

@@ -41,6 +41,21 @@ function OpenResourcesPage() {
   const [hasMore, setHasMore] = useState<boolean | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const activeAbort = useRef<AbortController | null>(null);
+  const [summaries, setSummaries] = useState<Record<string, any>>({});
+  const [summarizingId, setSummarizingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: 'error'|'info'; message: string } | null>(null);
+  const [summaryModal, setSummaryModal] = useState<{
+    open: boolean;
+    key: string | null;
+    data: {
+      modeUsed?: 'quick'|'deep';
+      fromCache?: boolean;
+      cache?: 'kv'|'memory'|'none';
+      tldr?: string;
+      bullets?: string[];
+      tags?: string[];
+    } | null;
+  }>({ open: false, key: null, data: null });
 
   // Friendly display names for providers
   const PROVIDER_LABELS: Record<string, string> = {
@@ -86,6 +101,10 @@ function OpenResourcesPage() {
     const qs = sp.toString();
     // Use replace to avoid stacking history on every pagination
     router.replace(`/openresources${qs ? `?${qs}` : ''}` as any, { scroll: false } as any);
+  }
+
+  function sanitizeText(s: any) {
+    return cleanDescription(typeof s === 'string' ? s : '');
   }
 
   async function search(
@@ -257,97 +276,181 @@ function OpenResourcesPage() {
                   </div>
                 )}
                 <div className="space-y-4 sm:space-y-6">
-                  {results.map((r, i) => (
-                    <div key={r.id || i} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3 relative">
-                      {/* Icon or badge could go here if desired */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
-                          {r.type && (
-                            <span className={`text-xs px-2 py-1 rounded font-bold border ${
-                              r.type === 'paper' ? 'bg-blue-900/30 text-blue-200 border-blue-800' :
-                              r.type === 'dataset' ? 'bg-yellow-900/30 text-yellow-200 border-yellow-800' :
-                              r.type === 'code' ? 'bg-purple-900/30 text-purple-200 border-purple-800' :
-                              r.type === 'model' ? 'bg-pink-900/30 text-pink-200 border-pink-800' :
-                              r.type === 'video' ? 'bg-red-900/30 text-red-200 border-red-800' :
-                              r.type === 'hardware' ? 'bg-green-900/30 text-green-200 border-green-800' :
-                              'bg-gray-800/80 text-gray-200 border-gray-700'
-                            }`}>
-                              {r.type === 'model' ? 'Model'
-                                : r.type === 'video' ? 'Video'
-                                : r.type === 'hardware' ? 'Hardware'
-                                : r.type.charAt(0).toUpperCase() + r.type.slice(1)}
-                            </span>
-                          )}
-                          {r.license && <span className="text-xs px-2 py-1 rounded bg-emerald-900/30 text-emerald-200 border border-emerald-800">{r.license}</span>}
-                          <div className="ml-auto flex items-center gap-3 text-xs text-white/60 font-semibold">
-                            {r.year && <span>{r.year}</span>}
-                            {typeof r.score === 'number' && (
-                              <span className="text-gray-400">Score: {r.score.toFixed(2)}</span>
+                  {results.map((r, i) => {
+                    const resKey = String(r.id || r.url || i);
+                    return (
+                      <div key={r.id || i} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3 relative">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
+                            {r.type && (
+                              <span className={`text-xs px-2 py-1 rounded font-bold border ${
+                                r.type === 'paper' ? 'bg-blue-900/30 text-blue-200 border-blue-800' :
+                                r.type === 'dataset' ? 'bg-yellow-900/30 text-yellow-200 border-yellow-800' :
+                                r.type === 'code' ? 'bg-purple-900/30 text-purple-200 border-purple-800' :
+                                r.type === 'model' ? 'bg-pink-900/30 text-pink-200 border-pink-800' :
+                                r.type === 'video' ? 'bg-red-900/30 text-red-200 border-red-800' :
+                                r.type === 'hardware' ? 'bg-green-900/30 text-green-200 border-green-800' :
+                                'bg-gray-800/80 text-gray-200 border-gray-700'
+                              }`}>
+                                {r.type === 'model' ? 'Model'
+                                  : r.type === 'video' ? 'Video'
+                                  : r.type === 'hardware' ? 'Hardware'
+                                  : r.type.charAt(0).toUpperCase() + r.type.slice(1)}
+                              </span>
                             )}
+                            {r.license && <span className="text-xs px-2 py-1 rounded bg-emerald-900/30 text-emerald-200 border border-emerald-800">{r.license}</span>}
+                            <div className="ml-auto flex items-center gap-3 text-xs text-white/60 font-semibold">
+                              {r.year && <span>{r.year}</span>}
+                              {typeof r.score === 'number' && (
+                                <span className="text-gray-400">Score: {r.score.toFixed(2)}</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-base sm:text-lg font-semibold text-white leading-snug mb-1">{r.title}</div>
-                        {/* Special fields for model/hardware/video */}
-                        {r.type === 'model' && r.meta?.pipeline && (
-                          <div className="text-xs text-pink-200 font-mono mb-1">Pipeline: {r.meta.pipeline}</div>
-                        )}
-                        {r.type === 'hardware' && r.meta?.cert_id && (
-                          <div className="text-xs text-green-200 font-mono mb-1">Cert ID: {r.meta.cert_id}</div>
-                        )}
-                        {r.type === 'video' && (r.meta?.duration || r.meta?.channel) && (
-                          <div className="text-xs text-red-200 font-mono mb-1">
-                            {r.meta?.duration && <>Duration: {r.meta.duration} </>}
-                            {r.meta?.channel && <>Channel: {r.meta.channel}</>}
-                          </div>
-                        )}
-                        <div className="text-xs sm:text-sm text-white/60 font-medium mb-1">{r.authors?.join(', ')}</div>
-                        {r.tags && r.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-1">
-                            {r.tags.map((tag: string, idx: number) => (
-                              <span key={idx} className="text-xs px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{tag}</span>
-                            ))}
-                          </div>
-                        )}
-                        <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{cleanDescription(r.description)}</div>
-                        <div className="flex gap-2 mt-2">
-                          {r.url ? (
-                            <a
-                              href={r.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition inline-flex items-center gap-1.5"
-                            >
-                              <span>Open</span>
-                              {/* External-link icon */}
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                className="h-3.5 w-3.5 opacity-90"
-                                aria-hidden="true"
-                                focusable="false"
-                              >
-                                <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69l-6.72 6.72a.75.75 0 1 0 1.06 1.06l6.72-6.72V7.5a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 17.75 2h-5.25z" />
-                                <path d="M6.25 4A2.25 2.25 0 0 0 4 6.25v7.5A2.25 2.25 0 0 0 6.25 16h7.5A2.25 2.25 0 0 0 16 13.75V10a.75.75 0 0 0-1.5 0v3.75c0 .414-.336.75-.75.75h-7.5a.75.75 0 0 1-.75-.75v-7.5c0-.414.336-.75.75-.75H10a.75.75 0 0 0 0-1.5H6.25z" />
-                              </svg>
-                            </a>
-                          ) : (
-                            <button
-                              className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed"
-                              title="No link available"
-                              disabled
-                            >
-                              Open
-                            </button>
+                          <div className="text-base sm:text-lg font-semibold text-white leading-snug mb-1">{r.title}</div>
+                          {/* Special fields for model/hardware/video */}
+                          {r.type === 'model' && r.meta?.pipeline && (
+                            <div className="text-xs text-pink-200 font-mono mb-1">Pipeline: {r.meta.pipeline}</div>
                           )}
-                          <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
-                          <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Summarize</button>
+                          {r.type === 'hardware' && r.meta?.cert_id && (
+                            <div className="text-xs text-green-200 font-mono mb-1">Cert ID: {r.meta.cert_id}</div>
+                          )}
+                          {r.type === 'video' && (r.meta?.duration || r.meta?.channel) && (
+                            <div className="text-xs text-red-200 font-mono mb-1">
+                              {r.meta?.duration && <>Duration: {r.meta.duration} </>}
+                              {r.meta?.channel && <>Channel: {r.meta.channel}</>}
+                            </div>
+                          )}
+                          <div className="text-xs sm:text-sm text-white/60 font-medium mb-1">{r.authors?.join(', ')}</div>
+                          {r.tags && r.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-1">
+                              {r.tags.map((tag: string, idx: number) => (
+                                <span key={idx} className="text-xs px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{tag}</span>
+                              ))}
+                            </div>
+                          )}
+                          <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{cleanDescription(r.description)}</div>
+                          <div className="flex gap-2 mt-2">
+                            {r.url ? (
+                              <a
+                                href={r.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition inline-flex items-center gap-1.5"
+                              >
+                                <span>Open</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 opacity-90" aria-hidden="true" focusable="false">
+                                  <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69l-6.72 6.72a.75.75 0 1 0 1.06 1.06l6.72-6.72V7.5a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 17.75 2h-5.25z" />
+                                  <path d="M6.25 4A2.25 2.25 0 0 0 4 6.25v7.5A2.25 2.25 0 0 0 6.25 16h7.5A2.25 2.25 0 0 0 16 13.75V10a.75.75 0 0 0-1.5 0v3.75c0 .414-.336.75-.75.75h-7.5a.75.75 0 0 1-.75-.75v-7.5c0-.414.336-.75.75-.75H10a.75.75 0 0 0 0-1.5H6.25z" />
+                                </svg>
+                              </a>
+                            ) : (
+                              <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed" title="No link available" disabled>Open</button>
+                            )}
+                            <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
+                            {r.type === 'paper' ? (
+                              <button
+                                className="px-4 py-1.5 bg-blue-600/80 hover:bg-blue-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
+                                disabled={summarizingId === resKey}
+                                onClick={async () => {
+                                  setToast(null);
+                                  setSummarizingId(resKey);
+                                  const mode = (r.source === 'arxiv' || r.source === 'openalex' || r.source === 'zenodo') ? 'deep' : 'quick';
+                                  try {
+                                    // Stream via SSE (GET)
+                                    const usp = new URLSearchParams({
+                                      id: String(r.id || ''),
+                                      source: String(r.source || ''),
+                                      title: String(r.title || ''),
+                                      abstract: String(r.description || ''),
+                                      url: String(r.url || ''),
+                                      mode,
+                                    });
+                                    const es = new EventSource(`/api/summarize?${usp.toString()}`);
+                                    const state: any = { tldr: '', bullets: [] as string[], tags: [] as string[], modeUsed: mode, fromCache: false, cache: 'none' };
+                                    es.addEventListener('meta', (ev: MessageEvent) => {
+                                      try {
+                                        const m = JSON.parse(ev.data);
+                                        state.modeUsed = m.modeUsed || m.modeRequested || state.modeUsed;
+                                        state.fromCache = Boolean(m.fromCache);
+                                        state.cache = (m.cache || 'none');
+                                        setSummaryModal({ open: true, key: resKey, data: { ...state } });
+                                      } catch {}
+                                    });
+                                    es.addEventListener('tldr', (ev: MessageEvent) => {
+                                      state.tldr = sanitizeText(ev.data);
+                                      setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                    });
+                                    es.addEventListener('bullets', (ev: MessageEvent) => {
+                                      try {
+                                        const arr = JSON.parse(ev.data);
+                                        state.bullets = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
+                                        setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                      } catch {}
+                                    });
+                                    es.addEventListener('tags', (ev: MessageEvent) => {
+                                      try {
+                                        const arr = JSON.parse(ev.data);
+                                        state.tags = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
+                                        setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                      } catch {}
+                                    });
+                                    es.addEventListener('error', (ev: MessageEvent) => {
+                                      try {
+                                        const d = JSON.parse(ev.data);
+                                        setToast({ type: 'error', message: d.message || 'Summarization failed' });
+                                      } catch {
+                                        setToast({ type: 'error', message: 'Summarization failed' });
+                                      }
+                                      es.close();
+                                      setSummarizingId(null);
+                                    });
+                                    es.addEventListener('done', () => {
+                                      es.close();
+                                      setSummaries(prev => ({ ...prev, [resKey]: { ...state } }));
+                                      setSummarizingId(null);
+                                    });
+                                  } catch (e: any) {
+                                    setToast({ type: 'error', message: e?.message || 'Summarization failed' });
+                                    setSummarizingId(null);
+                                  }
+                                }}
+                              >
+                                {summarizingId === resKey ? 'Summarizing…' : 'Summarize'}
+                              </button>
+                            ) : null}
+                          </div>
+                          {summaries[resKey] && (
+                            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="text-sm font-semibold text-emerald-300">Summary</div>
+                                <span className={`text-[10px] px-2 py-0.5 rounded border ${summaries[resKey].modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaries[resKey].modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
+                                {summaries[resKey].fromCache && (
+                                  <span className="text-[10px] px-2 py-0.5 rounded border bg-emerald-900/30 text-emerald-200 border-emerald-800">Cached: {summaries[resKey].cache}</span>
+                                )}
+                              </div>
+                              <div className="text-sm text-white/80 mb-2">{sanitizeText(summaries[resKey].tldr)}</div>
+                              {Array.isArray(summaries[resKey].bullets) && (
+                                <ul className="list-disc pl-5 text-xs text-white/70 space-y-1">
+                                  {summaries[resKey].bullets.map((b: string, idx: number) => (
+                                    <li key={idx}>{sanitizeText(b)}</li>
+                                  ))}
+                                </ul>
+                              )}
+                              {Array.isArray(summaries[resKey].tags) && summaries[resKey].tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {summaries[resKey].tags.map((t: string, idx: number) => (
+                                    <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{sanitizeText(t)}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {/* Score moved to header row to prevent overlap with year */}
                         </div>
-                        {/* Score moved to header row to prevent overlap with year */}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   {/* Skeletons while loading */}
                   {loading && (
                     <>
@@ -390,6 +493,53 @@ function OpenResourcesPage() {
             )}
           </div>
           {/* --- End Neon Search Bar + Federated Results --- */}
+
+          {/* Toasts */}
+          {toast && (
+            <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg shadow-lg border ${toast.type === 'error' ? 'bg-red-900/60 border-red-700 text-red-100' : 'bg-cyan-900/60 border-cyan-700 text-cyan-100'}`} role="status" aria-live="polite">
+              {toast.message}
+            </div>
+          )}
+
+          {/* Glassy summary modal */}
+          {summaryModal.open && summaryModal.data && (
+            <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSummaryModal({ open: false, key: null, data: null })} />
+              <div className="relative z-10 max-w-2xl w-full rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
+                <div className="p-5 sm:p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h3 className="text-lg font-semibold text-white">Summary</h3>
+                    <span className={`text-[10px] px-2 py-0.5 rounded border ${summaryModal.data.modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaryModal.data.modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
+                    {summaryModal.data.fromCache && (
+                      <span className="text-[10px] px-2 py-0.5 rounded border bg-emerald-900/30 text-emerald-200 border-emerald-800">Cached: {summaryModal.data.cache}</span>
+                    )}
+                  </div>
+                  {summaryModal.data.tldr ? (
+                    <p className="text-white/90 text-sm mb-3">{sanitizeText(summaryModal.data.tldr)}</p>
+                  ) : (
+                    <p className="text-white/60 text-sm mb-3">Preparing summary…</p>
+                  )}
+                  {Array.isArray(summaryModal.data.bullets) && summaryModal.data.bullets.length > 0 && (
+                    <ul className="list-disc pl-5 text-xs text-white/80 space-y-1">
+                      {summaryModal.data.bullets.map((b, i) => (
+                        <li key={i}>{sanitizeText(b)}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {Array.isArray(summaryModal.data.tags) && summaryModal.data.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {summaryModal.data.tags.map((t, i) => (
+                        <span key={i} className="text-[10px] px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{sanitizeText(t)}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-end gap-2 p-3 border-t border-white/10 bg-black/20">
+                  <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setSummaryModal({ open: false, key: null, data: null })}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* --- Original Resource Cards --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-10">
