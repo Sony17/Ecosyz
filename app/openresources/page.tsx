@@ -21,14 +21,29 @@ export default function OpenResourcesPage() {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [coverage, setCoverage] = useState<any>(null);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(30);
+  const [hasMore, setHasMore] = useState<boolean | null>(null);
 
-  async function search() {
+  async function search(
+    newPage = 1,
+    customQ = q,
+    customType = type,
+    customLimit = limit
+  ) {
+    if (!customQ) return; // Prevent search if query is empty
     setLoading(true); setError('');
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&type=${type}`);
+  const res = await fetch(`/api/search?q=${encodeURIComponent(customQ)}&type=${customType}&page=${newPage}&limit=${customLimit}` , { cache: 'no-store' });
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
-      setResults(data.results || []);
+  setResults(Array.isArray(data.results) ? data.results : []);
+      setCoverage(data.coverage || null);
+      setTotal(data.total || 0);
+      setPage(data.page || newPage);
+  setHasMore(typeof data.hasMore === 'boolean' ? data.hasMore : (Array.isArray(data.results) && data.results.length === customLimit));
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -65,7 +80,11 @@ export default function OpenResourcesPage() {
                     className="px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300/90 hover:bg-emerald-500/10 active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
                     data-active={type === tab.value}
                     style={type === tab.value ? { background: 'rgba(16, 185, 129, 0.12)' } : {}}
-                    onClick={() => setType(tab.value)}
+                    onClick={() => {
+                      setType(tab.value);
+                      setPage(1);
+                      search(1, q, tab.value);
+                    }}
                     disabled={loading}
                   >
                     {tab.label}
@@ -79,18 +98,50 @@ export default function OpenResourcesPage() {
                   placeholder="Search papers, datasets, code, models, videos..."
                   value={q}
                   onChange={e => setQ(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && search()}
+                  onKeyDown={e => e.key === 'Enter' && search(1)}
                 />
-                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-5 disabled:opacity-50 w-full sm:w-auto" onClick={search} disabled={loading}>
+                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-5 disabled:opacity-50 w-full sm:w-auto" onClick={() => search(1)} disabled={loading}>
                   {loading ? 'Searching...' : 'Search'}
                 </button>
+              </div>
+              {/* Page size selector */}
+              <div className="w-full max-w-2xl mt-3 flex items-center justify-end">
+                <label className="text-sm text-cyan-200 mr-2" htmlFor="page-size">Per page:</label>
+                <select
+                  id="page-size"
+                  className="h-9 rounded-md bg-zinc-900 text-cyan-100 border border-cyan-800 px-2"
+                  value={limit}
+                  onChange={(e) => {
+                    const newLimit = parseInt(e.target.value, 10) || 10;
+                    setLimit(newLimit);
+                    setPage(1);
+                    // Re-run search immediately with the new limit
+                    if (q) search(1, q, type, newLimit);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                </select>
               </div>
             </div>
             {/* Federated search results */}
             {(q || loading) && (
               <div className="w-full max-w-2xl mt-8">
+                {coverage && (
+                  <div className="mb-4 text-xs text-cyan-200 flex flex-wrap gap-3">
+                    <span className="font-bold text-cyan-300">Provider counts:</span>
+                    {Object.entries(coverage.receivedCounts || {}).map(([provider, count]) => (
+                      <span key={String(provider)} className="bg-cyan-900/40 px-2 py-1 rounded border border-cyan-800 text-cyan-100">{String(provider)}: {Number(count)}</span>
+                    ))}
+                  </div>
+                )}
                 {error && <div className="text-red-500 mb-4">{error}</div>}
-                {!loading && results.length === 0 && <div className="text-gray-400 text-lg text-center">No results.</div>}
+                {!loading && results.length === 0 && (
+                  <div className="text-gray-400 text-lg text-center">
+                    {page > 1 ? 'No results on this page.' : 'No results.'}
+                  </div>
+                )}
                 <div className="space-y-4 sm:space-y-6">
                   {results.map((r, i) => (
                     <div key={r.id || i} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3 relative">
@@ -150,6 +201,34 @@ export default function OpenResourcesPage() {
                     </div>
                   ))}
                 </div>
+                {/* Pagination controls */}
+                {q && total > 0 && (
+                  <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-8">
+                    <button
+                      className="px-3 py-1 rounded bg-cyan-800/60 text-cyan-100 disabled:opacity-50"
+                      onClick={() => { if (page > 1) search(page - 1, q, type); }}
+                      disabled={page === 1 || loading}
+                    >
+                      Previous
+                    </button>
+                    <span className="text-cyan-200">Page {page} of {Math.max(1, Math.ceil(total / limit))}</span>
+                    <button
+                      className="px-3 py-1 rounded bg-cyan-800/60 text-cyan-100 disabled:opacity-50"
+                      onClick={() => { if (hasMore) search(page + 1, q, type); }}
+                      disabled={!hasMore || loading}
+                    >
+                      Next
+                    </button>
+                    {/* Range indicator */}
+                    <span className="text-xs text-cyan-300 font-medium">
+                      {(() => {
+                        const start = (page - 1) * limit + 1;
+                        const end = Math.min(total, (page - 1) * limit + results.length);
+                        return `Showing ${start.toLocaleString()}–${end.toLocaleString()} of ${total.toLocaleString()}`;
+                      })()}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>

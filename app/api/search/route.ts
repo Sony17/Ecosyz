@@ -2,6 +2,7 @@
  * Federated search API route for Open Idea.
  */
 import { NextRequest, NextResponse } from 'next/server';
+export const revalidate = 0;
 import { searchOpenAlex } from './providers/openalex';
 import { searchArxiv } from './providers/arxiv';
 import { searchZenodo } from './providers/zenodo';
@@ -21,9 +22,9 @@ import { dedupeConservative } from './lib/dedupe';
 // - Uses Map for O(1) access and LRU eviction
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX = 100; // Max number of cached queries
-const cache = new Map<string, { ts: number; data: Resource[] }>();
+const cache = new Map<string, { ts: number; data: any }>();
 
-function getCache(key: string): Resource[] | undefined {
+function getCache(key: string): any | undefined {
   // Move accessed entry to the end (most recently used)
   const entry = cache.get(key);
   if (!entry) return undefined;
@@ -36,7 +37,7 @@ function getCache(key: string): Resource[] | undefined {
   return entry.data;
 }
 
-function setCache(key: string, data: Resource[]) {
+function setCache(key: string, data: any) {
   // Insert or update, then move to end (most recently used)
   if (cache.has(key)) cache.delete(key);
   cache.set(key, { ts: Date.now(), data });
@@ -64,7 +65,10 @@ export async function GET(req: NextRequest) {
   const debug = searchParams.get('debug') === '1';
   if (!q) return NextResponse.json({ error: 'Missing q' }, { status: 400 });
 
-  const cacheKey = `${q}:${type}`;
+  // Pagination params must be part of the cache key
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || '30', 10);
+  const cacheKey = `${q}:${type}:${page}:${limit}`;
   const cached = getCache(cacheKey);
   if (cached) return NextResponse.json(cached);
 
@@ -96,19 +100,31 @@ export async function GET(req: NextRequest) {
   if (type && type !== 'all') all = all.filter(r => r.type === type);
   all.forEach(r => (r.score = scoreResource(r, q)));
   const dedupeResult = dedupeConservative(all);
-  const deduped = dedupeResult.items
-    .sort((a, b) => (b.score || 0) - (a.score || 0))
-    .slice(0, 30);
-  setCache(cacheKey, deduped);
-  const coverage = {
-    requestedProviders: providerFns.map(p => p.name),
-    receivedCounts: Object.fromEntries(Object.entries(results).map(([k, v]) => [k, v.length])),
-    uniqueBefore: all.length,
-    uniqueAfter: dedupeResult.items.length,
-    merged: dedupeResult.merged,
-    // Documented in docs/specs/providers.md
+  const deduped = dedupeResult.items.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  // Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginated = deduped.slice(start, end);
+  const hasMore = end < deduped.length;
+
+  // Build response before caching so we cache the entire payload
+  const resp: any = {
+    results: paginated,
+    total: deduped.length,
+    page,
+    limit,
+    hasMore,
+    coverage: {
+      requestedProviders: providerFns.map(p => p.name),
+      receivedCounts: Object.fromEntries(Object.entries(results).map(([k, v]) => [k, v.length])),
+      uniqueBefore: all.length,
+      uniqueAfter: dedupeResult.items.length,
+      merged: dedupeResult.merged,
+      // Documented in docs/specs/providers.md
+    }
   };
-  const resp: any = { results: deduped, coverage };
+  setCache(cacheKey, resp);
   // See docs/specs/dedupe-pipeline.md and docs/specs/providers.md for details
   if (debug) resp.decisions = dedupeResult.decisions;
   return NextResponse.json(resp);
