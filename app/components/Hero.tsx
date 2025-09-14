@@ -39,19 +39,19 @@ export default function Hero() {
             <div className="grid lg:grid-cols-12 gap-16 items-center min-h-[70vh]">
               {/* Text */}
               <div className="lg:col-span-6 text-center lg:text-left">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight mb-4">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight mb-4">
                   <span className="block mb-1 text-gray-100">The future of</span>
-                  <span className="block font-extrabold text-5xl md:text-6xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-300 bg-clip-text text-transparent tracking-tight mb-4">
+                  <span className="block font-extrabold text-4xl sm:text-5xl md:text-6xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-300 bg-clip-text text-transparent tracking-tight mb-4">
                     INNOVATION
                   </span>
                 </h1>
-                <p className="text-lg md:text-xl text-teal-100/90 font-medium mt-6">
+                <p className="text-base sm:text-lg md:text-xl text-teal-100/90 font-medium mt-6">
                   The World&apos;s Open Innovation Infrastructure
                 </p>
-                <p className="mt-2 text-teal-200/70 text-lg md:text-xl">
+                <p className="mt-2 text-teal-200/70 text-base sm:text-lg md:text-xl">
                   Where open minds meet open knowledge—dream it, build it, and change the world together.
                 </p>
-                <div className="mt-10 flex flex-col sm:flex-row sm:justify-start gap-4 justify-center">
+                <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row sm:justify-start gap-4 justify-center">
                   <button
                     type="button"
                     onClick={() => setOpen(true)}

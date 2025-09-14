@@ -7,15 +7,14 @@ export default function JoinRevolution() {
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-radial from-emerald-500/10 to-transparent blur-3xl" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center mb-10">
+        <div className="lg:text-center mb-8 sm:mb-10">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             Shape What’s Next
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10">
           {/* Card 1 */}
-          <div className="text-center bg-[#172421]/70 rounded-xl shadow-lg p-8 border border-teal-400/20
-            transition-all duration-200 hover:border-emerald-400 hover:shadow-[0_0_32px_#10b98180] hover:scale-105 hover:-translate-y-2">
+          <div className="text-center glass-card glass-border rounded-xl p-8 transition-all duration-200 hover:-translate-y-2">
             <div className="mx-auto mb-4 flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-emerald-400/80 to-cyan-400/70 text-white shadow">
               <i className="fas fa-flask text-2xl"></i>
             </div>
@@ -30,8 +29,7 @@ export default function JoinRevolution() {
             </div>
           </div>
           {/* Card 2 */}
-          <div className="text-center bg-[#172421]/70 rounded-xl shadow-lg p-8 border border-teal-400/20
-            transition-all duration-200 hover:border-cyan-400 hover:shadow-[0_0_32px_#22d3ee80] hover:scale-105 hover:-translate-y-2">
+          <div className="text-center glass-card glass-border rounded-xl p-8 transition-all duration-200 hover:-translate-y-2">
             <div className="mx-auto mb-4 flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-teal-500/80 to-emerald-400/70 text-white shadow">
               <i className="fas fa-briefcase text-2xl"></i>
             </div>
@@ -46,8 +44,7 @@ export default function JoinRevolution() {
             </div>
           </div>
           {/* Card 3 */}
-          <div className="text-center bg-[#172421]/70 rounded-xl shadow-lg p-8 border border-teal-400/20
-            transition-all duration-200 hover:border-purple-400 hover:shadow-[0_0_32px_#a78bfa80] hover:scale-105 hover:-translate-y-2">
+          <div className="text-center glass-card glass-border rounded-xl p-8 transition-all duration-200 hover:-translate-y-2">
             <div className="mx-auto mb-4 flex items-center justify-center h-12 w-12 rounded-full bg-gradient-to-br from-cyan-400/80 to-emerald-400/70 text-white shadow">
               <i className="fas fa-globe-americas text-2xl"></i>
             </div>

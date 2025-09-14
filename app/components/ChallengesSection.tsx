@@ -14,7 +14,7 @@ export default function ChallengesSection() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Problems */}
-          <div className="bg-[#192527] p-8 rounded-xl border border-red-400/40 shadow-lg shadow-red-400/10 hover:shadow-[0_0_32px_#f87171bb] transition">
+          <div className="glass-card glass-border p-8 rounded-xl transition">
             <h3 className="text-2xl font-bold text-red-400 flex items-center mb-4">
               <i className="fas fa-times-circle mr-2"></i> The Problems
             </h3>
@@ -40,7 +40,7 @@ export default function ChallengesSection() {
             </ul>
           </div>
           {/* Solutions */}
-          <div className="bg-[#192527] p-8 rounded-xl border border-emerald-400/40 shadow-lg shadow-emerald-400/10 hover:shadow-[0_0_32px_#34d399bb] transition">
+          <div className="glass-card glass-border p-8 rounded-xl transition">
             <h3 className="text-2xl font-bold text-emerald-300 flex items-center mb-4">
               <i className="fas fa-check-circle mr-2"></i> Our Solutions
             </h3>

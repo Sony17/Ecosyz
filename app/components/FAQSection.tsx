@@ -25,19 +25,18 @@ export default function FAQSection() {
   return (
     <div>
       <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-40 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-      <section className="pt-8 pb-20 bg-gradient-to-br from-[#142622] via-[#152624] to-[#1b2a26] text-white relative">
+      <section className="pt-8 pb-16 sm:pb-20 bg-gradient-to-br from-[#142622] via-[#152624] to-[#1b2a26] text-white relative">
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:text-center mb-10">
+          <div className="lg:text-center mb-8 sm:mb-10">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
               Frequently Asked Questions
             </h2>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {faqs.map((faq, idx) => (
               <div
                 key={idx}
-                className="rounded-lg border border-teal-400/30 bg-[#182925]/80 shadow transition-all duration-200
-                  hover:border-emerald-400 hover:shadow-[0_0_20px_#10b98190] hover:scale-102"
+                className="rounded-lg glass-card glass-border transition-all duration-200"
               >
                 <button
                   className="w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none"
@@ -60,14 +59,14 @@ export default function FAQSection() {
                 <div
                   id={`faq-answer-${idx}`}
                   className={`overflow-hidden transition-all duration-300 ${
-                    openIndex === idx ? 'max-h-40 py-2 px-6' : 'max-h-0 px-6 py-0'
+                    openIndex === idx ? 'max-h-48 py-2 px-6' : 'max-h-0 px-6 py-0'
                   }`}
                   style={{
                     transitionProperty: 'max-height, padding',
                   }}
                 >
                   {openIndex === idx && (
-                    <p className="text-teal-100/90 text-base">{faq.answer}</p>
+                    <p className="text-teal-100/90 text-sm sm:text-base">{faq.answer}</p>
                   )}
                 </div>
               </div>

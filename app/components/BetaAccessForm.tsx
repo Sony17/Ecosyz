@@ -49,7 +49,7 @@ Email: ${email}
 }
 
   return (
-    <div className="bg-[#101e21] p-8 rounded-2xl max-w-md w-full mx-auto border border-cyan-400/20 shadow-lg">
+    <div className="glass-strong glass-border p-8 rounded-2xl max-w-md w-full mx-auto shadow-lg">
       <h2 className="text-2xl font-bold mb-4 text-cyan-300">{title}</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -60,7 +60,7 @@ Email: ${email}
             id="name"
             name="name"
             autoComplete="name"
-            className="w-full rounded-lg border border-cyan-500 bg-[#142226] px-4 py-2 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
+            className="w-full rounded-lg glass glass-border px-4 py-2 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Your Name"
@@ -76,7 +76,7 @@ Email: ${email}
             name="email"
             type="email"
             autoComplete="email"
-            className="w-full rounded-lg border border-cyan-500 bg-[#142226] px-4 py-2 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
+            className="w-full rounded-lg glass glass-border px-4 py-2 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="you@email.com"

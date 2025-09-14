@@ -7,23 +7,18 @@ export default function ResourcesSection() {
         <div className="absolute left-1/4 top-1/4 w-[500px] h-[200px] bg-gradient-radial from-cyan-400/20 to-transparent blur-2xl" />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
+        <div className="lg:text-center mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             The World’s Open Knowledge
           </h2>
-          <p className="mt-2 max-w-2xl mx-auto text-lg text-teal-100/70 font-medium">
+          <p className="mt-2 max-w-2xl mx-auto text-base sm:text-lg text-teal-100/70 font-medium">
             These are freely accessible, reusable, and modifiable assets created by individuals, communities, or institutions.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           {/* Open Source Software */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-emerald-400/30 shadow-md transition
-            hover:shadow-[0_0_32px_#12ffb880]
-            hover:border-cyan-400
-            hover:-translate-y-1
-            hover:scale-105
-          ">
+          <div className="glass-card glass-border p-6 rounded-xl transition hover:-translate-y-1">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-cyan-400/15 p-2 rounded-md">
                 <i className="fas fa-code text-cyan-300"></i>
@@ -36,12 +31,7 @@ export default function ResourcesSection() {
             </p>
           </div>
           {/* Open Data */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-emerald-400/30 shadow-md transition
-            hover:shadow-[0_0_32px_#16f2b0bb]
-            hover:border-emerald-400
-            hover:-translate-y-1
-            hover:scale-105
-          ">
+          <div className="glass-card glass-border p-6 rounded-xl transition hover:-translate-y-1">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-emerald-400/15 p-2 rounded-md">
                 <i className="fas fa-database text-emerald-300"></i>
@@ -54,12 +44,7 @@ export default function ResourcesSection() {
             </p>
           </div>
           {/* Open Access Research */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-emerald-400/30 shadow-md transition
-            hover:shadow-[0_0_32px_#b38fff80]
-            hover:border-purple-400
-            hover:-translate-y-1
-            hover:scale-105
-          ">
+          <div className="glass-card glass-border p-6 rounded-xl transition hover:-translate-y-1">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-purple-700/15 p-2 rounded-md">
                 <i className="fas fa-book text-purple-200"></i>

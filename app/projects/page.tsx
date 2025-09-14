@@ -8,7 +8,7 @@ export default function Projects() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="py-20  text-white relative">
+  <div className="py-16 sm:py-20  text-white relative">
                <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 py-16">

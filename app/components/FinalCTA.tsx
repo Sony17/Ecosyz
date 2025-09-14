@@ -54,7 +54,7 @@ export default function FinalCTA() {
                 type="email"
                 required
                 placeholder="Your email"
-                className="w-full px-4 py-3 rounded-md bg-[#151c1a] border border-emerald-400/20 text-white focus:outline-none"
+                className="w-full px-4 py-3 rounded-md glass glass-border text-white focus:outline-none"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 disabled={sending}

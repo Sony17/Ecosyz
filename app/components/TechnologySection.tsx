@@ -11,14 +11,13 @@ export default function TechnologySection() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             AI Trained on Global Innovation
           </h2>
-          <p className="mt-2 max-w-2xl mx-auto text-lg text-teal-100/80 font-medium text-center">
+          <p className="mt-2 max-w-2xl mx-auto text-base sm:text-lg text-teal-100/80 font-medium text-center">
             How This Changes the Game
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-10">
           {/* Card 1 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-cyan-400/30 shadow-md transition-all duration-200 
-            hover:border-cyan-400 hover:shadow-[0_0_32px_#22d3ee80] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-cyan-400/20 p-3 rounded-md">
                 <i className="fas fa-brain text-cyan-300 text-xl"></i>
@@ -30,8 +29,7 @@ export default function TechnologySection() {
             </p>
           </div>
           {/* Card 2 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-emerald-400/30 shadow-md transition-all duration-200 
-            hover:border-emerald-400 hover:shadow-[0_0_32px_#34d399bb] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-emerald-400/20 p-3 rounded-md">
                 <i className="fas fa-tags text-emerald-300 text-xl"></i>
@@ -43,8 +41,7 @@ export default function TechnologySection() {
             </p>
           </div>
           {/* Card 3 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-purple-400/30 shadow-md transition-all duration-200 
-            hover:border-purple-400 hover:shadow-[0_0_32px_#c084fc80] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-purple-700/20 p-3 rounded-md">
                 <i className="fas fa-file-alt text-purple-200 text-xl"></i>
@@ -56,8 +53,7 @@ export default function TechnologySection() {
             </p>
           </div>
           {/* Card 4 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-cyan-400/30 shadow-md transition-all duration-200 
-            hover:border-cyan-400 hover:shadow-[0_0_32px_#22d3ee80] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-cyan-400/20 p-3 rounded-md">
                 <i className="fas fa-link text-cyan-300 text-xl"></i>
@@ -67,8 +63,7 @@ export default function TechnologySection() {
             <p className="mt-4 text-teal-100/80">AI detects and links related resources across silos. Surfaces non-obvious combinations for innovation.</p>
           </div>
           {/* Card 5 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-red-400/30 shadow-md transition-all duration-200 
-            hover:border-red-400 hover:shadow-[0_0_32px_#f8717180] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-red-400/20 p-3 rounded-md">
                 <i className="fas fa-random text-red-300 text-xl"></i>
@@ -80,8 +75,7 @@ export default function TechnologySection() {
             </p>
           </div>
           {/* Card 6 */}
-          <div className="bg-[#192527] p-6 rounded-xl border border-cyan-400/30 shadow-md transition-all duration-200 
-            hover:border-indigo-400 hover:shadow-[0_0_32px_#818cf880] hover:scale-105 hover:-translate-y-2">
+          <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-indigo-400/20 p-3 rounded-md">
                 <i className="fas fa-comments text-indigo-200 text-xl"></i>

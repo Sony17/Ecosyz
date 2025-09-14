@@ -56,6 +56,7 @@ function OpenResourcesPage() {
       tags?: string[];
     } | null;
   }>({ open: false, key: null, data: null });
+  const modalRef = useRef<HTMLDivElement | null>(null);
 
   // Friendly display names for providers
   const PROVIDER_LABELS: Record<string, string> = {
@@ -182,6 +183,41 @@ function OpenResourcesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Focus trap for summary modal when open
+  useEffect(() => {
+    if (!summaryModal.open) return;
+    const panel = modalRef.current;
+    if (!panel) return;
+    const focusable = panel.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (!active || active === first) {
+          e.preventDefault();
+          (last || first).focus();
+        }
+      } else {
+        if (!active || active === last) {
+          e.preventDefault();
+          (first || last).focus();
+        }
+      }
+    };
+    panel.addEventListener('keydown', onKeyDown);
+    // initial focus to the first focusable (close button should be first)
+    first?.focus();
+    return () => panel.removeEventListener('keydown', onKeyDown);
+  }, [summaryModal.open]);
+
   return (
   <div className="min-h-screen flex flex-col overflow-x-hidden pb-[calc(env(safe-area-inset-bottom)+16px)]">
       <Header />
@@ -192,11 +228,11 @@ function OpenResourcesPage() {
         {/* Soft spot background */}
         <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none" />
         <Container>
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
+          <div className="text-center mb-6 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-3 sm:mb-4 text-center uppercase">
               Open Resources
             </h2>
-            <p className="mt-6 text-xl text-teal-100/90 max-w-2xl mx-auto font-medium">
+            <p className="mt-4 sm:mt-6 text-base sm:text-xl text-teal-100/90 max-w-2xl mx-auto font-medium">
               Freely accessible, reusable, and modifiable assets to power your next big idea.
             </p>
           </div>
@@ -224,39 +260,20 @@ function OpenResourcesPage() {
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-3 w-full">
                 <input
                   id="query"
-                  className="w-full h-11 rounded-lg border border-white/10 bg-white/5 px-4 placeholder-white/40 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  className="w-full h-11 rounded-lg border border-white/10 bg-white/5 px-3 sm:px-4 placeholder-white/40 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
                   placeholder="Search papers, datasets, code, models, videos..."
                   value={q}
                   onChange={e => setQ(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && search()}
                 />
-                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-5 disabled:opacity-50 w-full sm:w-auto" onClick={() => search()} disabled={loading}>
+                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-4 sm:px-5 disabled:opacity-50 w-full sm:w-auto" onClick={() => search()} disabled={loading}>
                   {loading ? 'Searching...' : 'Search'}
                 </button>
               </div>
-              {/* Page size selector */}
-              <div className="w-full max-w-2xl mt-3 flex items-center justify-end">
-                <label className="text-sm text-cyan-200 mr-2" htmlFor="page-size">Per page:</label>
-                <select
-                  id="page-size"
-                  className="h-9 rounded-md bg-zinc-900 text-cyan-100 border border-cyan-800 px-2"
-                  value={limit}
-                  onChange={(e) => {
-                    const newLimit = parseInt(e.target.value, 10) || 10;
-                    setLimit(newLimit);
-                    setNextCursor(null);
-                    // Re-run search immediately with the new limit
-                    if (q) search(q, type, newLimit);
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={30}>30</option>
-                </select>
-              </div>
+              {/* Page size selector removed per request */}
             </div>
             {/* Federated search results */}
             {(q || loading) && (
@@ -279,7 +296,7 @@ function OpenResourcesPage() {
                   {results.map((r, i) => {
                     const resKey = String(r.id || r.url || i);
                     return (
-                      <div key={r.id || i} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3 relative">
+                      <div key={r.id || i} className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3 relative">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
@@ -421,7 +438,7 @@ function OpenResourcesPage() {
                             ) : null}
                           </div>
                           {summaries[resKey] && (
-                            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                            <div className="mt-3 rounded-lg glass-card glass-border p-3">
                               <div className="flex items-center gap-2 mb-1">
                                 <div className="text-sm font-semibold text-emerald-300">Summary</div>
                                 <span className={`text-[10px] px-2 py-0.5 rounded border ${summaries[resKey].modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaries[resKey].modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
@@ -455,7 +472,7 @@ function OpenResourcesPage() {
                   {loading && (
                     <>
                       {Array.from({ length: Math.min(3, Math.max(1, Math.ceil(limit / 10))) }).map((_, idx) => (
-                        <div key={`skeleton-${idx}`} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 animate-pulse">
+                        <div key={`skeleton-${idx}`} className="rounded-xl glass-card glass-border p-4 sm:p-5 animate-pulse">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="h-4 w-16 bg-white/10 rounded" />
                             <div className="h-4 w-12 bg-white/10 rounded" />
@@ -503,24 +520,44 @@ function OpenResourcesPage() {
 
           {/* Glassy summary modal */}
           {summaryModal.open && summaryModal.data && (
-            <div className="fixed inset-0 z-40 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div
+              className="fixed inset-0 z-40 flex items-center justify-center p-4"
+              role="dialog"
+              aria-modal="true"
+              onKeyDown={(e) => { if (e.key === 'Escape') setSummaryModal({ open: false, key: null, data: null }); }}
+              tabIndex={-1}
+            >
               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSummaryModal({ open: false, key: null, data: null })} />
-              <div className="relative z-10 max-w-2xl w-full rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl shadow-2xl overflow-hidden">
-                <div className="p-5 sm:p-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <h3 className="text-lg font-semibold text-white">Summary</h3>
+              <div ref={modalRef} className="relative z-10 w-full max-w-3xl rounded-2xl glass-strong glass-border max-h-[90vh] flex flex-col" aria-labelledby="summary-modal-title">
+                {/* Top-right close button */}
+                <button
+                  aria-label="Close"
+                  className="absolute top-2 right-2 p-2 rounded-md bg-white/10 hover:bg-white/15 text-white"
+                  onClick={() => setSummaryModal({ open: false, key: null, data: null })}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                {/* Header (static) */}
+                <div className="p-5 sm:p-6 pb-3">
+                  <div className="flex items-center gap-2">
+                    <h3 id="summary-modal-title" className="text-lg font-semibold text-white">Summary</h3>
                     <span className={`text-[10px] px-2 py-0.5 rounded border ${summaryModal.data.modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaryModal.data.modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
                     {summaryModal.data.fromCache && (
                       <span className="text-[10px] px-2 py-0.5 rounded border bg-emerald-900/30 text-emerald-200 border-emerald-800">Cached: {summaryModal.data.cache}</span>
                     )}
                   </div>
+                </div>
+                {/* Scrollable body */}
+                <div id="summary-modal-printable" className="px-5 sm:px-6 py-2 overflow-y-auto" style={{ maxHeight: '70vh' }}>
                   {summaryModal.data.tldr ? (
-                    <p className="text-white/90 text-sm mb-3">{sanitizeText(summaryModal.data.tldr)}</p>
+                    <p className="text-white/90 text-sm mb-3 leading-relaxed">{sanitizeText(summaryModal.data.tldr)}</p>
                   ) : (
-                    <p className="text-white/60 text-sm mb-3">Preparing summary…</p>
+                    <p className="text-white/60 text-sm mb-3 leading-relaxed">Preparing summary…</p>
                   )}
                   {Array.isArray(summaryModal.data.bullets) && summaryModal.data.bullets.length > 0 && (
-                    <ul className="list-disc pl-5 text-xs text-white/80 space-y-1">
+                    <ul className="list-disc pl-5 text-xs text-white/80 space-y-1 leading-relaxed">
                       {summaryModal.data.bullets.map((b, i) => (
                         <li key={i}>{sanitizeText(b)}</li>
                       ))}
@@ -534,8 +571,46 @@ function OpenResourcesPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex items-center justify-end gap-2 p-3 border-t border-white/10 bg-black/20">
-                  <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setSummaryModal({ open: false, key: null, data: null })}>Close</button>
+                {/* Footer (static) */}
+                <div className="flex items-center justify-between gap-2 p-3 border-t border-white/10 bg-black/20">
+                  <div className="text-[11px] text-white/50">
+                    Tip: Copy or print the summary for later.
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15"
+                      onClick={async () => {
+                        try {
+                          const textParts: string[] = [];
+                          if (summaryModal.data?.tldr) textParts.push(sanitizeText(summaryModal.data.tldr));
+                          if (Array.isArray(summaryModal.data?.bullets) && summaryModal.data!.bullets!.length) {
+                            textParts.push('\n' + summaryModal.data!.bullets!.map(b => `• ${sanitizeText(b)}`).join('\n'));
+                          }
+                          if (Array.isArray(summaryModal.data?.tags) && summaryModal.data!.tags!.length) {
+                            textParts.push('\nTags: ' + summaryModal.data!.tags!.map(t => sanitizeText(t)).join(', '));
+                          }
+                          const toCopy = textParts.join('\n\n').trim();
+                          await navigator.clipboard.writeText(toCopy || '');
+                          setToast({ type: 'info', message: 'Summary copied to clipboard' });
+                        } catch (e) {
+                          setToast({ type: 'error', message: 'Copy failed' });
+                        }
+                      }}
+                    >
+                      Copy summary
+                    </button>
+                    <button
+                      className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15"
+                      onClick={() => {
+                        try {
+                          window.print();
+                        } catch {}
+                      }}
+                    >
+                      Print
+                    </button>
+                    <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setSummaryModal({ open: false, key: null, data: null })}>Close</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -544,7 +619,7 @@ function OpenResourcesPage() {
           {/* --- Original Resource Cards --- */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-10">
             {/* Card 1 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3">
+            <div className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3">
               <i className="fas fa-code text-2xl sm:text-3xl text-cyan-400 mt-1"></i>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Open Source Software</h3>
@@ -552,7 +627,7 @@ function OpenResourcesPage() {
               </div>
             </div>
             {/* Card 2 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3">
+            <div className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3">
               <i className="fas fa-database text-2xl sm:text-3xl text-emerald-400 mt-1"></i>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Open Data</h3>
@@ -560,7 +635,7 @@ function OpenResourcesPage() {
               </div>
             </div>
             {/* Card 3 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3">
+            <div className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3">
               <i className="fas fa-book text-2xl sm:text-3xl text-purple-300 mt-1"></i>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Open Access Research</h3>
@@ -568,7 +643,7 @@ function OpenResourcesPage() {
               </div>
             </div>
             {/* Card 4 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3">
+            <div className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3">
               <i className="fas fa-graduation-cap text-2xl sm:text-3xl text-yellow-300 mt-1"></i>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Educational Resources</h3>
@@ -576,7 +651,7 @@ function OpenResourcesPage() {
               </div>
             </div>
             {/* Card 5 */}
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 flex items-start gap-3">
+            <div className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3">
               <i className="fas fa-microchip text-2xl sm:text-3xl text-pink-300 mt-1"></i>
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-2">Open Hardware</h3>

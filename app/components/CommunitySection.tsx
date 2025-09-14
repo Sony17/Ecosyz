@@ -11,27 +11,24 @@ export default function CommunitySection() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             Our DNA and Community
           </h2>
-          <p className="mt-2 max-w-2xl mx-auto text-base sm:text-lg text-teal-100/80 font-medium text-center">
+          <p className="mt-2 max-w-2xl mx-auto text-sm sm:text-lg text-teal-100/80 font-medium text-center">
             Builders, developers, researchers, students, educators, entrepreneurs, creators.
           </p>
         </div>
         <div className="mt-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10">
             {/* Card 1 */}
-            <div className="bg-[#192527] p-6 rounded-xl border border-cyan-400/30 shadow-md transition-all duration-200 
-              hover:border-cyan-400 hover:shadow-[0_0_32px_#22d3ee80] hover:scale-105 hover:-translate-y-2">
+            <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
               <h4 className="text-lg font-semibold text-cyan-300">Open by Default</h4>
               <p className="mt-2 text-teal-100/80 text-base">Transparency and collaboration drive breakthrough innovation</p>
             </div>
             {/* Card 2 */}
-            <div className="bg-[#192527] p-6 rounded-xl border border-emerald-400/30 shadow-md transition-all duration-200 
-              hover:border-emerald-400 hover:shadow-[0_0_32px_#34d399bb] hover:scale-105 hover:-translate-y-2">
+            <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
               <h4 className="text-lg font-semibold text-emerald-300">Impact First</h4>
               <p className="mt-2 text-teal-100/80 text-base">Every project should contribute to positive global change</p>
             </div>
             {/* Card 3 */}
-            <div className="bg-[#192527] p-6 rounded-xl border border-purple-400/30 shadow-md transition-all duration-200 
-              hover:border-purple-400 hover:shadow-[0_0_32px_#c084fc80] hover:scale-105 hover:-translate-y-2">
+            <div className="glass-card glass-border p-6 rounded-xl transition-all duration-200 hover:-translate-y-2">
               <h4 className="text-lg font-semibold text-purple-300">Community Powered</h4>
               <p className="mt-2 text-teal-100/80 text-base">Collective intelligence amplifies individual brilliance</p>
             </div>

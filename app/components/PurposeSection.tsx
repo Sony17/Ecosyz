@@ -8,14 +8,14 @@ export default function PurposeSection() {
         <div className="absolute right-1/4 top-0 w-[600px] h-[300px] bg-gradient-radial from-cyan-400/20 to-transparent blur-2xl" />
       </div>
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
+        <div className="lg:text-center mb-10 sm:mb-12">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
 OUR NORTH STAR</h2>
 
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
           {/* Mission Card */}
-          <div className="bg-[#172024] rounded-xl border border-emerald-400/30 shadow-lg p-8 transition hover:shadow-[0_0_24px_#30ffe0bb] hover:border-cyan-400/70">
+          <div className="glass-card glass-border rounded-xl p-8 transition">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-cyan-400/20 p-3 rounded-lg">
                 <i className="fas fa-bullseye text-cyan-300 text-xl"></i>
@@ -27,7 +27,7 @@ OUR NORTH STAR</h2>
             </p>
           </div>
           {/* Vision Card */}
-          <div className="bg-[#172024] rounded-xl border border-emerald-400/30 shadow-lg p-8 transition hover:shadow-[0_0_24px_#16f2b0bb] hover:border-emerald-400/80">
+          <div className="glass-card glass-border rounded-xl p-8 transition">
             <div className="flex items-center gap-4">
               <span className="flex-shrink-0 bg-emerald-400/20 p-3 rounded-lg">
                 <i className="fas fa-eye text-emerald-300 text-xl"></i>

@@ -10,7 +10,7 @@ export default function Footer() {
     <>
       <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-40 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
 
-      <footer className="bg-[#0a0a0a] text-gray-400 pt-12 pb-8 px-4 sm:px-8">
+      <footer className="glass text-gray-300 pt-12 pb-8 px-4 sm:px-8 border-t glass-border">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           {/* 🔵 Logo + Name */}
           <div className="flex items-center space-x-3 mb-6 md:mb-0">
@@ -27,7 +27,7 @@ export default function Footer() {
           </div>
 
           {/* 🌍 Tagline */}
-          <p className="text-center text-sm md:text-base mb-6 md:mb-0 max-w-md">
+          <p className="text-center text-sm md:text-base mb-6 md:mb-0 max-w-md text-gray-300/80">
             Empowering Open, Sustainable Innovation Worldwide
           </p>
 
@@ -84,7 +84,7 @@ export default function Footer() {
         </div>
 
         {/* 🔚 Bottom Note */}
-        <div className="mt-8 text-center text-xs text-gray-500">
+        <div className="mt-8 text-center text-xs text-gray-400">
           © {currentYear} ECOSYZ. All rights reserved. Built with{' '}
           <span className="text-emerald-400">❤️</span> for global innovation.
         </div>

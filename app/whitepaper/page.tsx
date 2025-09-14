@@ -8,7 +8,7 @@ export default function WhitepaperPage() {
       <main className="flex-grow p-8">
       <div className="bg-gradient-to-br from-[#10171a] via-[#132726] to-[#091312] text-white min-h-screen pb-16">
   {/* Hero Section */}
-  <section className="hero-gradient py-20 relative">
+  <section className="hero-gradient py-16 sm:py-20 relative">
     <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[300px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none"/>
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
@@ -91,7 +91,7 @@ export default function WhitepaperPage() {
   </section>
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 {/* Fragmentation Problem Section */}
-<section id="problem" className="py-20 bg-gradient-to-br from-[#121b1a] via-[#172524] to-[#121819] text-white">
+<section id="problem" className="py-16 sm:py-20 bg-gradient-to-br from-[#121b1a] via-[#172524] to-[#121819] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
     <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-8 uppercase">
       2. The Fragmentation Problem in Open Knowledge
@@ -159,7 +159,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Solution Section */}
-<section id="solution" className="py-20 bg-gradient-to-br from-[#101b1d] via-[#112124] to-[#11181c] text-white">
+<section id="solution" className="py-16 sm:py-20 bg-gradient-to-br from-[#101b1d] via-[#112124] to-[#11181c] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase"> 3. Open Idea: A Unified Solution</h1>
 
@@ -219,7 +219,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* How the System Works */}
-<section id="system" className="py-20 bg-gradient-to-br from-[#10241d] via-[#16252a] to-[#182025] text-white">
+<section id="system" className="py-16 sm:py-20 bg-gradient-to-br from-[#10241d] via-[#16252a] to-[#182025] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
       4. How the System Works
@@ -263,7 +263,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* User Types & Use Cases */}
-<section id="users" className="py-20 bg-gradient-to-br from-[#11212a] via-[#132921] to-[#181822] text-white">
+<section id="users" className="py-16 sm:py-20 bg-gradient-to-br from-[#11212a] via-[#132921] to-[#181822] text-white">
   <div className="max-w-7xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
    5. User Types and Use Cases
@@ -332,7 +332,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Technology Stack */}
-<section id="technology" className="py-20 bg-gradient-to-br from-[#132926] via-[#192129] to-[#181e24] text-white">
+<section id="technology" className="py-16 sm:py-20 bg-gradient-to-br from-[#132926] via-[#192129] to-[#181e24] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
    6. Technology Stack and Architecture
@@ -370,7 +370,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Monetization Strategy */}
-<section id="monetization" className="py-20 bg-gradient-to-br from-[#131f21] via-[#152624] to-[#0f191c] text-white">
+<section id="monetization" className="py-16 sm:py-20 bg-gradient-to-br from-[#131f21] via-[#152624] to-[#0f191c] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
    7. Monetization Strategy
@@ -420,7 +420,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Roadmap and Milestones */}
-<section id="roadmap" className="py-20 bg-gradient-to-br from-[#12271c] via-[#152624] to-[#1a2926] text-white">
+<section id="roadmap" className="py-16 sm:py-20 bg-gradient-to-br from-[#12271c] via-[#152624] to-[#1a2926] text-white">
   <div className="max-w-5xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
         8. Roadmap and Milestones
@@ -472,7 +472,7 @@ export default function WhitepaperPage() {
 <div className="w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-40" />
 
 {/* Call to Action */}
-<section id="action" className="py-20 bg-gradient-to-br from-[#152624] via-[#12362f] to-[#1b2a26] text-white">
+<section id="action" className="py-16 sm:py-20 bg-gradient-to-br from-[#152624] via-[#12362f] to-[#1b2a26] text-white">
   <div className="max-w-7xl mx-auto px-4 sm:px-6">
   <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">        
         9. Call to Action

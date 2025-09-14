@@ -8,11 +8,11 @@ import { usePathname } from "next/navigation";
 import { Container } from "./ui/Container";
 
 const NAV_LINKS = [
+  { href: "/about", label: "About" },
   { href: "/openresources", label: "Resources" },
   { href: "/projects", label: "Projects" },
   { href: "/community", label: "Community" },
   { href: "/whitepaper", label: "Whitepaper" },
-  { href: "/feedback", label: "Feedback" },
 ];
 
 export default function Header() {
@@ -51,7 +51,7 @@ export default function Header() {
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-black/40 border-b border-white/10 h-14">
+    <header className="sticky top-0 z-50 glass h-14 border-b glass-border">
       <Container>
         <div className="h-14 flex items-center justify-between relative">
           {/* Brand left */}
@@ -65,7 +65,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="focus:outline-none focus:ring-2 focus:ring-emerald-400/60 px-1 py-1 rounded transition hover:text-emerald-400"
+                className="focus:outline-none focus:ring-2 focus:ring-emerald-400/60 px-2 py-1 rounded transition hover:text-emerald-400/90"
               >
                 {link.label}
               </Link>
@@ -91,7 +91,7 @@ export default function Header() {
           {/* Hamburger for mobile */}
           <button
             type="button"
-            className="md:hidden p-2 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ml-auto"
+            className="md:hidden p-2 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 ml-auto hover:bg-white/10"
             aria-label="Open menu"
             aria-controls="mobile-nav"
             aria-expanded={mobileOpen}
@@ -108,7 +108,7 @@ export default function Header() {
       <div
         id="mobile-nav"
         ref={mobileNavRef}
-        className={`md:hidden grid gap-2 p-4 bg-black/80 border-t border-white/10 transition-all duration-200 ${mobileOpen ? 'block' : 'hidden'}`}
+        className={`md:hidden grid gap-2 p-4 glass-strong border-t glass-border transition-all duration-200 ${mobileOpen ? 'block' : 'hidden'}`}
         tabIndex={mobileOpen ? 0 : -1}
         aria-label="Main"
       >
@@ -116,7 +116,7 @@ export default function Header() {
           <Link
             key={link.href}
             href={link.href}
-            className="block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-emerald-900/20 text-white"
+            className="block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
             onClick={() => setMobileOpen(false)}
             tabIndex={mobileOpen ? 0 : -1}
           >
@@ -126,7 +126,7 @@ export default function Header() {
         <button
           onClick={toggleTheme}
           aria-label="Toggle Theme"
-          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-emerald-900/20 text-white"
+          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
           tabIndex={mobileOpen ? 0 : -1}
         >
           {mounted && theme === "dark" ? <i className="fas fa-sun" /> : <i className="fas fa-moon" />}
@@ -134,7 +134,7 @@ export default function Header() {
         </button>
         <Link
           href="/feedback"
-          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-emerald-900/20 text-white font-medium"
+          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white font-medium"
           onClick={() => setMobileOpen(false)}
           tabIndex={mobileOpen ? 0 : -1}
         >
