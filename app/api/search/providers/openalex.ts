@@ -24,7 +24,7 @@ export async function searchOpenAlex(q: string): Promise<Resource[]> {
       title: item.title,
       authors: item.authors?.map((a: any) => a.author.display_name) || [],
       year: item.publication_year,
-      source: 'OpenAlex',
+      source: 'openalex',
       url: item.id,
       license: item.license || 'NOASSERTION',
       description: item.abstract_inverted_index ? Object.keys(item.abstract_inverted_index).join(' ') : undefined,

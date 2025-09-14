@@ -4,6 +4,7 @@
 .gradient-text {
   background: linear-gradient(90deg, #10ff8b, #2fd0ff 60%);
   -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 .bg-neon-green {

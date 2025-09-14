@@ -18,17 +18,25 @@ export async function searchZenodo(q: string): Promise<Resource[]> {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) throw new Error(`Zenodo error: ${res.status}`);
     const data = await res.json();
-    return (data.hits?.hits || []).map((item: any) => ({
-      id: item.doi || item.id,
-      type: item.metadata.resource_type?.type === 'dataset' ? 'dataset' : 'paper',
-      title: item.metadata.title,
-      authors: item.metadata.creators?.map((a: any) => a.name) || [],
-      year: item.metadata.publication_date ? parseInt(item.metadata.publication_date.slice(0,4)) : undefined,
-      source: 'Zenodo',
-      url: item.links.html,
-      license: item.metadata.license?.id || 'NOASSERTION',
-      description: item.metadata.description,
-    }));
+    return (data.hits?.hits || []).map((item: any) => {
+      // Build a robust URL that always opens in a new tab
+      const htmlUrl: string = (
+        item?.links?.html
+        || (item?.id ? `https://zenodo.org/records/${item.id}` : '')
+        || (item?.doi ? `https://doi.org/${item.doi}` : '')
+      ) as string;
+      return {
+        id: String(item.doi || item.id || ''),
+        type: item.metadata?.resource_type?.type === 'dataset' ? 'dataset' : 'paper',
+        title: item.metadata?.title,
+        authors: item.metadata?.creators?.map((a: any) => a?.name).filter(Boolean) || [],
+        year: item.metadata?.publication_date ? parseInt(item.metadata.publication_date.slice(0, 4)) : undefined,
+        source: 'zenodo',
+        url: htmlUrl,
+        license: item.metadata?.license?.id || 'NOASSERTION',
+        description: item.metadata?.description,
+      } as Resource;
+    });
   } catch (e) {
     // Fail gracefully
     return [];

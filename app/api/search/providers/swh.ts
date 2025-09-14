@@ -24,8 +24,8 @@ export async function searchSoftwareHeritage(q: string): Promise<Resource[]> {
       title: item.title || item.url,
       authors: item.authors || [],
       year: item.date ? parseInt(item.date.slice(0,4)) : undefined,
-      source: 'Software Heritage',
-      url: item.url,
+      source: 'swh',
+      url: String(item.url || ''),
       license: item.license || 'NOASSERTION',
       description: item.summary,
     }));

@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
@@ -16,6 +17,8 @@ const TABS = [
 ];
 
 export default function OpenResourcesPage() {
+  const router = useRouter();
+  const params = useSearchParams();
   const [q, setQ] = useState('');
   const [type, setType] = useState('all');
   const [results, setResults] = useState<any[]>([]);
@@ -23,33 +26,131 @@ export default function OpenResourcesPage() {
   const [error, setError] = useState('');
   const [coverage, setCoverage] = useState<any>(null);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(30);
   const [hasMore, setHasMore] = useState<boolean | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const activeAbort = useRef<AbortController | null>(null);
+
+  // Friendly display names for providers
+  const PROVIDER_LABELS: Record<string, string> = {
+    openalex: 'OpenAlex',
+    arxiv: 'arXiv',
+    zenodo: 'Zenodo',
+    swh: 'Software Heritage',
+    ckan: 'CKAN',
+    huggingface: 'Hugging Face',
+    paperswithcode: 'Papers with Code',
+    youtube: 'YouTube',
+    github: 'GitHub',
+    gitlab: 'GitLab',
+    figshare: 'Figshare',
+    kaggle: 'Kaggle',
+    custom: 'Custom',
+  };
+
+  // Utility: convert potential HTML description to plain text
+  function cleanDescription(input: any): string {
+    if (typeof input !== 'string') return '';
+    // remove script/style blocks first
+    const noScripts = input
+      .replace(new RegExp('<script[^>]*>[\\s\\S]*?<\\/script>', 'gi'), '')
+      .replace(new RegExp('<style[^>]*>[\\s\\S]*?<\\/style>', 'gi'), '');
+    // strip remaining tags
+    const stripped = noScripts.replace(/<[^>]+>/g, ' ');
+    // decode HTML entities in the browser safely
+    if (typeof window !== 'undefined') {
+      const el = document.createElement('textarea');
+      el.innerHTML = stripped;
+      const text = (el.value || el.textContent || '').toString();
+      return text.replace(/\s+/g, ' ').trim();
+    }
+    return stripped.replace(/\s+/g, ' ').trim();
+  }
+
+  function updateURL(nextQ: string, nextType: string, nextLimit: number) {
+    const sp = new URLSearchParams();
+    if (nextQ) sp.set('q', nextQ);
+    if (nextType && nextType !== 'all') sp.set('type', nextType);
+    if (nextLimit && nextLimit !== 30) sp.set('limit', String(nextLimit));
+    const qs = sp.toString();
+    // Use replace to avoid stacking history on every pagination
+    router.replace(`/openresources${qs ? `?${qs}` : ''}` as any, { scroll: false } as any);
+  }
 
   async function search(
-    newPage = 1,
     customQ = q,
     customType = type,
     customLimit = limit
   ) {
     if (!customQ) return; // Prevent search if query is empty
+    // Abort any in-flight request
+    if (activeAbort.current) {
+      activeAbort.current.abort();
+    }
+    const controller = new AbortController();
+    activeAbort.current = controller;
     setLoading(true); setError('');
     try {
-  const res = await fetch(`/api/search?q=${encodeURIComponent(customQ)}&type=${customType}&page=${newPage}&limit=${customLimit}` , { cache: 'no-store' });
+      const res = await fetch(`/api/search?q=${encodeURIComponent(customQ)}&type=${customType}&limit=${customLimit}` , { cache: 'no-store', signal: controller.signal });
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
-  setResults(Array.isArray(data.results) ? data.results : []);
+      setResults(Array.isArray(data.results) ? data.results : []);
       setCoverage(data.coverage || null);
       setTotal(data.total || 0);
-      setPage(data.page || newPage);
-  setHasMore(typeof data.hasMore === 'boolean' ? data.hasMore : (Array.isArray(data.results) && data.results.length === customLimit));
+      setHasMore(Boolean(data.nextCursor));
+      setNextCursor(typeof data.nextCursor === 'string' ? data.nextCursor : null);
+      // Sync URL
+      updateURL(customQ, customType, customLimit);
     } catch (e: any) {
-      setError(e.message);
+      if (e?.name !== 'AbortError') {
+        setError(e.message || 'Search failed');
+      }
     } finally {
       setLoading(false);
+      // Clear only if this controller is still the active one
+      if (activeAbort.current === controller) activeAbort.current = null;
     }
   }
+
+  async function loadMore() {
+    if (!nextCursor) return;
+    // Cancel any in-flight
+    if (activeAbort.current) activeAbort.current.abort();
+    const controller = new AbortController();
+    activeAbort.current = controller;
+    setLoading(true); setError('');
+    try {
+      const res = await fetch(`/api/search?cursor=${encodeURIComponent(nextCursor)}`, { cache: 'no-store', signal: controller.signal });
+      if (!res.ok) throw new Error('Load more failed');
+      const data = await res.json();
+      const newItems = Array.isArray(data.results) ? data.results : [];
+      setResults(prev => [...prev, ...newItems]);
+      setTotal(data.total || total);
+      setHasMore(Boolean(data.nextCursor));
+      setNextCursor(typeof data.nextCursor === 'string' ? data.nextCursor : null);
+      // Do not update URL during load more to avoid scrolling to top
+    } catch (e: any) {
+      if (e?.name !== 'AbortError') setError(e.message || 'Load more failed');
+    } finally {
+      setLoading(false);
+      if (activeAbort.current === controller) activeAbort.current = null;
+    }
+  }
+
+  // Initialize state from URL on first mount
+  useEffect(() => {
+    const qp = params?.get('q') || '';
+    const tp = (params?.get('type') as string) || 'all';
+    const lm = parseInt(params?.get('limit') || '30', 10) || 30;
+    if (qp) {
+      setQ(qp);
+      setType(tp);
+      setLimit(lm);
+      // Kick off initial search
+      search(qp, tp, lm);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
   <div className="min-h-screen flex flex-col overflow-x-hidden pb-[calc(env(safe-area-inset-bottom)+16px)]">
@@ -73,17 +174,19 @@ export default function OpenResourcesPage() {
           {/* --- Neon Search Bar + Federated Results --- */}
           <div className="flex flex-col items-center mb-10 w-full">
             <div className="w-full max-w-2xl">
-              <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start mb-4">
+              <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start mb-4" role="tablist" aria-label="Resource type">
                 {TABS.map(tab => (
                   <button
                     key={tab.value}
                     className="px-3 py-1.5 rounded-full border border-emerald-500/40 text-emerald-300/90 hover:bg-emerald-500/10 active:scale-[.98] focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                    role="tab"
+                    aria-selected={type === tab.value}
                     data-active={type === tab.value}
                     style={type === tab.value ? { background: 'rgba(16, 185, 129, 0.12)' } : {}}
                     onClick={() => {
                       setType(tab.value);
-                      setPage(1);
-                      search(1, q, tab.value);
+                      setNextCursor(null);
+                      search(q, tab.value);
                     }}
                     disabled={loading}
                   >
@@ -98,9 +201,9 @@ export default function OpenResourcesPage() {
                   placeholder="Search papers, datasets, code, models, videos..."
                   value={q}
                   onChange={e => setQ(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && search(1)}
+                  onKeyDown={e => e.key === 'Enter' && search()}
                 />
-                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-5 disabled:opacity-50 w-full sm:w-auto" onClick={() => search(1)} disabled={loading}>
+                <button className="h-11 rounded-lg bg-emerald-500 text-black font-medium px-5 disabled:opacity-50 w-full sm:w-auto" onClick={() => search()} disabled={loading}>
                   {loading ? 'Searching...' : 'Search'}
                 </button>
               </div>
@@ -114,9 +217,9 @@ export default function OpenResourcesPage() {
                   onChange={(e) => {
                     const newLimit = parseInt(e.target.value, 10) || 10;
                     setLimit(newLimit);
-                    setPage(1);
+                    setNextCursor(null);
                     // Re-run search immediately with the new limit
-                    if (q) search(1, q, type, newLimit);
+                    if (q) search(q, type, newLimit);
                   }}
                 >
                   <option value={10}>10</option>
@@ -127,19 +230,19 @@ export default function OpenResourcesPage() {
             </div>
             {/* Federated search results */}
             {(q || loading) && (
-              <div className="w-full max-w-2xl mt-8">
+              <div className="w-full max-w-2xl mt-8" aria-busy={loading}>
                 {coverage && (
                   <div className="mb-4 text-xs text-cyan-200 flex flex-wrap gap-3">
                     <span className="font-bold text-cyan-300">Provider counts:</span>
                     {Object.entries(coverage.receivedCounts || {}).map(([provider, count]) => (
-                      <span key={String(provider)} className="bg-cyan-900/40 px-2 py-1 rounded border border-cyan-800 text-cyan-100">{String(provider)}: {Number(count)}</span>
+                      <span key={String(provider)} className="bg-cyan-900/40 px-2 py-1 rounded border border-cyan-800 text-cyan-100">{PROVIDER_LABELS[String(provider)] || String(provider)}: {Number(count)}</span>
                     ))}
                   </div>
                 )}
                 {error && <div className="text-red-500 mb-4">{error}</div>}
                 {!loading && results.length === 0 && (
                   <div className="text-gray-400 text-lg text-center">
-                    {page > 1 ? 'No results on this page.' : 'No results.'}
+                    No results.
                   </div>
                 )}
                 <div className="space-y-4 sm:space-y-6">
@@ -148,7 +251,7 @@ export default function OpenResourcesPage() {
                       {/* Icon or badge could go here if desired */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{r.source}</span>
+                          <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
                           {r.type && (
                             <span className={`text-xs px-2 py-1 rounded font-bold border ${
                               r.type === 'paper' ? 'bg-blue-900/30 text-blue-200 border-blue-800' :
@@ -166,7 +269,12 @@ export default function OpenResourcesPage() {
                             </span>
                           )}
                           {r.license && <span className="text-xs px-2 py-1 rounded bg-emerald-900/30 text-emerald-200 border border-emerald-800">{r.license}</span>}
-                          <span className="ml-auto text-xs text-white/60 font-semibold">{r.year || ''}</span>
+                          <div className="ml-auto flex items-center gap-3 text-xs text-white/60 font-semibold">
+                            {r.year && <span>{r.year}</span>}
+                            {typeof r.score === 'number' && (
+                              <span className="text-gray-400">Score: {r.score.toFixed(2)}</span>
+                            )}
+                          </div>
                         </div>
                         <div className="text-base sm:text-lg font-semibold text-white leading-snug mb-1">{r.title}</div>
                         {/* Special fields for model/hardware/video */}
@@ -190,42 +298,80 @@ export default function OpenResourcesPage() {
                             ))}
                           </div>
                         )}
-                        <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{r.description}</div>
+                        <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{cleanDescription(r.description)}</div>
                         <div className="flex gap-2 mt-2">
-                          <a href={r.url} target="_blank" rel="noopener" className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition">Open</a>
+                          {r.url ? (
+                            <a
+                              href={r.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition inline-flex items-center gap-1.5"
+                            >
+                              <span>Open</span>
+                              {/* External-link icon */}
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                className="h-3.5 w-3.5 opacity-90"
+                                aria-hidden="true"
+                                focusable="false"
+                              >
+                                <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69l-6.72 6.72a.75.75 0 1 0 1.06 1.06l6.72-6.72V7.5a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 17.75 2h-5.25z" />
+                                <path d="M6.25 4A2.25 2.25 0 0 0 4 6.25v7.5A2.25 2.25 0 0 0 6.25 16h7.5A2.25 2.25 0 0 0 16 13.75V10a.75.75 0 0 0-1.5 0v3.75c0 .414-.336.75-.75.75h-7.5a.75.75 0 0 1-.75-.75v-7.5c0-.414.336-.75.75-.75H10a.75.75 0 0 0 0-1.5H6.25z" />
+                              </svg>
+                            </a>
+                          ) : (
+                            <button
+                              className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed"
+                              title="No link available"
+                              disabled
+                            >
+                              Open
+                            </button>
+                          )}
                           <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
                           <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Summarize</button>
                         </div>
-                        <span className="absolute right-4 top-4 text-xs text-gray-700">{r.score !== undefined ? `Score: ${r.score.toFixed(2)}` : ''}</span>
+                        {/* Score moved to header row to prevent overlap with year */}
                       </div>
                     </div>
                   ))}
+                  {/* Skeletons while loading */}
+                  {loading && (
+                    <>
+                      {Array.from({ length: Math.min(3, Math.max(1, Math.ceil(limit / 10))) }).map((_, idx) => (
+                        <div key={`skeleton-${idx}`} className="rounded-xl border border-white/10 bg-white/5 p-4 sm:p-5 animate-pulse">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-4 w-16 bg-white/10 rounded" />
+                            <div className="h-4 w-12 bg-white/10 rounded" />
+                            <div className="ml-auto h-4 w-24 bg-white/10 rounded" />
+                          </div>
+                          <div className="h-5 w-3/4 bg-white/10 rounded mb-2" />
+                          <div className="h-4 w-1/2 bg-white/10 rounded mb-1" />
+                          <div className="flex gap-2 mt-3">
+                            <div className="h-7 w-16 bg-white/10 rounded" />
+                            <div className="h-7 w-16 bg-white/10 rounded" />
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
-                {/* Pagination controls */}
+                {/* Load more controls */}
                 {q && total > 0 && (
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-8">
                     <button
-                      className="px-3 py-1 rounded bg-cyan-800/60 text-cyan-100 disabled:opacity-50"
-                      onClick={() => { if (page > 1) search(page - 1, q, type); }}
-                      disabled={page === 1 || loading}
+                      className="px-3 py-1 rounded bg-emerald-600 text-black disabled:opacity-50"
+                      onClick={loadMore}
+                      disabled={!nextCursor || loading}
+                      title="Append more results using cursor"
                     >
-                      Previous
+                      {loading ? 'Loading…' : 'Load more'}
                     </button>
-                    <span className="text-cyan-200">Page {page} of {Math.max(1, Math.ceil(total / limit))}</span>
-                    <button
-                      className="px-3 py-1 rounded bg-cyan-800/60 text-cyan-100 disabled:opacity-50"
-                      onClick={() => { if (hasMore) search(page + 1, q, type); }}
-                      disabled={!hasMore || loading}
-                    >
-                      Next
-                    </button>
-                    {/* Range indicator */}
-                    <span className="text-xs text-cyan-300 font-medium">
-                      {(() => {
-                        const start = (page - 1) * limit + 1;
-                        const end = Math.min(total, (page - 1) * limit + results.length);
-                        return `Showing ${start.toLocaleString()}–${end.toLocaleString()} of ${total.toLocaleString()}`;
-                      })()}
+                    {/* Range indicator now based on accumulated results */}
+                    <span className="text-xs text-cyan-300 font-medium" aria-live="polite" aria-atomic="true">
+                      {`Showing 1–${Math.min(total, results.length).toLocaleString()} of ${total.toLocaleString()}`}
                     </span>
                   </div>
                 )}

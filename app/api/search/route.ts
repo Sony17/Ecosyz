@@ -48,6 +48,28 @@ function setCache(key: string, data: any) {
   }
 }
 
+// Cursor helpers
+function encodeCursor(obj: { sessionId: string; offset: number; limit: number }): string {
+  const json = JSON.stringify(obj);
+  // base64url encoding
+  const b64 = Buffer.from(json, 'utf8').toString('base64');
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function decodeCursor(str: string): { sessionId: string; offset: number; limit: number } | null {
+  try {
+    // Convert base64url back to base64
+    let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const json = Buffer.from(b64, 'base64').toString('utf8');
+    const obj = JSON.parse(json);
+    if (!obj || typeof obj.sessionId !== 'string') return null;
+    return { sessionId: obj.sessionId, offset: Number(obj.offset) || 0, limit: Number(obj.limit) || 30 };
+  } catch {
+    return null;
+  }
+}
+
 // Scoring helpers
 function scoreResource(r: Resource, q: string): number {
   const text = (r.title + ' ' + (r.description || '')).toLowerCase();
@@ -59,6 +81,41 @@ function scoreResource(r: Resource, q: string): number {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+  const cursorParam = searchParams.get('cursor');
+
+  // Cursor-mode handling: return next slice from an existing session
+  if (cursorParam) {
+    const cur = decodeCursor(cursorParam);
+    if (!cur) {
+      return NextResponse.json({ results: [], total: 0, nextCursor: null }, {
+        headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=30' },
+      });
+    }
+    const sessionKey = `session:${cur.sessionId}`;
+    const session = getCache(sessionKey) as undefined | { items: Resource[]; total: number; coverage?: any };
+    if (!session || !Array.isArray(session.items)) {
+      return NextResponse.json({ results: [], total: 0, nextCursor: null }, {
+        headers: { 'Cache-Control': 's-maxage=60, stale-while-revalidate=30' },
+      });
+    }
+    const start = Math.max(0, cur.offset);
+    const end = Math.min(session.items.length, start + cur.limit);
+    const slice = session.items.slice(start, end);
+    const nextOffset = end;
+    const nextCursor = nextOffset < session.items.length
+      ? encodeCursor({ sessionId: cur.sessionId, offset: nextOffset, limit: cur.limit })
+      : null;
+    const resp = {
+      results: slice,
+      total: session.items.length,
+      limit: cur.limit,
+      nextCursor,
+      coverage: session.coverage || null,
+    };
+    return NextResponse.json(resp, {
+      headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=60' },
+    });
+  }
   const q = searchParams.get('q') || '';
   const type = searchParams.get('type') as ResourceType | 'all' | null;
   // Accept new type values: model, hardware, video (even if no providers yet)
@@ -70,7 +127,11 @@ export async function GET(req: NextRequest) {
   const limit = parseInt(searchParams.get('limit') || '30', 10);
   const cacheKey = `${q}:${type}:${page}:${limit}`;
   const cached = getCache(cacheKey);
-  if (cached) return NextResponse.json(cached);
+  if (cached) return NextResponse.json(cached, {
+    headers: {
+      'Cache-Control': 's-maxage=300, stale-while-revalidate=60',
+    },
+  });
 
   // Fan-out to providers in parallel
   // Add new providers here as needed (see docs/specs/providers.md)
@@ -108,6 +169,19 @@ export async function GET(req: NextRequest) {
   const paginated = deduped.slice(start, end);
   const hasMore = end < deduped.length;
 
+  // Create a session for cursor-based continuation
+  const sessionId = (globalThis as any).crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  const sessionKey = `session:${sessionId}`;
+  setCache(sessionKey, { items: deduped, total: deduped.length, coverage: {
+    requestedProviders: providerFns.map(p => p.name),
+    receivedCounts: Object.fromEntries(Object.entries(results).map(([k, v]) => [k, v.length])),
+    uniqueBefore: all.length,
+    uniqueAfter: dedupeResult.items.length,
+    merged: dedupeResult.merged,
+  } });
+  const nextOffset = end;
+  const nextCursor = nextOffset < deduped.length ? encodeCursor({ sessionId, offset: nextOffset, limit }) : null;
+
   // Build response before caching so we cache the entire payload
   const resp: any = {
     results: paginated,
@@ -115,6 +189,7 @@ export async function GET(req: NextRequest) {
     page,
     limit,
     hasMore,
+    nextCursor,
     coverage: {
       requestedProviders: providerFns.map(p => p.name),
       receivedCounts: Object.fromEntries(Object.entries(results).map(([k, v]) => [k, v.length])),
@@ -127,5 +202,9 @@ export async function GET(req: NextRequest) {
   setCache(cacheKey, resp);
   // See docs/specs/dedupe-pipeline.md and docs/specs/providers.md for details
   if (debug) resp.decisions = dedupeResult.decisions;
-  return NextResponse.json(resp);
+  return NextResponse.json(resp, {
+    headers: {
+      'Cache-Control': 's-maxage=300, stale-while-revalidate=60',
+    },
+  });
 }
