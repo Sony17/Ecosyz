@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -16,7 +16,18 @@ const TABS = [
   { label: 'Videos', value: 'video' },
 ];
 
-export default function OpenResourcesPage() {
+export default function OpenResourcesPageWrapper() {
+  // Wrap the client-side search params consumer in Suspense per Next.js guidance
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-cyan-200">Loading search…</div>
+    }>
+      <OpenResourcesPage />
+    </Suspense>
+  );
+}
+
+function OpenResourcesPage() {
   const router = useRouter();
   const params = useSearchParams();
   const [q, setQ] = useState('');
