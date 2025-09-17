@@ -1,0 +1,51 @@
+// Prisma schema for Basic Project Workspace
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provinpm run db:pushnpm run db:pushder = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Workspace {
+  id        String      @id @default(cuid())
+  title     String
+  ownerId   String
+  createdAt DateTime    @default(now())
+  resources Resource[]
+  shares    ShareLink[]
+}
+
+model Resource {
+  id          String      @id @default(cuid())
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  title       String
+  url         String?
+  type        String?
+  tags        String[]
+  data        Json?
+  createdAt   DateTime    @default(now())
+  annotations Annotation[]
+}
+
+model Annotation {
+  id         String   @id @default(cuid())
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  resourceId String
+  body       String
+  highlights Json?
+  createdAt  DateTime @default(now())
+}
+
+model ShareLink {
+  id          String    @id @default(cuid())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  token       String    @unique
+  readOnly    Boolean  @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+}
