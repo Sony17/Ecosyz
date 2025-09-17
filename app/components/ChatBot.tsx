@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import emailjs from 'emailjs-com';
 
 // Read EmailJS config from public env vars (client-side)
@@ -17,6 +17,31 @@ export default function ChatBot() {
   const [stage, setStage] = useState<'ask' | 'askContact' | 'done'>('ask');
   const [userChat, setUserChat] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Initialize EmailJS once with public key (safe on client)
+  useEffect(() => {
+    if (USER_ID) {
+      try {
+        // Some versions require init; passing user ID to send also works, but init is explicit
+        // @ts-ignore - types may vary between packages
+        emailjs.init?.(USER_ID);
+      } catch (e) {
+        console.warn('EmailJS init warning:', e);
+      }
+    } else {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('EmailJS public key is missing. Set NEXT_PUBLIC_EMAILJS_PUBLIC_KEY');
+      }
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('EmailJS env present:', {
+        hasServiceId: Boolean(SERVICE_ID),
+        hasTemplateId: Boolean(TEMPLATE_ID),
+        hasPublicKey: Boolean(USER_ID),
+        hasCompanyEmail: Boolean(COMPANY_EMAIL),
+      });
+    }
+  }, []);
 
   // Simple regex for email and phone (very basic)
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/;
@@ -65,16 +90,28 @@ Phone: ${phone}
           if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID || !COMPANY_EMAIL) {
             throw new Error('EmailJS environment variables are not set');
           }
-          await emailjs.send(
+
+          // Provide common param names to match typical EmailJS templates.
+          // Your template can use any of these: to_email, from_email, user_email, user_phone, message, subject
+          const templateParams = {
+            to_email: COMPANY_EMAIL,
+            from_email: email,
+            user_email: email,
+            user_phone: phone,
+            message: emailBody,
+            subject: 'New website chat submission',
+          };
+
+          const result = await emailjs.send(
             SERVICE_ID,
             TEMPLATE_ID,
-            {
-              email: COMPANY_EMAIL, // send to yourself!
-              message: emailBody,
-              subject: "New website chat submission",
-            },
+            templateParams,
             USER_ID
           );
+
+          if ((result as any)?.status && (result as any)?.status !== 200) {
+            throw new Error(`EmailJS responded with status ${(result as any)?.status}`);
+          }
           setLoading(false);
           setTimeout(() => {
             setMessages((msgs) => [
@@ -83,11 +120,19 @@ Phone: ${phone}
             ]);
             setStage('done');
           }, 500);
-        } catch (err) {
+        } catch (err: any) {
           setLoading(false);
+          console.error('EmailJS send failed:', err);
+          const status = err?.status ?? err?.response?.status;
+          const is412 = status === 412 || /412/.test(String(err));
           setMessages((msgs) => [
             ...msgs,
-            { text: "Sorry, failed to send feedback. Please try again later.", isBot: true },
+            {
+              text: is412
+                ? 'Send blocked by EmailJS policy (domain/public key/service). Please try again later or email us directly.'
+                : 'Sorry, failed to send. Please try again later or email us directly.',
+              isBot: true,
+            },
           ]);
         }
       } else {
