@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/community", label: "Community" },
   { href: "/whitepaper", label: "Whitepaper" },
+   { href: "/pricing", label: "Pricing" },
 ];
 
 export default function Header() {
@@ -103,44 +104,44 @@ export default function Header() {
             </svg>
           </button>
         </div>
-  </Container>
-      {/* Mobile nav panel */}
-      <div
-        id="mobile-nav"
-        ref={mobileNavRef}
-        className={`md:hidden grid gap-2 p-4 glass-strong border-t glass-border transition-all duration-200 ${mobileOpen ? 'block' : 'hidden'}`}
-        tabIndex={mobileOpen ? 0 : -1}
-        aria-label="Main"
-      >
-        {NAV_LINKS.map(link => (
+        {/* Mobile nav panel */}
+        <div
+          id="mobile-nav"
+          ref={mobileNavRef}
+          className={`md:hidden grid gap-2 p-4 glass-strong border-t glass-border transition-all duration-200 ${mobileOpen ? 'block' : 'hidden'}`}
+          tabIndex={mobileOpen ? 0 : -1}
+          aria-label="Main"
+        >
+          {NAV_LINKS.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
+              onClick={() => setMobileOpen(false)}
+              tabIndex={mobileOpen ? 0 : -1}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle Theme"
+            className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
+            tabIndex={mobileOpen ? 0 : -1}
+          >
+            {mounted && theme === "dark" ? <i className="fas fa-sun" /> : <i className="fas fa-moon" />}
+            <span>Toggle Theme</span>
+          </button>
           <Link
-            key={link.href}
-            href={link.href}
-            className="block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
+            href="/feedback"
+            className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white font-medium"
             onClick={() => setMobileOpen(false)}
             tabIndex={mobileOpen ? 0 : -1}
           >
-            {link.label}
+            Feedback
           </Link>
-        ))}
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle Theme"
-          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
-          tabIndex={mobileOpen ? 0 : -1}
-        >
-          {mounted && theme === "dark" ? <i className="fas fa-sun" /> : <i className="fas fa-moon" />}
-          <span>Toggle Theme</span>
-        </button>
-        <Link
-          href="/feedback"
-          className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white font-medium"
-          onClick={() => setMobileOpen(false)}
-          tabIndex={mobileOpen ? 0 : -1}
-        >
-          Feedback
-        </Link>
-      </div>
+        </div>
+      </Container>
     </header>
   );
 }
