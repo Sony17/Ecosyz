@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import emailjs from 'emailjs-com';
 
-// Replace these with your actual IDs/keys
-const SERVICE_ID = 'service_vq39t28';
-const TEMPLATE_ID = 'template_cn2j1xs';
-const USER_ID = 'Qv7kBjOI9KWh5Uw7G';
-const COMPANY_EMAIL = 'sohni2012@gmail.com';
+// Read EmailJS config from public env vars (client-side)
+// Note: EmailJS public key is intended to be public; service/template IDs are non-secret identifiers.
+const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
+const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
+const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
 export default function ChatBot() {
   const [open, setOpen] = useState(false);
@@ -61,6 +62,9 @@ Phone: ${phone}
         `.trim();
 
         try {
+          if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID || !COMPANY_EMAIL) {
+            throw new Error('EmailJS environment variables are not set');
+          }
           await emailjs.send(
             SERVICE_ID,
             TEMPLATE_ID,
