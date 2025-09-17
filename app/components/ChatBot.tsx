@@ -20,6 +20,20 @@ export default function ChatBot() {
 
   // Initialize EmailJS once with public key (safe on client)
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[ChatBot] Mounting. Env presence:', {
+        hasServiceId: Boolean(SERVICE_ID),
+        hasTemplateId: Boolean(TEMPLATE_ID),
+        hasPublicKey: Boolean(USER_ID),
+        hasCompanyEmail: Boolean(COMPANY_EMAIL),
+      });
+      // Ping server to log envs on server-side too (dev only)
+      fetch('/api/debug/emailjs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'mount', stage }),
+      }).catch((e) => console.warn('[ChatBot] Debug ping failed:', e));
+    }
     if (USER_ID) {
       try {
         // Some versions require init; passing user ID to send also works, but init is explicit
@@ -87,6 +101,22 @@ Phone: ${phone}
         `.trim();
 
         try {
+          if (process.env.NODE_ENV !== 'production') {
+            console.info('[ChatBot] Attempting send with params:', {
+              SERVICE_ID,
+              TEMPLATE_ID,
+              USER_ID: USER_ID ? `${USER_ID.slice(0, 4)}...` : '',
+              COMPANY_EMAIL,
+              email,
+              phone,
+            });
+            // Notify server for logging
+            fetch('/api/debug/emailjs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ event: 'pre-send', userEmail: email, userPhone: phone, stage }),
+            }).catch(() => {});
+          }
           if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID || !COMPANY_EMAIL) {
             throw new Error('EmailJS environment variables are not set');
           }
@@ -125,6 +155,15 @@ Phone: ${phone}
           console.error('EmailJS send failed:', err);
           const status = err?.status ?? err?.response?.status;
           const is412 = status === 412 || /412/.test(String(err));
+          if (process.env.NODE_ENV !== 'production') {
+            try {
+              await fetch('/api/debug/emailjs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ event: 'send-error', status, message: String(err) }),
+              });
+            } catch {}
+          }
           setMessages((msgs) => [
             ...msgs,
             {
