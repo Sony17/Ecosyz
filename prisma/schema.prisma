@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provinpm run db:pushnpm run db:pushder = "sqlite"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -25,7 +25,7 @@ model Resource {
   title       String
   url         String?
   type        String?
-  tags        String[]
+  tags        Json?
   data        Json?
   createdAt   DateTime    @default(now())
   annotations Annotation[]
