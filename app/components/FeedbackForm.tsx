@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import emailjs from 'emailjs-com';
-
-const SERVICE_ID = 'service_vq39t28';
-const TEMPLATE_ID = 'template_cn2j1xs';
-const USER_ID = 'Qv7kBjOI9KWh5Uw7G';
-const COMPANY_EMAIL = 'sohni2012@gmail.com';
+const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
+const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
+const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
 export default function FeedbackForm() {
   const [message, setMessage] = useState('');
@@ -21,19 +20,24 @@ export default function FeedbackForm() {
     setLoading(true);
 
     try {
+      if (process.env.NODE_ENV !== 'production') {
+        console.info('[FeedbackForm] sending', { SERVICE_ID, TEMPLATE_ID, hasUserId: Boolean(USER_ID), company: COMPANY_EMAIL });
+      }
+      if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
       await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
         {
-          email: COMPANY_EMAIL,   // So it always sends to you
+          to_email: COMPANY_EMAIL,
           message: `New feedback submission:\n\n${message}`,
-          subject: "New feedback from Open Idea website",
+          subject: 'New feedback from Open Idea website',
         },
         USER_ID
       );
       setSubmitted(true);
       setMessage('');
     } catch (err) {
+      if (process.env.NODE_ENV !== 'production') console.error('[FeedbackForm] send failed', err);
       setError('Something went wrong. Please try again.');
     }
     setLoading(false);
