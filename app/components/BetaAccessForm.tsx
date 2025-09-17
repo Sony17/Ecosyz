@@ -29,20 +29,30 @@ Email: ${email}
   `.trim();
 
   try {
+    if (process.env.NODE_ENV !== 'production') {
+      console.info('[BetaAccessForm] sending');
+    }
+    const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
+    const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
+    const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+    const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
+    if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
     await emailjs.send(
-      'service_vq39t28',
-      'template_cn2j1xs',
+      SERVICE_ID,
+      TEMPLATE_ID,
       {
-        message, // Send the combined message
-        subject: "New Beta Signup",
-        to_email: "sohni2012@gmail.com"
+        message,
+        subject: 'New Beta Signup',
+        to_email: COMPANY_EMAIL,
+        from_email: email,
       },
-      'Qv7kBjOI9KWh5Uw7G'
+      USER_ID
     );
     setSuccess("Thank you for signing up! 🚀");
     setName('');
     setEmail('');
   } catch (err) {
+    if (process.env.NODE_ENV !== 'production') console.error('[BetaAccessForm] send failed', err);
     setError("Failed to send. Please try again.");
   }
   setLoading(false);
