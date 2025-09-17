@@ -19,13 +19,29 @@ function isAsset(pathname: string) {
 
 function newSessionId() {
   // Use crypto.randomUUID when available
-  // Fallback to a simple random string (very unlikely path in modern runtimes)
-  try {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     // @ts-ignore
     return crypto.randomUUID();
-  } catch {
-    return 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
+  // Secure fallback using Web Crypto
+  if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
+    const bytes = new Uint8Array(16);
+    // @ts-ignore
+    crypto.getRandomValues(bytes);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    const b64 = typeof btoa !== 'undefined' ? btoa(bin) : Buffer.from(bytes).toString('base64');
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }
+  // If secure randomness is not available, fail rather than issue weak IDs
+  throw new Error('Secure randomness unavailable');
+}
+
+function isValidSessionId(id: string) {
+  if (!id || id.length > 128) return false;
+  const uuidV4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const b64url16 = /^[A-Za-z0-9\-_]{22}$/; // 16-byte base64url
+  return uuidV4.test(id) || b64url16.test(id);
 }
 
 export function middleware(req: NextRequest) {
@@ -38,7 +54,7 @@ export function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const existing = req.cookies.get(SESSION_COOKIE)?.value;
 
-  if (!existing) {
+  if (!existing || !isValidSessionId(existing)) {
     const sid = newSessionId();
     res.cookies.set({
       name: SESSION_COOKIE,
