@@ -1,10 +1,10 @@
 'use client';
 import { useState } from 'react';
 import emailjs from 'emailjs-com';
-
-const SERVICE_ID = 'service_vq39t28';
-const TEMPLATE_ID = 'template_cn2j1xs';
-const USER_ID = 'Qv7kBjOI9KWh5Uw7G';
+const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
+const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
+const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
 export default function FinalCTA() {
   const [email, setEmail] = useState('');
@@ -17,15 +17,20 @@ export default function FinalCTA() {
     setStatus('');
     const fullMessage = `User Email: ${email}\nInterested in: ${action}`;
     try {
+      if (process.env.NODE_ENV !== 'production') {
+        console.info('[FinalCTA] sending', { SERVICE_ID, TEMPLATE_ID, hasUserId: Boolean(USER_ID), company: COMPANY_EMAIL });
+      }
+      if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
       await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
-        { message: fullMessage },
+        { message: fullMessage, to_email: COMPANY_EMAIL, from_email: email, subject: 'CTA submission' },
         USER_ID
       );
       setStatus('success');
       setEmail('');
     } catch (err) {
+      if (process.env.NODE_ENV !== 'production') console.error('[FinalCTA] send failed', err);
       setStatus('error');
     }
     setSending(false);
