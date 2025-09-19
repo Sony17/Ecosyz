@@ -1,0 +1,61 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '../../../../../src/lib/db';
+import { getUid } from '../../../../../src/lib/auth';
+import { CreateAnnotation } from '../../../../../src/lib/validation';
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const uid = await getUid();
+
+  // @ts-ignore
+  // Check if resource belongs to user's workspace
+  const resource = await prisma.resource.findUnique({
+    where: { id },
+    // @ts-ignore
+    include: { workspace: true },
+  });
+  // @ts-ignore
+  if (!resource || resource.workspace.ownerId !== uid) {
+    return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 });
+  }
+
+  // @ts-ignore
+  const annotations = await prisma.annotation.findMany({
+    where: { resourceId: id },
+    orderBy: { createdAt: 'asc' },
+  });
+  return NextResponse.json(annotations);
+}
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const uid = await getUid();
+
+  // Check ownership
+  // @ts-ignore
+  const resource = await prisma.resource.findUnique({
+    where: { id },
+    // @ts-ignore
+    include: { workspace: true },
+  });
+  // @ts-ignore
+  if (!resource || resource.workspace.ownerId !== uid) {
+    return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 });
+  }
+
+  const body = await req.json();
+  const parse = CreateAnnotation.safeParse(body);
+  if (!parse.success) {
+    return NextResponse.json({ error: parse.error.message }, { status: 400 });
+  }
+
+  // @ts-ignore
+  const annotation = await prisma.annotation.create({
+    data: {
+      resourceId: id,
+      body: parse.data.body,
+      highlights: parse.data.highlights ?? null,
+    },
+  });
+  return NextResponse.json(annotation, { status: 201 });
+}

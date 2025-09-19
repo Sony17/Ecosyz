@@ -71,6 +71,6 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Run for all routes (except API auth paths in the future if needed)
-  matcher: ['/((?!api/auth).*)'],
+  // Run for all routes
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

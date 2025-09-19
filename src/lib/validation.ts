@@ -7,6 +7,7 @@ export const CreateWorkspace = z.object({
 export const CreateResource = z.object({
   title: z.string().min(1),
   url: z.string().url().optional(),
+  notes: z.string().optional(),
   type: z.string().optional(),
   tags: z.array(z.string()).optional(),
   data: z.any().optional()

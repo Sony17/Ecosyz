@@ -1,10 +1,58 @@
 'use client';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+interface Workspace {
+  id: string;
+  title: string;
+  createdAt: string;
+}
+
 export default function Projects() {
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    fetchWorkspaces();
+  }, []);
+
+  const fetchWorkspaces = async () => {
+    try {
+      const res = await fetch('/api/workspaces');
+      if (res.ok) {
+        const data = await res.json();
+        setWorkspaces(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch workspaces:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createWorkspace = async () => {
+    setCreating(true);
+    try {
+      const res = await fetch('/api/workspaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: 'New Project' }),
+      });
+      if (res.ok) {
+        const newWorkspace = await res.json();
+        router.push(`/workspaces/${newWorkspace.id}`);
+      }
+    } catch (error) {
+      console.error('Failed to create workspace:', error);
+      setCreating(false);
+    }
+  };
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -23,58 +71,59 @@ export default function Projects() {
 
           {/* Project Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {/* Project 1 */}
-            <div className="bg-[#192527]/90 p-6 rounded-xl border border-emerald-400/10 shadow-lg hover:shadow-[0_0_32px_#10b98145] transition flex flex-col justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-emerald-200 mb-2">Open Climate Model</h2>
-                <p className="text-teal-100/80 mb-6">
-                  Collaborative, open-source AI for predicting climate impacts. Integrates public data and global code contributions.
-                </p>
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-[#192527]/90 p-6 rounded-xl border border-emerald-400/10 shadow-lg animate-pulse">
+                  <div className="h-6 bg-emerald-400/20 rounded mb-2"></div>
+                  <div className="h-4 bg-teal-100/20 rounded mb-1"></div>
+                  <div className="h-4 bg-teal-100/20 rounded mb-1 w-3/4"></div>
+                  <div className="h-8 bg-emerald-400/30 rounded mt-6 w-24"></div>
+                </div>
+              ))
+            ) : workspaces.length > 0 ? (
+              workspaces.map((workspace, index) => {
+                const colors = [
+                  { bg: 'bg-[#192527]/90', border: 'border-emerald-400/10', shadow: 'hover:shadow-[0_0_32px_#10b98145]', title: 'text-emerald-200', button: 'from-emerald-400 to-cyan-400' },
+                  { bg: 'bg-[#192535]/90', border: 'border-cyan-400/10', shadow: 'hover:shadow-[0_0_32px_#00d9ff45]', title: 'text-cyan-200', button: 'from-cyan-400 to-emerald-400' },
+                  { bg: 'bg-[#1a2531]/90', border: 'border-purple-400/10', shadow: 'hover:shadow-[0_0_32px_#c084fc45]', title: 'text-purple-200', button: 'from-purple-300 to-cyan-400' },
+                ];
+                const color = colors[index % colors.length];
+
+                return (
+                  <div key={workspace.id} className={`${color.bg} p-6 rounded-xl border ${color.border} shadow-lg ${color.shadow} transition flex flex-col justify-between`}>
+                    <div>
+                      <h2 className={`text-xl font-bold ${color.title} mb-2`}>{workspace.title}</h2>
+                      <p className="text-teal-100/80 mb-6">
+                        Your personal workspace for organizing research, resources, and ideas. Created {new Date(workspace.createdAt).toLocaleDateString()}.
+                      </p>
+                    </div>
+                    <Link
+                      href={`/workspaces/${workspace.id}`}
+                      className={`inline-block px-6 py-2 mt-auto bg-gradient-to-r ${color.button} text-gray-900 font-semibold rounded-md shadow transition hover:scale-105 text-sm text-center`}
+                    >
+                      Open Workspace
+                    </Link>
+                  </div>
+                );
+              })
+            ) : (
+              // Empty state
+              <div className="col-span-full text-center py-12">
+                <p className="text-teal-100/80 text-lg mb-4">No projects yet. Start your first project!</p>
               </div>
-              <Link
-                href="/projects/open-climate-model"
-                className="inline-block px-6 py-2 mt-auto bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-md shadow transition hover:scale-105 text-sm text-center"
-              >
-                View Project
-              </Link>
-            </div>
-            {/* Project 2 */}
-            <div className="bg-[#192535]/90 p-6 rounded-xl border border-cyan-400/10 shadow-lg hover:shadow-[0_0_32px_#00d9ff45] transition flex flex-col justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-cyan-200 mb-2">Healthcare AI Toolkit</h2>
-                <p className="text-teal-100/80 mb-6">
-                  Open health datasets and code for diagnosis, available for doctors and researchers worldwide.
-                </p>
-              </div>
-              <Link
-                href="/projects/healthcare-ai-toolkit"
-                className="inline-block px-6 py-2 mt-auto bg-gradient-to-r from-cyan-400 to-emerald-400 text-gray-900 font-semibold rounded-md shadow transition hover:scale-105 text-sm text-center"
-              >
-                View Project
-              </Link>
-            </div>
-            {/* Project 3 */}
-            <div className="bg-[#1a2531]/90 p-6 rounded-xl border border-purple-400/10 shadow-lg hover:shadow-[0_0_32px_#c084fc45] transition flex flex-col justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-purple-200 mb-2">Open Hardware Lab</h2>
-                <p className="text-teal-100/80 mb-6">
-                  Build and share 3D printable hardware, circuits, and robotics—all designs open for remix.
-                </p>
-              </div>
-              <Link
-                href="/projects/open-hardware-lab"
-                className="inline-block px-6 py-2 mt-auto bg-gradient-to-r from-purple-300 to-cyan-400 text-gray-900 font-semibold rounded-md shadow transition hover:scale-105 text-sm text-center"
-              >
-                View Project
-              </Link>
-            </div>
+            )}
           </div>
 
           {/* Create Project Button */}
           <div className="mt-20 text-center">
-            <a href="#create" className="inline-block px-8 py-3 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg shadow-lg transition hover:scale-105">
-              Start a New Project
-            </a>
+            <button
+              onClick={createWorkspace}
+              disabled={creating}
+              className="inline-block px-8 py-3 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg shadow-lg transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {creating ? 'Creating...' : 'Start a New Project'}
+            </button>
           </div>
         </div>
       </div>

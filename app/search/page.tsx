@@ -6,6 +6,8 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
+import SaveToWorkspace from '../components/workspace/SaveToWorkspace';
+import ToastProvider from '../components/ui/ToastProvider';
 
 const FILTERS = [
   { label: 'All', value: 'all' },
@@ -49,6 +51,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      <ToastProvider />
       <Header />
       <Container>
         <main className="py-12">
@@ -132,7 +135,7 @@ export default function SearchPage() {
               <div className="text-sm text-gray-400 line-clamp-2 mb-2">{r.description}</div>
               <div className="flex gap-2 mt-2">
                 <a href={r.url} target="_blank" rel="noopener" className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition">Open</a>
-                <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
+                <SaveToWorkspace result={r} />
                 <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Summarize</button>
               </div>
               <span className="absolute right-4 top-4 text-xs text-gray-700">{r.score !== undefined ? `Score: ${r.score.toFixed(2)}` : ''}</span>
