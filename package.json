@@ -21,6 +21,7 @@
     "@emailjs/browser": "^4.4.1",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@prisma/client": "^6.16.2",
+    "@supabase/supabase-js": "^2.57.4",
     "@vercel/kv": "^3.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.15",

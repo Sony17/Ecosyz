@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { init, send } from '@emailjs/browser';
-const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
-const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
-const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+import { supabase } from '../../src/lib/supabase';
+
+// Supabase configuration
 const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
 export default function FeedbackForm() {
@@ -21,19 +20,29 @@ export default function FeedbackForm() {
 
     try {
       if (process.env.NODE_ENV !== 'production') {
-        console.info('[FeedbackForm] sending', { SERVICE_ID, TEMPLATE_ID, hasUserId: Boolean(USER_ID), company: COMPANY_EMAIL });
+        console.info('[FeedbackForm] sending feedback');
       }
-      if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
-      await send(
-        SERVICE_ID,
-        TEMPLATE_ID,
-        {
-          to_email: COMPANY_EMAIL,
-          message: `New feedback submission:\n\n${message}`,
+
+      if (!COMPANY_EMAIL) {
+        throw new Error('Supabase environment variables are not set');
+      }
+
+      // Send email via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: COMPANY_EMAIL,
           subject: 'New feedback from Open Idea website',
+          html: `
+            <h2>New Feedback Submission</h2>
+            <p><strong>Message:</strong></p>
+            <p>${message.replace(/\n/g, '<br>')}</p>
+          `,
+          text: `New feedback submission:\n\n${message}`,
         },
-        USER_ID
-      );
+      });
+
+      if (error) throw error;
+
       setSubmitted(true);
       setMessage('');
     } catch (err) {

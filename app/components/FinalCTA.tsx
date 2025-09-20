@@ -1,9 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { init, send } from '@emailjs/browser';
-const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
-const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
-const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
+import { supabase } from '../../src/lib/supabase';
+
+// Supabase configuration
 const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
 export default function FinalCTA() {
@@ -18,15 +17,29 @@ export default function FinalCTA() {
     const fullMessage = `User Email: ${email}\nInterested in: ${action}`;
     try {
       if (process.env.NODE_ENV !== 'production') {
-        console.info('[FinalCTA] sending', { SERVICE_ID, TEMPLATE_ID, hasUserId: Boolean(USER_ID), company: COMPANY_EMAIL });
+        console.info('[FinalCTA] sending CTA submission');
       }
-      if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
-      await send(
-        SERVICE_ID,
-        TEMPLATE_ID,
-        { message: fullMessage, to_email: COMPANY_EMAIL, from_email: email, subject: 'CTA submission' },
-        USER_ID
-      );
+
+      if (!COMPANY_EMAIL) {
+        throw new Error('Supabase environment variables are not set');
+      }
+
+      // Send email via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: COMPANY_EMAIL,
+          subject: `CTA submission - ${action}`,
+          html: `
+            <h2>New CTA Submission</h2>
+            <p><strong>User Email:</strong> ${email}</p>
+            <p><strong>Interested in:</strong> ${action}</p>
+          `,
+          text: fullMessage,
+        },
+      });
+
+      if (error) throw error;
+
       setStatus('success');
       setEmail('');
     } catch (err) {

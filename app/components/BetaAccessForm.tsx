@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect } from "react";
-import { init, send } from '@emailjs/browser';
+import { useState } from "react";
+import { supabase } from "../../src/lib/supabase";
 
 interface BetaAccessFormProps {
   title?: string;
@@ -14,29 +14,7 @@ export default function BetaAccessForm({ title = "Join the Beta", onClose }: Bet
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize EmailJS on component mount
-  useEffect(() => {
-    const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-    if (USER_ID) {
-      try {
-        init(USER_ID);
-        if (process.env.NODE_ENV !== 'production') {
-          console.info('[BetaAccessForm] EmailJS initialized with config:', {
-            hasServiceId: Boolean(process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID),
-            hasTemplateId: Boolean(process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID),
-            hasPublicKey: Boolean(USER_ID),
-            hasCompanyEmail: Boolean(process.env.NEXT_PUBLIC_COMPANY_EMAIL)
-          });
-        }
-      } catch (err) {
-        console.warn('[BetaAccessForm] EmailJS init warning:', err);
-      }
-    } else {
-      console.warn('[BetaAccessForm] Missing EmailJS public key');
-    }
-  }, []);
-
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   setLoading(true);
   setSuccess(null);
@@ -52,55 +30,38 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   const message = `Message: Beta Access Request\nName: ${name}\nEmail: ${email}`.trim();
 
   try {
-    const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
-    const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
-    const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
     const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 
     if (process.env.NODE_ENV !== 'production') {
       console.info('[BetaAccessForm] Attempting to send with config:', {
-        serviceId: SERVICE_ID,
-        templateId: TEMPLATE_ID,
-        publicKey: USER_ID ? `${USER_ID.slice(0, 4)}...` : '',
         companyEmail: COMPANY_EMAIL,
         name,
         email
       });
-      
-      // Log the template parameters for verification
-      console.info('[BetaAccessForm] Template parameters:', {
-        message,
-        subject: 'New Beta Signup',
-        to_email: COMPANY_EMAIL,
-        from_email: email,
-        from_name: name,
-        user_name: name,
-        user_email: email
-      });
     }
 
-    // Validate all required env vars
-    if (!SERVICE_ID) throw new Error('Missing EmailJS service ID');
-    if (!TEMPLATE_ID) throw new Error('Missing EmailJS template ID');
-    if (!USER_ID) throw new Error('Missing EmailJS public key');
+    // Validate required env vars
     if (!COMPANY_EMAIL) throw new Error('Missing company email');
 
-    // Keep it simple - just like in your template
-    const templateParams = {
-      to_email: COMPANY_EMAIL,
-      from_email: email,
-      message: message
-    };
+    // Send email via Supabase Edge Function
+    const { data, error } = await supabase.functions.invoke('send-email', {
+      body: {
+        to: COMPANY_EMAIL,
+        subject: 'New Beta Access Request',
+        html: `
+          <h2>New Beta Access Request</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Message:</strong> Beta Access Request</p>
+        `,
+        text: `New Beta Access Request\n\nName: ${name}\nEmail: ${email}\nMessage: Beta Access Request`,
+      },
+    });
 
-    const result = await send(
-      SERVICE_ID,
-      TEMPLATE_ID,
-      templateParams,
-      USER_ID
-    );
+    if (error) throw error;
 
     if (process.env.NODE_ENV !== 'production') {
-      console.info('[BetaAccessForm] Send successful:', result);
+      console.info('[BetaAccessForm] Send successful:', data);
     }
     setSuccess("Thank you for signing up! 🚀");
     setName('');
