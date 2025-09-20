@@ -65,9 +65,9 @@ export default function WhitepaperPage() {
       <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 uppercase">1. Mission and Vision</h1>
 
       <div className="bg-[#182925]/80 p-6 rounded-xl mb-6 shadow-lg border border-emerald-400/20">
-        <p className="text-lg font-medium text-teal-100/90">Open Idea's mission is to democratize innovation by providing an open, AI-powered platform where impactful projects across all domains can launch, connect, and thrive together.</p>
+        <p className="text-lg font-medium text-teal-100/90">Open Idea&apos;s mission is to democratize innovation by providing an open, AI-powered platform where impactful projects across all domains can launch, connect, and thrive together.</p>
       </div>
-      <p className="mb-4 text-teal-100/80">Our vision is a world where every breakthrough – in science, technology, or social impact – has the open platform, community, and resources to change the world. In essence, Open Idea aspires to be "the world's open innovation infrastructure", unifying knowledge and people to accelerate positive change.</p>
+      <p className="mb-4 text-teal-100/80">Our vision is a world where every breakthrough – in science, technology, or social impact – has the open platform, community, and resources to change the world. In essence, Open Idea aspires to be &quot;the world&apos;s open innovation infrastructure&quot;, unifying knowledge and people to accelerate positive change.</p>
       <p className="mb-4 text-teal-100/80">By bringing every open resource under one roof and empowering anyone to build on them, Open Idea aims to multiply the impact of individual ideas through global collaboration.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
         <div className="bg-gradient-to-br from-emerald-900/50 to-emerald-800/10 border border-emerald-400/30 p-6 rounded-lg">
@@ -142,13 +142,13 @@ export default function WhitepaperPage() {
           <h4 className="text-lg font-medium text-purple-200">Licensing Barriers</h4>
         </div>
         <p className="text-teal-100/80">
-          Even "open" resources come with varied licenses (MIT, GPL, Creative Commons, etc.) and conditions. Combining a public dataset with an open-source algorithm can trigger legal uncertainty.
+          Even &quot;open&quot; resources come with varied licenses (MIT, GPL, Creative Commons, etc.) and conditions. Combining a public dataset with an open-source algorithm can trigger legal uncertainty.
         </p>
       </div>
     </div>
 
     <div className="mt-8 bg-[#162322]/90 p-6 rounded-lg border border-cyan-400/10 shadow text-teal-100/90 italic text-lg">
-      "Although nearly 38% of global research articles are now published open access (up from just 11% a decade ago), much of that knowledge isn't reaching software developers or entrepreneurs who could apply it."
+      "      &quot;Although nearly 38% of global research articles are now published open access (up from just 11% a decade ago), much of that knowledge isn&apos;t reaching software developers or entrepreneurs who could apply it.&quot;"
     </div>
 
     <p className="mt-6 text-teal-100/80">
@@ -256,7 +256,7 @@ export default function WhitepaperPage() {
       </div>
     </div>
     <div className="mt-10 bg-[#162322]/90 p-6 rounded-lg border border-emerald-400/10 shadow text-teal-100/90 text-lg italic">
-      “This seamless workflow from search to creation is what makes Open Idea a game-changer in harnessing the world's open resources.”
+      “      &quot;This seamless workflow from search to creation is what makes Open Idea a game-changer in harnessing the world&apos;s open resources.&quot;”
     </div>
   </div>
 </section>

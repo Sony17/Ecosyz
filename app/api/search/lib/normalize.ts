@@ -18,8 +18,8 @@ export function normUrl(u: string): string {
       .split('&')
       .filter(p => !/^utm_|^ref/.test(p))
       .join('&');
-    let host = url.host.toLowerCase();
-    let path = url.pathname.replace(/\/$/, '');
+    const host = url.host.toLowerCase();
+    const path = url.pathname.replace(/\/$/, '');
     return `${url.protocol}//${host}${path}`;
   } catch {
     return u.toLowerCase().replace(/\/$/, '');
@@ -38,6 +38,14 @@ export function normAuthors(a: string[]): string[] {
   return a.map(s => s.toLowerCase().trim());
 }
 
-export function pickYear(meta: any): number | undefined {
+interface DateMeta {
+  publishedPrint?: number;
+  publishedOnline?: number;
+  year?: number;
+  created?: number;
+  updated?: number;
+}
+
+export function pickYear(meta: DateMeta): number | undefined {
   return meta?.publishedPrint || meta?.publishedOnline || meta?.year || meta?.created || meta?.updated;
 }

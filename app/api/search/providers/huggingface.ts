@@ -8,9 +8,24 @@ const HF_MODELS_ENDPOINT = 'https://huggingface.co/api/models';
 /**
  * Parse Hugging Face model API response to Resource[]
  */
-function parseHuggingFaceModels(json: any): Resource[] {
+interface HuggingFaceModel {
+  id: string;
+  modelId?: string;
+  author?: string;
+  createdAt?: string;
+  license?: string;
+  cardData?: { summary?: string };
+  description?: string;
+  tags?: string[];
+  pipeline_tag?: string;
+  pipeline_tags?: string[];
+  downloads?: number;
+  likes?: number;
+}
+
+function parseHuggingFaceModels(json: HuggingFaceModel[]): Resource[] {
   if (!Array.isArray(json)) return [];
-  return json.map((model: any) => ({
+  return json.map((model) => ({
     id: model.id,
     type: 'model',
     title: model.modelId || model.id,
@@ -43,8 +58,8 @@ export async function searchHuggingFaceModels(q: string): Promise<Resource[]> {
     if (!res.ok) throw new Error(`HuggingFace error: ${res.status}`);
     const json = await res.json();
     return parseHuggingFaceModels(json);
-  } catch (e) {
-    // Fail gracefully
+  } catch (error) {
+    // Fail gracefully - no need to handle the error
     return [];
   } finally {
     clearTimeout(timeout);

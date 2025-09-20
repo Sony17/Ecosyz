@@ -1,17 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import FeatureCards from './FeatureCards';
-import PurposeSection from './PurposeSection';
-import UniquePoints from './UniquePoints';
-import ResourcesSection from './ResourcesSection';
-import ImpactSection from './ImpactSection';
-import ChallengesSection from './ChallengesSection';
-import TechnologySection from './TechnologySection';
-import CommunitySection from './CommunitySection';
-import JoinRevolution from './JoinRevolution';
-import FAQSection from './FAQSection';
-import FinalCTA from './FinalCTA';
 import BetaAccessForm from "./BetaAccessForm";
 import { useState } from "react";
 

@@ -6,6 +6,7 @@ import { ExternalLink, Trash2, Copy, MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '../../../src/lib/ui'
 import { json, copy } from '../../../src/lib/api'
+import AddAnnotationForm from './AddAnnotationForm'
 
 interface Resource {
   id: string
@@ -20,10 +21,12 @@ interface Resource {
 interface ResourceCardProps {
   resource: Resource
   onDeleted?: (id: string) => void
+  onAnnotationCreated?: (resourceId: string) => void
 }
 
-export default function ResourceCard({ resource, onDeleted }: ResourceCardProps) {
+export default function ResourceCard({ resource, onDeleted, onAnnotationCreated }: ResourceCardProps) {
   const [deleting, setDeleting] = useState(false)
+  const [showAnnotationForm, setShowAnnotationForm] = useState(false)
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this resource?')) return
@@ -51,7 +54,8 @@ export default function ResourceCard({ resource, onDeleted }: ResourceCardProps)
     try {
       await copy(resource.url)
       toast.success('URL copied to clipboard!')
-    } catch (error) {
+    } catch {
+      // Error handling not needed for this case
       toast.error('Failed to copy URL')
     }
   }
@@ -171,18 +175,32 @@ export default function ResourceCard({ resource, onDeleted }: ResourceCardProps)
         )}
       </div>
 
-      {/* Add annotation link */}
-      <div className="mt-4 pt-4 border-t border-zinc-800">
-        <button
-          className={cn(
-            "flex items-center gap-2 text-emerald-400 hover:text-emerald-300",
-            "text-sm font-medium transition-colors"
-          )}
-        >
-          <MessageSquare className="w-4 h-4" />
-          Add Annotation
-        </button>
-      </div>
+      {/* Add annotation section */}
+      {!showAnnotationForm && (
+        <div className="mt-4 pt-4 border-t border-zinc-800">
+          <button
+            onClick={() => setShowAnnotationForm(true)}
+            className={cn(
+              "flex items-center gap-2 text-emerald-400 hover:text-emerald-300",
+              "text-sm font-medium transition-colors"
+            )}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Add Annotation
+          </button>
+        </div>
+      )}
+
+      {showAnnotationForm && (
+        <AddAnnotationForm
+          resourceId={resource.id}
+          onCreated={() => {
+            onAnnotationCreated?.(resource.id)
+            setShowAnnotationForm(false)
+          }}
+          onCancel={() => setShowAnnotationForm(false)}
+        />
+      )}
     </motion.div>
   )
 }

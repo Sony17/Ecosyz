@@ -23,9 +23,9 @@ interface Workspace {
 export default async function WorkspacePage({
   params
 }: {
-  params: Promise<{ id: string }>
+  params: { id: string }
 }) {
-  const { id } = await params
+  const { id } = params
 
   const workspace = await prisma.workspace.findUnique({
     where: { id },
@@ -46,21 +46,25 @@ export default async function WorkspacePage({
     notFound()
   }
 
+  interface ResourceData {
+    notes?: string;
+  }
+
   // Add annotation count to resources
   const resourcesWithCount = workspace.resources.map(resource => {
-    const data = resource.data as any
+    const data = (resource.data as ResourceData | null) ?? {};
     return {
       ...resource,
       url: resource.url || undefined,
-      notes: data?.notes || undefined,
+      notes: data.notes,
       createdAt: resource.createdAt.toISOString(),
-      annotations: resource.annotations.map((annotation: any) => ({
+      annotations: resource.annotations.map((annotation) => ({
         id: annotation.id,
         body: annotation.body,
         createdAt: annotation.createdAt.toISOString(),
       })),
       annotationCount: resource.annotations.length,
-      tags: Array.isArray(resource.tags) ? resource.tags as string[] : undefined,
+      tags: Array.isArray(resource.tags) ? resource.tags.map(tag => String(tag)) : undefined,
     }
   })
 
@@ -68,7 +72,7 @@ export default async function WorkspacePage({
     id: workspace.id,
     title: workspace.title,
     resources: resourcesWithCount,
-    shareLinks: workspace.shares.map((share: any) => ({
+    shareLinks: workspace.shares.map((share) => ({
       id: share.id,
       token: share.token,
       createdAt: share.createdAt.toISOString(),

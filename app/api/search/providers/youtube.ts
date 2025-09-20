@@ -5,13 +5,34 @@ import type { Resource } from '../../../../src/types/resource';
 
 // NOTE: This uses the public YouTube Data API v3. You need an API key for production use.
 const YT_SEARCH_ENDPOINT = 'https://www.googleapis.com/youtube/v3/search';
-const YT_VIDEO_ENDPOINT = 'https://www.googleapis.com/youtube/v3/videos';
 const YT_API_KEY = process.env.YOUTUBE_API_KEY || '';
 
-function parseYouTubeVideos(json: any): Resource[] {
+interface YouTubeSnippet {
+  title?: string;
+  channelTitle?: string;
+  publishedAt?: string;
+  description?: string;
+  tags?: string[];
+}
+
+interface YouTubeItem {
+  id: {
+    videoId?: string;
+  } | string;
+  snippet?: YouTubeSnippet;
+  contentDetails?: {
+    duration?: string;
+  };
+}
+
+interface YouTubeResponse {
+  items?: YouTubeItem[];
+}
+
+function parseYouTubeVideos(json: YouTubeResponse): Resource[] {
   if (!json.items) return [];
-  return json.items.map((item: any) => {
-    const vid = item.id.videoId || item.id;
+  return json.items.map((item) => {
+    const vid = typeof item.id === 'string' ? item.id : (item.id.videoId || '');
     return {
       id: vid,
       type: 'video',

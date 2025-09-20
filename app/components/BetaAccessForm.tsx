@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import emailjs from "emailjs-com";
 
 export default function BetaAccessForm({ title = "Join the Beta" }) {
@@ -8,6 +8,18 @@ export default function BetaAccessForm({ title = "Join the Beta" }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    if (USER_ID) {
+      try {
+        emailjs.init(USER_ID);
+      } catch (err) {
+        console.warn('EmailJS init warning:', err);
+      }
+    }
+  }, []);
 
 const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();

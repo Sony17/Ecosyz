@@ -47,8 +47,8 @@ export async function searchArxiv(q: string): Promise<Resource[]> {
     if (!res.ok) throw new Error(`arXiv error: ${res.status}`);
     const xml = await res.text();
     return parseArxivAtom(xml);
-  } catch (e) {
-    // Fail gracefully
+  } catch (error) {
+    // Fail gracefully - no need to handle the error
     return [];
   } finally {
     clearTimeout(timeout);

@@ -17,15 +17,38 @@ import { searchWikifactoryDesigns } from './providers/wikifactory';
 import type { Resource, ResourceType } from '../../../src/types/resource';
 import { dedupeConservative } from './lib/dedupe';
 
+interface SearchCoverage {
+  requestedProviders: string[];
+  receivedCounts: Record<string, number>;
+  uniqueBefore: number;
+  uniqueAfter: number;
+  merged: number;
+}
+
+interface SearchSessionData {
+  items: Resource[];
+  total: number;
+  coverage: SearchCoverage;
+}
+
+interface SearchResponse extends Omit<SearchSessionData, 'items'> {
+  results: Resource[];
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  nextCursor: string | null;
+  decisions?: Array<{ winnerId: string; loserId: string; reason: string }>;
+}
+
 // Optimized in-memory LRU cache for search results
 // - Avoids rate limits by caching recent queries
 // - TTL (time-to-live) and max size are configurable
 // - Uses Map for O(1) access and LRU eviction
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const CACHE_MAX = 100; // Max number of cached queries
-const cache = new Map<string, { ts: number; data: any }>();
+const cache = new Map<string, { ts: number; data: SearchSessionData }>();
 
-function getCache(key: string): any | undefined {
+function getCache(key: string): SearchSessionData | undefined {
   // Move accessed entry to the end (most recently used)
   const entry = cache.get(key);
   if (!entry) return undefined;
@@ -38,7 +61,7 @@ function getCache(key: string): any | undefined {
   return entry.data;
 }
 
-function setCache(key: string, data: any) {
+function setCache(key: string, data: SearchSessionData) {
   // Insert or update, then move to end (most recently used)
   if (cache.has(key)) cache.delete(key);
   cache.set(key, { ts: Date.now(), data });
@@ -184,7 +207,7 @@ export async function GET(req: NextRequest) {
   const nextCursor = nextOffset < deduped.length ? encodeCursor({ sessionId, offset: nextOffset, limit }) : null;
 
   // Build response before caching so we cache the entire payload
-  const resp: any = {
+  const resp: SearchResponse = {
     results: paginated,
     total: deduped.length,
     page,
@@ -200,7 +223,12 @@ export async function GET(req: NextRequest) {
       // Documented in docs/specs/providers.md
     }
   };
-  setCache(cacheKey, resp);
+  const sessionData: SearchSessionData = {
+    items: deduped,
+    total: deduped.length,
+    coverage: resp.coverage
+  };
+  setCache(cacheKey, sessionData);
   // See docs/specs/dedupe-pipeline.md and docs/specs/providers.md for details
   if (debug) resp.decisions = dedupeResult.decisions;
   return NextResponse.json(resp, {

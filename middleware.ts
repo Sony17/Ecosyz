@@ -20,14 +20,12 @@ function isAsset(pathname: string) {
 function newSessionId() {
   // Use crypto.randomUUID when available
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    // @ts-ignore
     return crypto.randomUUID();
   }
   // Secure fallback using Web Crypto
   if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
     const bytes = new Uint8Array(16);
-    // @ts-ignore
-    crypto.getRandomValues(bytes);
+    (crypto as Crypto).getRandomValues(bytes);
     let bin = '';
     for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     const b64 = typeof btoa !== 'undefined' ? btoa(bin) : Buffer.from(bytes).toString('base64');

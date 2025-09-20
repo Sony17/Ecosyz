@@ -38,7 +38,6 @@ function OpenResourcesPage() {
   const [coverage, setCoverage] = useState<any>(null);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(30);
-  const [hasMore, setHasMore] = useState<boolean | null>(null);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const activeAbort = useRef<AbortController | null>(null);
   const [summaries, setSummaries] = useState<Record<string, any>>({});
@@ -128,7 +127,6 @@ function OpenResourcesPage() {
       setResults(Array.isArray(data.results) ? data.results : []);
       setCoverage(data.coverage || null);
       setTotal(data.total || 0);
-      setHasMore(Boolean(data.nextCursor));
       setNextCursor(typeof data.nextCursor === 'string' ? data.nextCursor : null);
       // Sync URL
       updateURL(customQ, customType, customLimit);
@@ -157,7 +155,6 @@ function OpenResourcesPage() {
       const newItems = Array.isArray(data.results) ? data.results : [];
       setResults(prev => [...prev, ...newItems]);
       setTotal(data.total || total);
-      setHasMore(Boolean(data.nextCursor));
       setNextCursor(typeof data.nextCursor === 'string' ? data.nextCursor : null);
       // Do not update URL during load more to avoid scrolling to top
     } catch (e: any) {

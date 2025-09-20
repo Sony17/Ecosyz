@@ -28,8 +28,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">{workspace.title} (Shared)</h1>
       <div className="space-y-4">
-        {/* @ts-ignore */}
-        {workspace.resources.map((resource) => (
+        {workspace.resources?.map((resource) => (
           <div key={resource.id} className="border p-4 rounded">
             <h2 className="text-xl font-semibold">{resource.title}</h2>
             {resource.url && (
@@ -41,8 +40,7 @@ export default async function SharePage({ params }: { params: Promise<{ token: s
               <div className="mt-4">
                 <h3 className="font-semibold">Annotations:</h3>
                 <ul className="list-disc list-inside">
-                  {/* @ts-ignore */}
-                  {resource.annotations.map((annotation) => (
+                  {resource.annotations?.map((annotation) => (
                     <li key={annotation.id} className="mt-1">
                       {annotation.body}
                     </li>

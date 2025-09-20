@@ -18,7 +18,27 @@ export async function searchOpenAlex(q: string): Promise<Resource[]> {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) throw new Error(`OpenAlex error: ${res.status}`);
     const data = await res.json();
-    return (data.results || []).map((item: any) => ({
+    interface OpenAlexAuthor {
+      author: {
+        display_name: string;
+      };
+    }
+
+    interface OpenAlexItem {
+      doi?: string;
+      id: string;
+      title: string;
+      authors?: OpenAlexAuthor[];
+      publication_year?: number;
+      license?: string;
+      abstract_inverted_index?: Record<string, unknown>;
+    }
+
+    interface OpenAlexResponse {
+      results?: OpenAlexItem[];
+    }
+
+    return ((data as OpenAlexResponse).results || []).map((item) => ({
       id: item.doi || item.id,
       type: 'paper',
       title: item.title,
@@ -29,8 +49,8 @@ export async function searchOpenAlex(q: string): Promise<Resource[]> {
       license: item.license || 'NOASSERTION',
       description: item.abstract_inverted_index ? Object.keys(item.abstract_inverted_index).join(' ') : undefined,
     }));
-  } catch (e) {
-    // Fail gracefully
+  } catch (error) {
+    // Fail gracefully - no need to handle the error
     return [];
   } finally {
     clearTimeout(timeout);

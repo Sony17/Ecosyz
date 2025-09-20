@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Share, Copy, Clock, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -23,11 +23,7 @@ export default function ShareLinksPanel({ workspaceId }: ShareLinksPanelProps) {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
 
-  useEffect(() => {
-    fetchShareLinks()
-  }, [workspaceId])
-
-  const fetchShareLinks = async () => {
+  const fetchShareLinks = useCallback(async () => {
     try {
       const data = await json<ShareLink[]>(await fetch(`/api/workspaces/${workspaceId}/share`))
       setShareLinks(data)
@@ -36,7 +32,7 @@ export default function ShareLinksPanel({ workspaceId }: ShareLinksPanelProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [workspaceId])
 
   const createShareLink = async () => {
     setCreating(true)
@@ -64,15 +60,20 @@ export default function ShareLinksPanel({ workspaceId }: ShareLinksPanelProps) {
     try {
       await copy(shareUrl)
       toast.success('Share URL copied to clipboard!')
-    } catch (error) {
+    } catch {
+      // Error already handled by fetchShareLinks
       toast.error('Failed to copy URL')
     }
   }
 
   const openShareUrl = (token: string) => {
-    const shareUrl = `${window.location.origin}/share/${token}`
-    window.open(shareUrl, '_blank', 'noopener,noreferrer')
+    window.open(`${window.location.origin}/share/${token}`, '_blank', 'noopener,noreferrer')
   }
+
+  // Fetch share links on mount and when workspaceId changes
+  useEffect(() => {
+    fetchShareLinks()
+  }, [fetchShareLinks])
 
   if (loading) {
     return (

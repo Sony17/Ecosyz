@@ -51,8 +51,8 @@ export interface Resource {
   /** Optional tags */
   tags?: string[];
   /** Optional meta object for extra metadata */
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
   /** Optional score for ranking */
   score?: number;
-  [key: string]: any;
+  [key: string]: string | ResourceType | string[] | number | ResourceProvider | boolean | Record<string, unknown> | undefined;
 }

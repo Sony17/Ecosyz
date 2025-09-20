@@ -9,15 +9,7 @@ import { Container } from '../components/ui/Container';
 import SaveToWorkspace from '../components/workspace/SaveToWorkspace';
 import ToastProvider from '../components/ui/ToastProvider';
 
-const FILTERS = [
-  { label: 'All', value: 'all' },
-  { label: 'Papers', value: 'paper' },
-  { label: 'Datasets', value: 'dataset' },
-  { label: 'Code', value: 'code' },
-  { label: 'Models', value: 'model' },
-  { label: 'Hardware', value: 'hardware' },
-  { label: 'Videos', value: 'video' },
-];
+
 
 export default function SearchPage() {
   const [q, setQ] = useState('');

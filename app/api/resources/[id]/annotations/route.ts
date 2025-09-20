@@ -7,19 +7,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const uid = await getUid();
 
-  // @ts-ignore
   // Check if resource belongs to user's workspace
   const resource = await prisma.resource.findUnique({
     where: { id },
-    // @ts-ignore
     include: { workspace: true },
   });
-  // @ts-ignore
   if (!resource || resource.workspace.ownerId !== uid) {
     return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 });
   }
 
-  // @ts-ignore
   const annotations = await prisma.annotation.findMany({
     where: { resourceId: id },
     orderBy: { createdAt: 'asc' },
@@ -32,13 +28,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const uid = await getUid();
 
   // Check ownership
-  // @ts-ignore
   const resource = await prisma.resource.findUnique({
     where: { id },
-    // @ts-ignore
     include: { workspace: true },
   });
-  // @ts-ignore
   if (!resource || resource.workspace.ownerId !== uid) {
     return NextResponse.json({ error: 'Not found or forbidden' }, { status: 404 });
   }
@@ -49,7 +42,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: parse.error.message }, { status: 400 });
   }
 
-  // @ts-ignore
   const annotation = await prisma.annotation.create({
     data: {
       resourceId: id,

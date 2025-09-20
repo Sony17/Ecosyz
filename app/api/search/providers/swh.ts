@@ -18,10 +18,24 @@ export async function searchSoftwareHeritage(q: string): Promise<Resource[]> {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) throw new Error(`SWH error: ${res.status}`);
     const data = await res.json();
-    return (data.results || []).map((item: any) => ({
-      id: item.swhid || item.url,
+    interface SWHItem {
+      swhid?: string;
+      url?: string;
+      title?: string;
+      authors?: string[];
+      date?: string;
+      license?: string;
+      summary?: string;
+    }
+
+    interface SWHResponse {
+      results?: SWHItem[];
+    }
+
+    return ((data as SWHResponse).results || []).map((item) => ({
+      id: item.swhid || item.url || 'no-id',
       type: 'code',
-      title: item.title || item.url,
+      title: item.title || item.url || 'Untitled',
       authors: item.authors || [],
       year: item.date ? parseInt(item.date.slice(0,4)) : undefined,
       source: 'swh',
@@ -29,8 +43,8 @@ export async function searchSoftwareHeritage(q: string): Promise<Resource[]> {
       license: item.license || 'NOASSERTION',
       description: item.summary,
     }));
-  } catch (e) {
-    // Fail gracefully
+  } catch (error) {
+    // Fail gracefully - no need to handle the error
     return [];
   } finally {
     clearTimeout(timeout);

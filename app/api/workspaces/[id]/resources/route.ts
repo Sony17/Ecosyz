@@ -8,7 +8,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ws = await ensureOwner(id);
   if (ws instanceof NextResponse) return ws;
 
-  // @ts-ignore
   const resources = await prisma.resource.findMany({
     where: { workspaceId: id },
     include: { annotations: true },
@@ -28,16 +27,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: parse.error.message }, { status: 400 });
   }
 
-  // @ts-ignore
+  const resourceData = {
+    workspaceId: id,
+    title: parse.data.title,
+    type: parse.data.type,
+    tags: parse.data.tags,
+    data: parse.data.data ?? {},
+    ...(parse.data.url && { url: parse.data.url }),
+  };
+
   const resource = await prisma.resource.create({
-    data: {
-      workspaceId: id,
-      title: parse.data.title,
-      url: parse.data.url,
-      type: parse.data.type,
-      tags: parse.data.tags,
-      data: parse.data.data ?? {},
-    },
+    data: resourceData,
   });
   return NextResponse.json(resource, { status: 201 });
 }

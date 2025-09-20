@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
-import { Container } from '@/app/components/ui/Container';
+
 
 export const metadata = {
   title: 'Pricing • Open Idea',

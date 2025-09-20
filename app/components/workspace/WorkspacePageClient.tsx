@@ -103,7 +103,11 @@ export default function WorkspacePageClient({ workspaceData }: WorkspacePageClie
                   >
                     <ResourceCard
                       resource={resource}
-                      onDeleted={(id: string) => {
+                      onDeleted={() => {
+                        // This will trigger a re-fetch on the client side
+                        window.location.reload()
+                      }}
+                      onAnnotationCreated={() => {
                         // This will trigger a re-fetch on the client side
                         window.location.reload()
                       }}

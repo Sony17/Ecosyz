@@ -44,9 +44,13 @@ export default function WorkspacesPage() {
       if (res.ok) {
         setNewTitle('');
         fetchWorkspaces();
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to create workspace: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to create workspace:', error);
+      alert('Failed to create workspace. Please try again.');
     }
   };
 

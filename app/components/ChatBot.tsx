@@ -3,6 +3,23 @@
 import { useEffect, useState } from 'react';
 import emailjs from 'emailjs-com';
 
+interface EmailJSResponse {
+  status: number;
+  text: string;
+}
+
+interface EmailJSError extends Error {
+  status?: number;
+  response?: {
+    status?: number;
+  };
+}
+
+interface Message {
+  text: string;
+  isBot?: boolean;
+}
+
 // Read EmailJS config from public env vars (client-side)
 // Note: EmailJS public key is intended to be public; service/template IDs are non-secret identifiers.
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
@@ -13,7 +30,7 @@ const COMPANY_EMAIL = process.env.NEXT_PUBLIC_COMPANY_EMAIL ?? '';
 export default function ChatBot() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{ text: string; isBot?: boolean }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [stage, setStage] = useState<'ask' | 'askContact' | 'done'>('ask');
   const [userChat, setUserChat] = useState('');
   const [loading, setLoading] = useState(false);
@@ -37,7 +54,6 @@ export default function ChatBot() {
     if (USER_ID) {
       try {
         // Some versions require init; passing user ID to send also works, but init is explicit
-        // @ts-ignore - types may vary between packages
         emailjs.init?.(USER_ID);
       } catch (e) {
         console.warn('EmailJS init warning:', e);
@@ -139,8 +155,9 @@ Phone: ${phone}
             USER_ID
           );
 
-          if ((result as any)?.status && (result as any)?.status !== 200) {
-            throw new Error(`EmailJS responded with status ${(result as any)?.status}`);
+          const emailResult = result as EmailJSResponse;
+          if (emailResult.status && emailResult.status !== 200) {
+            throw new Error(`EmailJS responded with status ${emailResult.status}`);
           }
           setLoading(false);
           setTimeout(() => {
@@ -150,10 +167,11 @@ Phone: ${phone}
             ]);
             setStage('done');
           }, 500);
-        } catch (err: any) {
+        } catch (error) {
           setLoading(false);
+          const err = error as EmailJSError;
           console.error('EmailJS send failed:', err);
-          const status = err?.status ?? err?.response?.status;
+          const status = err.status ?? err.response?.status;
           const is412 = status === 412 || /412/.test(String(err));
           if (process.env.NODE_ENV !== 'production') {
             try {

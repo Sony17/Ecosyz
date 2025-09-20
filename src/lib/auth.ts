@@ -7,14 +7,12 @@ const SESSION_COOKIE = 'anon_session';
 function newSessionId() {
   // Use crypto.randomUUID when available
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    // @ts-ignore
     return crypto.randomUUID();
   }
   // Secure fallback using Web Crypto
   if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
     const bytes = new Uint8Array(16);
-    // @ts-ignore
-    crypto.getRandomValues(bytes);
+    (crypto as Crypto).getRandomValues(bytes);
     let bin = '';
     for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     const b64 = typeof btoa !== 'undefined' ? btoa(bin) : Buffer.from(bytes).toString('base64');
@@ -50,7 +48,6 @@ export async function getUid() {
 
 export async function ensureOwner(workspaceId: string) {
   const uid = await getUid();
-  // @ts-ignore: Prisma typegen may not show .workspace if not generated yet
   const ws = await prisma.workspace.findUnique({ where: { id: workspaceId } });
   if (!ws) {
     return NextResponse.json({ error: 'Workspace not found' }, { status: 404 });

@@ -5,7 +5,6 @@ import { CreateWorkspace } from '../../../src/lib/validation';
 
 export async function GET() {
   const uid = await getUid();
-  // @ts-ignore
   const workspaces = await prisma.workspace.findMany({
     where: { ownerId: uid },
     select: {
@@ -28,7 +27,6 @@ export async function POST(req: NextRequest) {
   if (!parse.success) {
     return NextResponse.json({ error: parse.error.message }, { status: 400 });
   }
-  // @ts-ignore
   const ws = await prisma.workspace.create({
     data: {
       title: parse.data.title,

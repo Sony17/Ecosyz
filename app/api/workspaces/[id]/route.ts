@@ -8,7 +8,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ws = await ensureOwner(id);
   if (ws instanceof NextResponse) return ws; // Error response
 
-  // @ts-ignore
   const workspace = await prisma.workspace.findUnique({
     where: { id },
     include: {
@@ -33,7 +32,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: parse.error.message }, { status: 400 });
   }
 
-  // @ts-ignore
   const updated = await prisma.workspace.update({
     where: { id },
     data: { title: parse.data.title },
@@ -47,7 +45,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const ws = await ensureOwner(id);
   if (ws instanceof NextResponse) return ws;
 
-  // @ts-ignore
   await prisma.workspace.delete({ where: { id } });
   return NextResponse.json({ message: 'Deleted' });
 }

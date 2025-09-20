@@ -31,14 +31,14 @@ export default function WorkspaceHeader({ id, title: initialTitle }: WorkspaceHe
     fetchShareLinks()
   }, [id])
 
-  const fetchShareLinks = async () => {
+  const fetchShareLinks = useCallback(async () => {
     try {
       const data = await json<ShareLink[]>(await fetch(`/api/workspaces/${id}/share`))
       setShareLinks(data)
     } catch (error) {
       console.error('Failed to fetch share links:', error)
     }
-  }
+  }, [id])
 
   const saveTitle = useCallback(async (newTitle: string) => {
     if (newTitle.trim() === initialTitle) return
@@ -106,7 +106,8 @@ export default function WorkspaceHeader({ id, title: initialTitle }: WorkspaceHe
     try {
       await copy(shareUrl)
       toast.success('Share URL copied to clipboard!')
-    } catch (error) {
+    } catch {
+      // Error already handled by fetchShareLinks
       toast.error('Failed to copy URL')
     }
   }

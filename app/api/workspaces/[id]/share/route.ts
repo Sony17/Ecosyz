@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../../src/lib/db';
-import { getUid } from '../../../../../src/lib/auth';
 import { ensureOwner } from '../../../../../src/lib/auth';
 import { CreateShare } from '../../../../../src/lib/validation';
 

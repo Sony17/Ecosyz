@@ -18,7 +18,40 @@ export async function searchZenodo(q: string): Promise<Resource[]> {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) throw new Error(`Zenodo error: ${res.status}`);
     const data = await res.json();
-    return (data.hits?.hits || []).map((item: any) => {
+    interface ZenodoMetadata {
+      resource_type?: {
+        type?: string;
+      };
+      title?: string;
+      creators?: { name: string }[];
+      publication_date?: string;
+      description?: string;
+      keywords?: string[];
+      communities?: { id: string }[];
+      relations?: {
+        version?: { is_last?: boolean };
+      };
+      license?: {
+        id?: string;
+      };
+    }
+
+    interface ZenodoItem {
+      links?: {
+        html?: string;
+      };
+      id?: string;
+      doi?: string;
+      metadata?: ZenodoMetadata;
+    }
+
+    interface ZenodoResponse {
+      hits?: {
+        hits?: ZenodoItem[];
+      };
+    }
+
+    return ((data as ZenodoResponse).hits?.hits || []).map((item) => {
       // Build a robust URL that always opens in a new tab
       const htmlUrl: string = (
         item?.links?.html
@@ -37,8 +70,8 @@ export async function searchZenodo(q: string): Promise<Resource[]> {
         description: item.metadata?.description,
       } as Resource;
     });
-  } catch (e) {
-    // Fail gracefully
+  } catch (error) {
+    // Fail gracefully - no need to handle the error
     return [];
   } finally {
     clearTimeout(timeout);
