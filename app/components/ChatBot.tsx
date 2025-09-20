@@ -61,7 +61,11 @@ export default function ChatBot() {
             });
           }
           if (!COMPANY_EMAIL) {
-            throw new Error('Supabase environment variables are not set');
+            throw new Error('Company email is not configured');
+          }
+
+          if (!supabase) {
+            throw new Error('Supabase client is not available');
           }
 
           // Send email via Supabase Edge Function
