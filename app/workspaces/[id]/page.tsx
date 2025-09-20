@@ -25,7 +25,7 @@ export default async function WorkspacePage({
 }: {
   params: { id: string }
 }) {
-  const { id } = params
+  const { id } = await params
 
   const workspace = await prisma.workspace.findUnique({
     where: { id },
