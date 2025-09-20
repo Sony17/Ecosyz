@@ -20,12 +20,16 @@ interface Workspace {
   shareLinks: { id: string; token: string; createdAt: string; expiresAt?: string }[]
 }
 
+export async function generateStaticParams() {
+  return []
+}
+
 export default async function WorkspacePage({
   params
 }: {
   params: { id: string }
 }) {
-  const { id } = await params
+  const { id } = params
 
   const workspace = await prisma.workspace.findUnique({
     where: { id },
