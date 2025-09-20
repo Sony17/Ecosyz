@@ -14,9 +14,11 @@ export function mergeResources(a: Resource, b: Resource): Resource {
   const authors = unionCI(a.authors, b.authors);
   const tags = unionCI(a.tags, b.tags);
   const meta = { ...a.meta, ...b.meta };
+  const aSources = Array.isArray(a.meta?.sources) ? a.meta.sources : [{ source: a.source, url: a.url }];
+  const bSources = Array.isArray(b.meta?.sources) ? b.meta.sources : [{ source: b.source, url: b.url }];
   meta.sources = [
-    ...(a.meta?.sources || [{ source: a.source, url: a.url }]),
-    ...(b.meta?.sources || [{ source: b.source, url: b.url }])
+    ...aSources,
+    ...bSources
   ].filter((v, i, arr) => arr.findIndex(x => x.source === v.source && x.url === v.url) === i);
   // Always keep canonical/earliest url
   const url = a.url;

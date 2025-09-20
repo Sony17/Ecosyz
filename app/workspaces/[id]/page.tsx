@@ -27,9 +27,9 @@ export async function generateStaticParams() {
 export default async function WorkspacePage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const { id } = params
+  const { id } = await params
 
   const workspace = await prisma.workspace.findUnique({
     where: { id },
