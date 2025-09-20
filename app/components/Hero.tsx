@@ -55,14 +55,12 @@ export default function Hero() {
         </div>
         {/* Modal for form */}
         {open && (
-          <div className="fixed inset-0 z-40 bg-black/70 flex items-center justify-center">
-            <div className="relative">
-              <button
-                className="absolute top-2 right-2 text-cyan-200 text-2xl"
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-              >×</button>
-              <BetaAccessForm />
+          <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+            <div 
+              className="relative max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <BetaAccessForm onClose={() => setOpen(false)} />
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import emailjs from 'emailjs-com';
+import { init, send } from '@emailjs/browser';
 const SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? '';
 const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? '';
 const USER_ID = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? '';
@@ -24,7 +24,7 @@ export default function FeedbackForm() {
         console.info('[FeedbackForm] sending', { SERVICE_ID, TEMPLATE_ID, hasUserId: Boolean(USER_ID), company: COMPANY_EMAIL });
       }
       if (!SERVICE_ID || !TEMPLATE_ID || !USER_ID) throw new Error('EmailJS env not configured');
-      await emailjs.send(
+      await send(
         SERVICE_ID,
         TEMPLATE_ID,
         {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import emailjs from 'emailjs-com';
+import { init, send } from '@emailjs/browser';
 
 interface EmailJSResponse {
   status: number;
@@ -54,7 +54,7 @@ export default function ChatBot() {
     if (USER_ID) {
       try {
         // Some versions require init; passing user ID to send also works, but init is explicit
-        emailjs.init?.(USER_ID);
+        init(USER_ID);
       } catch (e) {
         console.warn('EmailJS init warning:', e);
       }
@@ -148,7 +148,7 @@ Phone: ${phone}
             subject: 'New website chat submission',
           };
 
-          const result = await emailjs.send(
+          const result = await send(
             SERVICE_ID,
             TEMPLATE_ID,
             templateParams,
