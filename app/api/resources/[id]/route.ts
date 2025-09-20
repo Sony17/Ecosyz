@@ -4,10 +4,10 @@ import { getUid } from '../../../../src/lib/auth'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const { id } = params
+    const { id } = context.params
     const userId = await getUid()
 
     if (!userId) {
