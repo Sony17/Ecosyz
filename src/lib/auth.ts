@@ -1,10 +1,88 @@
 import { cookies } from 'next/headers';
 import { prisma } from './db';
-import { NextResponse } from 'next/server';
+import { supabase } from './supabase';
+import { NextRequest, NextResponse } from 'next/server';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
-const SESSION_COOKIE = 'anon_session';
+const SESSION_COOKIE = 'sb-access-token';
+const REFRESH_COOKIE = 'sb-refresh-token';
 
-function newSessionId() {
+export async function getCurrentUser(): Promise<SupabaseUser | null> {
+  if (!supabase) return null;
+
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get(SESSION_COOKIE)?.value;
+    const refreshToken = cookieStore.get(REFRESH_COOKIE)?.value;
+
+    if (!accessToken) return null;
+
+    // Set the session in Supabase
+    if (!refreshToken) {
+      console.error('No refresh token found');
+      return null;
+    }
+
+    const { data: { user }, error } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+
+    if (error) {
+      console.error('Error setting session:', error);
+      return null;
+    }
+
+    if (!user) {
+      console.error('No user found in session');
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
+}
+
+export async function getUid(): Promise<string> {
+  const user = await getCurrentUser();
+
+  if (user) {
+    // Ensure user exists in our database
+    await ensureUserInDb(user);
+    return user.id;
+  }
+
+  // Fallback to anonymous session for backwards compatibility
+  return getAnonymousUid();
+}
+
+async function getAnonymousUid(): Promise<string> {
+  // Read the session/owner cookie
+  const cookieStore = await cookies();
+  const cookie = cookieStore.get('anon_session');
+  let uid = typeof cookie === 'object' && cookie !== null ? cookie.value : undefined;
+
+  // If no session cookie exists, create a new one
+  if (!uid) {
+    uid = newAnonymousSessionId();
+    // Set the cookie for future requests
+    cookieStore.set({
+      name: 'anon_session',
+      value: uid,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 180, // 180 days
+    });
+  }
+
+  return uid;
+}
+
+function newAnonymousSessionId() {
   // Use crypto.randomUUID when available
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID();
@@ -22,28 +100,31 @@ function newSessionId() {
   throw new Error('Secure randomness unavailable');
 }
 
-export async function getUid() {
-  // Read the session/owner cookie
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get(SESSION_COOKIE);
-  let uid = typeof cookie === 'object' && cookie !== null ? cookie.value : undefined;
-
-  // If no session cookie exists, create a new one
-  if (!uid) {
-    uid = newSessionId();
-    // Set the cookie for future requests
-    cookieStore.set({
-      name: SESSION_COOKIE,
-      value: uid,
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 180, // 180 days
-    });
+async function ensureUserInDb(user: SupabaseUser) {
+  if (!user.email) {
+    console.error('User email is required');
+    return;
   }
-
-  return uid;
+  
+  try {
+    await prisma.User.upsert({
+      where: { supabaseId: user.id },
+      update: {
+        email: user.email,
+        name: user.user_metadata?.name || user.user_metadata?.full_name || user.email.split('@')[0],
+        avatarUrl: user.user_metadata?.avatar_url,
+        updatedAt: new Date(),
+      },
+      create: {
+        supabaseId: user.id,
+        email: user.email,
+        name: user.user_metadata?.name || user.user_metadata?.full_name || user.email.split('@')[0],
+        avatarUrl: user.user_metadata?.avatar_url,
+      },
+    });
+  } catch (error) {
+    console.error('Error ensuring user in database:', error);
+  }
 }
 
 export async function ensureOwner(workspaceId: string) {

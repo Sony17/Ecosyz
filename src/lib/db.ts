@@ -1,18 +1,22 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
-// Prevent multiple instances in dev (hot-reload safe)
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+declare global {
+  var prisma: PrismaClient | undefined;
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    // Disable prepared statements for Supabase transaction pooler compatibility
-    // This prevents "prepared statement already exists" errors with connection pooling
-    transactionOptions: {
-      maxWait: 20000,
-      timeout: 20000,
+const logLevels: Prisma.LogLevel[] = process.env.NODE_ENV === 'development' 
+  ? ['query', 'error', 'warn'] 
+  : ['error'];
+
+export const prisma = global.prisma || new PrismaClient({
+  log: logLevels,
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
     },
-  });
+  },
+});
 
-if (process.env.NODE_ENV === 'development') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') {
+  global.prisma = prisma;
+}
