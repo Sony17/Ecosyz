@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Container } from "./ui/Container";
+import { toast } from "sonner";
 
 const NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -20,12 +21,40 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<{ name?: string; email?: string; avatarUrl?: string } | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const mobileNavRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => setMounted(true), []);
   // Close mobile nav on route change
   useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+  // Check authentication status and fetch user data
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        if (response.ok) {
+          const data = await response.json();
+          setIsAuthenticated(true);
+          setUserData(data.user);
+        } else {
+          setIsAuthenticated(false);
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+        setUserData(null);
+      }
+    };
+    checkAuth();
+  }, []);
+
   // Trap focus in mobile nav
   useEffect(() => {
     if (!mobileOpen) return;
@@ -51,6 +80,57 @@ export default function Header() {
 
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        toast.success('Signed out successfully', {
+          description: 'You have been logged out of your account.',
+          duration: 3000,
+          style: {
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+        setIsAuthenticated(false);
+        setUserData(null);
+        setDropdownOpen(false);
+        router.push('/');
+      } else {
+        toast.error('Failed to sign out', {
+          description: 'Please try again or refresh the page.',
+          duration: 4000,
+          style: {
+            background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to sign out');
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 glass h-14 border-b glass-border">
       <Container>
@@ -74,6 +154,69 @@ export default function Header() {
           </nav>
           {/* Utilities right */}
           <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated && userData ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  aria-label="User menu"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    {userData.avatarUrl ? (
+                      <Image
+                        src={userData.avatarUrl}
+                        alt="User avatar"
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {(userData.name || userData.email || 'U').charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {userData.name || userData.email?.split('@')[0] || 'User'}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                    <div className="py-1">
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/auth"
+                className="focus:outline-none focus:ring-2 focus:ring-emerald-400/60 px-4 py-2 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg hover:shadow-lg transition-all"
+              >
+                Sign In
+              </Link>
+            )}
             <button
               onClick={toggleTheme}
               aria-label="Toggle Theme"
@@ -140,6 +283,37 @@ export default function Header() {
           >
             Feedback
           </Link>
+          {isAuthenticated ? (
+            <>
+              <Link
+                href="/profile"
+                className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white font-medium"
+                onClick={() => setMobileOpen(false)}
+                tabIndex={mobileOpen ? 0 : -1}
+              >
+                Profile
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMobileOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white font-medium"
+                tabIndex={mobileOpen ? 0 : -1}
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth"
+              className="w-full flex items-center justify-center gap-2 p-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold"
+              onClick={() => setMobileOpen(false)}
+              tabIndex={mobileOpen ? 0 : -1}
+            >
+              Sign In
+            </Link>
+          )}
         </div>
       </Container>
     </header>

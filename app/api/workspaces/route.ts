@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../src/lib/db';
-import { getUid } from '../../../src/lib/auth';
+import { getCurrentUser } from '../../../src/lib/auth';
 import { CreateWorkspace } from '../../../src/lib/validation';
 
 export async function GET() {
-  const uid = await getUid();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+
   const workspaces = await prisma.workspace.findMany({
-    where: { ownerId: uid },
+    where: { ownerId: user.id },
     select: {
       id: true,
       title: true,
@@ -21,7 +29,15 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const uid = await getUid();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Not authenticated' },
+      { status: 401 }
+    );
+  }
+
   const body = await req.json();
   const parse = CreateWorkspace.safeParse(body);
   if (!parse.success) {
@@ -30,7 +46,7 @@ export async function POST(req: NextRequest) {
   const ws = await prisma.workspace.create({
     data: {
       title: parse.data.title,
-      ownerId: uid,
+      ownerId: user.id,
     },
     select: { id: true, title: true, createdAt: true },
   });

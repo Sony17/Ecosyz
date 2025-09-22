@@ -19,6 +19,19 @@ model User {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   workspaces    Workspace[]
+  profile       Profile?
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName String?
+  bio         String?  @db.Text
+  avatarUrl   String?
+  preferences Json?    // { theme: "system"|"light"|"dark", language: "en-IN", emailNotifications: boolean, marketingEmails: boolean }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Workspace {

@@ -107,7 +107,7 @@ async function ensureUserInDb(user: SupabaseUser) {
   }
   
   try {
-    await prisma.User.upsert({
+    await prisma.user.upsert({
       where: { supabaseId: user.id },
       update: {
         email: user.email,

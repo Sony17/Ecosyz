@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
 import { cookies } from 'next/headers';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   if (!supabase) {
     return NextResponse.json(
       { error: 'Authentication service unavailable' },

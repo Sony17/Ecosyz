@@ -46,6 +46,10 @@ coverage/
 .envrc
 .env.test
 
+# Sensitive project files
+TASKS.md
+STRATEGY.md
+
 # Optional: Build artifacts
 build/
 tmp/

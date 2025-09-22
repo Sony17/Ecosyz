@@ -4,5 +4,12 @@
       "maxDuration": 30
     }
   },
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "env": {
+    "PRISMA_GENERATE": "true",
+    "NODE_ENV": "production",
+    "PRISMA_MIGRATE_ALLOW_RESET": "false"
+  }
 }
