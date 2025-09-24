@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,9 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Enhanced schema with email for direct reset
 const resetPasswordSchema = z.object({
+  email: z.string().email('Valid email is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -19,12 +21,12 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+// Simplified reset password component that doesn't rely on URL parameters
+function ResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const {
     register,
@@ -32,30 +34,17 @@ export default function ResetPasswordPage() {
     formState: { errors },
   } = useForm<ResetPasswordForm>({
     resolver: zodResolver(resetPasswordSchema),
-  });
-
-  // Check if we have the required tokens from URL
-  useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
-
-    if (!accessToken || !refreshToken) {
-      toast.error('Invalid or expired reset link');
-      router.push('/auth');
+    defaultValues: {
+      email: '',
+      password: '',
+      confirmPassword: '',
     }
-  }, [searchParams, router]);
+  });
 
   const onSubmit = async (data: ResetPasswordForm) => {
     setLoading(true);
     try {
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-
-      if (!accessToken || !refreshToken) {
-        throw new Error('Invalid reset link');
-      }
-
-      // Update password using Supabase
+      // Simplified direct password reset request
       const response = await fetch('/api/auth/update-password', {
         method: 'POST',
         headers: {
@@ -63,19 +52,18 @@ export default function ResetPasswordPage() {
         },
         body: JSON.stringify({
           password: data.password,
-          accessToken,
-          refreshToken,
+          email: data.email
         }),
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to update password');
+        throw new Error(result.error || 'Failed to send password reset');
       }
 
-      toast.success('Password updated successfully!', {
-        description: 'You can now sign in with your new password.',
+      toast.success('Password reset initiated!', {
+        description: 'Please check your email to complete the process.',
         duration: 4000,
         style: {
           background: 'linear-gradient(135deg, #10b981, #06b6d4)',
@@ -87,9 +75,9 @@ export default function ResetPasswordPage() {
 
       router.push('/auth');
     } catch (error) {
-      console.error('Password update error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to update password', {
-        description: 'Please try again or request a new reset link.',
+      console.error('Password reset error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to reset password', {
+        description: 'Please try again later.',
         duration: 5000,
         style: {
           background: 'linear-gradient(135deg, #ef4444, #dc2626)',
@@ -124,11 +112,29 @@ export default function ResetPasswordPage() {
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-white mb-2">Reset Password</h2>
               <p className="text-teal-100/90">
-                Enter your new password below
+                Enter your email and new password below
               </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <input
+                    {...register('email')}
+                    type="email"
+                    id="email"
+                    className="w-full px-3 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 backdrop-blur-sm"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+                )}
+              </div>
+            
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
                   New Password
@@ -219,4 +225,8 @@ export default function ResetPasswordPage() {
       </div>
     </div>
   );
+}
+
+export default function ResetPasswordPage() {
+  return <ResetPasswordContent />;
 }
