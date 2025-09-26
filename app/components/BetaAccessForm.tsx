@@ -42,6 +42,7 @@ export default function BetaAccessForm({ title = "Join the Beta", onClose }: Bet
 
     // Validate required env vars
     if (!COMPANY_EMAIL) throw new Error('Missing company email');
+    if (!supabase) throw new Error('Supabase client not available');
 
     // Send email via Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('send-email', {

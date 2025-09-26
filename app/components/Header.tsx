@@ -14,7 +14,8 @@ const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/community", label: "Community" },
   { href: "/whitepaper", label: "Whitepaper" },
-   { href: "/pricing", label: "Pricing" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/docs", label: "Documentation" },
 ];
 
 export default function Header() {
