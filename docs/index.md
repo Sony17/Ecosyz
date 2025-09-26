@@ -5,9 +5,9 @@ Welcome to the Ecosyz project documentation! This is a comprehensive guide for d
 ## 📋 Table of Contents
 
 ### 🚀 Getting Started
-- [README](../README.md) - Project overview and setup instructions
 - [Quick Start](getting-started.md) - Fast setup guide for new developers
 - [Architecture Overview](architecture.md) - System design and components
+- [Migration Guide](MIGRATION.md) - Platform migration instructions
 
 ### 🔧 Development
 - [API Documentation](api-documentation.md) - Complete API reference and endpoints
