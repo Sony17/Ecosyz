@@ -6,10 +6,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
-  callback: T,
+export function useDebouncedCallback<TArgs extends unknown[], TReturn>(
+  callback: (...args: TArgs) => TReturn,
   delay: number = 600
-): T {
+): (...args: TArgs) => void {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const callbackRef = useRef(callback)
 
@@ -25,7 +25,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     }
   }, [])
 
-  return useCallback((...args: Parameters<T>) => {
+  return useCallback((...args: TArgs) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
@@ -33,5 +33,5 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     timeoutRef.current = setTimeout(() => {
       callbackRef.current(...args)
     }, delay)
-  }, [delay]) as T
+  }, [delay])
 }
