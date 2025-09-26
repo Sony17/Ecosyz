@@ -14,7 +14,7 @@ const resetTokens = new Map();
 const TOKEN_EXPIRY = 60 * 60 * 1000; // 1 hour in milliseconds
 
 // Function to validate a reset token
-export function validateResetToken(email: string, token: string): boolean {
+function validateResetToken(email: string, token: string): boolean {
   const resetData = resetTokens.get(email);
   
   if (!resetData) {
