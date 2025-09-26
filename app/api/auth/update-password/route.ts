@@ -1,7 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
 import { z } from 'zod';
-import { validateResetToken } from '../reset-password/route';
+
+// Map to store reset tokens
+const resetTokens = new Map();
+
+// Function to validate a reset token
+function validateResetToken(email: string, token: string): boolean {
+  const resetData = resetTokens.get(email);
+  
+  if (!resetData) {
+    return false;
+  }
+  
+  const { token: storedToken, expires } = resetData;
+  
+  if (Date.now() > expires.getTime()) {
+    // Token has expired, remove it
+    resetTokens.delete(email);
+    return false;
+  }
+  
+  return token === storedToken;
+}
 
 const UpdatePasswordSchema = z.object({
   password: z.string().min(6),

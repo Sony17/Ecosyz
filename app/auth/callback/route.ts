@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
-import { cookies } from 'next/headers';
 
 export async function GET(req: NextRequest) {
   if (!supabase) {
@@ -29,9 +28,11 @@ export async function GET(req: NextRequest) {
         const refreshToken = hash.match(/refresh_token=([^&]*)/)?.[1];
         
         if (accessToken && refreshToken) {
-          // Set session cookies manually from hash params
-          const cookieStore = cookies();
-          cookieStore.set('sb-access-token', accessToken, {
+          // Create response with cookies
+          const response = NextResponse.redirect(new URL('/', req.url));
+          
+          // Set session cookies in the response
+          response.cookies.set('sb-access-token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -39,7 +40,7 @@ export async function GET(req: NextRequest) {
             path: '/',
           });
 
-          cookieStore.set('sb-refresh-token', refreshToken, {
+          response.cookies.set('sb-refresh-token', refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
@@ -69,9 +70,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(new URL('/auth?error=code_exchange_failed', req.url));
       }
 
+      // Create response with cookies
+      const response = NextResponse.redirect(new URL('/profile', req.url));
+      
       // Set session cookies
-      const cookieStore = cookies();
-      cookieStore.set('sb-access-token', sessionData.session.access_token, {
+      response.cookies.set('sb-access-token', sessionData.session.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -79,7 +82,7 @@ export async function GET(req: NextRequest) {
         path: '/',
       });
 
-      cookieStore.set('sb-refresh-token', sessionData.session.refresh_token, {
+      response.cookies.set('sb-refresh-token', sessionData.session.refresh_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

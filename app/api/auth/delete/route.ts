@@ -25,6 +25,13 @@ export async function DELETE() {
     }
 
     // Delete user from Supabase
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Authentication service unavailable' },
+        { status: 503 }
+      );
+    }
+
     const { error: supabaseError } = await supabase.auth.admin.deleteUser(user.id);
 
     if (supabaseError) {

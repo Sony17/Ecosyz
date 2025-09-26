@@ -57,6 +57,10 @@ export async function POST(req: NextRequest) {
 
     // Create user record in Prisma database immediately
     try {
+      if (!data.user.email) {
+        throw new Error('User email is required');
+      }
+
       await prisma.user.upsert({
         where: { supabaseId: data.user.id },
         update: {
