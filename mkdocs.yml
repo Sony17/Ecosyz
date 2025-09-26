@@ -1,0 +1,85 @@
+site_name: Ecosyz Documentation
+site_description: Documentation for the Ecosyz platform
+repo_url: https://github.com/Sony17/Ecosyz
+repo_name: Sony17/Ecosyz
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    # Dark mode as default to match website
+    - scheme: slate
+      primary: custom
+      accent: emerald
+      toggle:
+        icon: material/brightness-7
+        name: Switch to light mode
+    # Light mode as secondary option
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: emerald
+      toggle:
+        icon: material/brightness-4
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  language: en
+  logo: assets/eco.png
+  favicon: assets/favicon.svg
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Architecture: architecture.md
+  - API Documentation: 
+    - Overview: api.md
+    - Detailed Documentation: api-documentation.md
+  - Database:
+    - Schema: database-schema.md
+    - Connections: database-connections.md
+  - Authentication: authentication.md
+  - Deployment: deployment.md
+  - Contributing: contributing.md
+  - Migration Guide: MIGRATION.md
+  - Profile System: PROFILE.md
+  - Development:
+    - Todo: TODO.md
+    - Backlog: backlog.md
+    - LRU Cache: lru-cache.md
+    - Summarization: summarization.md
+  - Specifications:
+    - AI Basics: specs/ai-basics.md
+    - Dedupe Pipeline: specs/dedupe-pipeline.md
