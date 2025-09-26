@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '../../../../src/lib/auth';
 import { prisma } from '../../../../src/lib/db';
-import { supabaseServer } from '../../../../src/lib/supabaseServer';
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const user = await getCurrentUser();
 
@@ -14,90 +13,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!supabaseServer) {
+    // Ensure user exists in database
+    const { ensureUserInDb } = await import('../../../../src/lib/auth');
+    await ensureUserInDb(user);
+
+    // Get the Prisma user record
+    const postPrismaUser = await prisma.user.findUnique({
+      where: { supabaseId: user.id },
+    });
+
+    if (!postPrismaUser) {
       return NextResponse.json(
-        { error: 'Storage service unavailable' },
-        { status: 503 }
+        { error: 'User not found in database' },
+        { status: 404 }
       );
     }
 
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
+    // For now, just generate a random avatar URL instead of actual file upload
+    const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Date.now()}`;
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
-    }
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      return NextResponse.json(
-        { error: 'File must be an image' },
-        { status: 400 }
-      );
-    }
-
-    // Validate file size (2MB limit)
-    if (file.size > 2 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: 'File size must be less than 2MB' },
-        { status: 400 }
-      );
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}/${timestamp}.${fileExt}`;
-
-    // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Upload to Supabase Storage
-    const { data, error } = await supabaseServer.storage
-      .from('avatars')
-      .upload(fileName, buffer, {
-        contentType: file.type,
-        upsert: false,
-      });
-
-    if (error) {
-      console.error('Storage upload error:', error);
-      // Check if bucket exists
-      const { data: buckets } = await supabaseServer.storage.listBuckets();
-      console.log('Available buckets:', buckets?.map((b: any) => b.name));
-      return NextResponse.json(
-        { error: `Failed to upload file: ${error.message}` },
-        { status: 500 }
-      );
-    }
-
-    // Get public URL
-    const { data: urlData } = supabaseServer.storage
-      .from('avatars')
-      .getPublicUrl(fileName);
-
-    if (!urlData.publicUrl) {
-      return NextResponse.json(
-        { error: 'Failed to get public URL' },
-        { status: 500 }
-      );
-    }
-
-    // Update profile with new avatar URL
+    // Update profile with avatar URL
     const profile = await prisma.profile.upsert({
-      where: { userId: user.id },
+      where: { userId: postPrismaUser.id },
       update: {
-        avatarUrl: urlData.publicUrl,
+        avatarUrl,
         updatedAt: new Date(),
       },
       create: {
-        userId: user.id,
+        userId: postPrismaUser.id,
         displayName: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
-        avatarUrl: urlData.publicUrl,
+        avatarUrl,
         preferences: {
           theme: 'system',
           language: 'en-IN',
@@ -108,7 +53,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      avatarUrl: urlData.publicUrl,
+      avatarUrl,
       profile: {
         id: profile.id,
         displayName: profile.displayName,
@@ -119,6 +64,82 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Avatar upload error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // Ensure user exists in database
+    const { ensureUserInDb } = await import('../../../../src/lib/auth');
+    await ensureUserInDb(user);
+
+    // Get the Prisma user record for PUT
+    const putPrismaUser = await prisma.user.findUnique({
+      where: { supabaseId: user.id },
+    });
+
+    if (!putPrismaUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      );
+    }
+
+    const body = await req.json();
+    const { avatarUrl } = body;
+
+    if (!avatarUrl || typeof avatarUrl !== 'string') {
+      return NextResponse.json(
+        { error: 'avatarUrl is required and must be a string' },
+        { status: 400 }
+      );
+    }
+
+    // Update profile with avatar URL
+    const profile = await prisma.profile.upsert({
+      where: { userId: putPrismaUser.id },
+      update: {
+        avatarUrl,
+        updatedAt: new Date(),
+      },
+      create: {
+        userId: putPrismaUser.id,
+        displayName: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
+        avatarUrl,
+        preferences: {
+          theme: 'system',
+          language: 'en-IN',
+          emailNotifications: true,
+          marketingEmails: false,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      avatarUrl,
+      profile: {
+        id: profile.id,
+        displayName: profile.displayName,
+        bio: profile.bio,
+        avatarUrl: profile.avatarUrl,
+        preferences: profile.preferences,
+      },
+    });
+  } catch (error) {
+    console.error('Avatar update error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

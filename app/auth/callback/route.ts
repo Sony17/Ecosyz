@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         
         if (accessToken && refreshToken) {
           // Set session cookies manually from hash params
-          const cookieStore = await cookies();
+          const cookieStore = cookies();
           cookieStore.set('sb-access-token', accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
       }
 
       // Set session cookies
-      const cookieStore = await cookies();
+      const cookieStore = cookies();
       cookieStore.set('sb-access-token', sessionData.session.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -103,11 +103,6 @@ export async function GET(req: NextRequest) {
     // No session could be established
     console.error('No session could be established');
     return NextResponse.redirect(new URL('/auth?error=no_session_found', req.url));
-    
-    // This line should not be here - removing the extra closing brace
-    // No session could be established through other methods
-    console.error('All OAuth methods failed, trying existing session');
-    return NextResponse.redirect(new URL('/auth?error=session_methods_failed', req.url));
   } catch (error) {
     console.error('OAuth callback error:', error);
     return NextResponse.redirect(new URL('/auth?error=callback_error', req.url));

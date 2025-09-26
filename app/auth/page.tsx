@@ -186,16 +186,34 @@ export default function AuthPage() {
         throw new Error(result.error || 'Failed to send reset email');
       }
 
-      toast.success('Password reset email sent!', {
-        description: 'Please check your email for instructions to reset your password.',
-        duration: 6000,
-        style: {
-          background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-          color: 'white',
-          border: 'none',
-          fontWeight: '600',
-        },
-      });
+      // Check if we're in development mode and got a direct reset URL
+      if (result.resetUrl) {
+        toast.success('Password reset link generated!', {
+          description: 'Since you\'re in development mode, you can click the button below to reset your password.',
+          duration: 8000,
+          action: {
+            label: 'Reset Password',
+            onClick: () => window.open(result.resetUrl, '_blank'),
+          },
+          style: {
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+      } else {
+        toast.success('Password reset email sent!', {
+          description: 'Please check your email for instructions to reset your password.',
+          duration: 5000,
+          style: {
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+      }
 
       setShowForgotPassword(false);
       forgotPasswordForm.reset();

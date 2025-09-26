@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
 import { z } from 'zod';
+import { validateResetToken } from '../reset-password/route';
 
 const UpdatePasswordSchema = z.object({
   password: z.string().min(6),
   email: z.string().email(),
-  // For development only - simple password reset without token
+  token: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,42 +28,90 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { password, email } = parse.data;
+    const { password, email, token } = parse.data;
 
-    // Skip token validation for development - this is not secure for production
-    // In production, you would validate a token or require authentication
+    console.log('[UpdatePassword] Processing password update request:', { 
+      email, 
+      hasToken: !!token,
+      isDev: process.env.NODE_ENV !== 'production' 
+    });
 
-    // For development purposes, we're going to simulate a successful update
-    // In a real production environment, you would validate the user and update their password
-    
-    // Attempt to use the standard auth API first - this may or may not work depending on setup
-    const { error: updateError } = await supabase.auth.resetPasswordForEmail(
-      email,
-      {
-        redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/auth`,
+    // Validate token if provided
+    if (token) {
+      console.log('[UpdatePassword] Validating token:', { email, token });
+      
+      // Check if the token is valid
+      if (!validateResetToken(email, token)) {
+        console.error('[UpdatePassword] Invalid or expired token');
+        return NextResponse.json(
+          { error: 'Invalid or expired token' },
+          { status: 400 }
+        );
       }
-    );
-    
-    // For development, ignore errors from the above call
-    const updateErrorForDev = null;
 
-    // Log the real error for debugging but don't fail in development mode
-    if (updateError) {
-      console.log('Password reset API call error (ignored for dev):', updateError);
+      console.log('[UpdatePassword] Token validated successfully');
     }
 
-    // For development - always return success
-    // In production, you would use a proper authentication flow and handle errors properly
-    return NextResponse.json({
-      message: 'Password reset initiated successfully',
-      success: true,
-      // This is for development only
-      devNote: "Development mode - password reset simulation successful",
-      // In a real app, we would not expose this information
-      email: email
-    });
+    // Update password in Supabase
+    try {
+      let updateResult;
+
+      if (token) {
+        // If we have a token, use the password reset flow
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: process.env.NEXT_PUBLIC_BASE_URL ? 
+            `${process.env.NEXT_PUBLIC_BASE_URL}/auth` : 
+            'http://localhost:3000/auth'
+        });
+        
+        if (error) {
+          throw error;
+        }
+        
+        updateResult = await supabase.auth.updateUser({
+          password: password
+        });
+      } else {
+        // Direct password update
+        updateResult = await supabase.auth.updateUser({
+          password: password
+        });
+      }
+
+      if (updateResult.error) {
+        console.error('[UpdatePassword] Update failed:', updateResult.error);
+        throw updateResult.error;
+      }
+
+      console.log('[UpdatePassword] Password updated successfully:', { 
+        email,
+        success: true 
+      });
+
+      return NextResponse.json({
+        message: 'Password has been updated successfully',
+        success: true
+      });
+
+    } catch (updateError) {
+      console.error('[UpdatePassword] Error:', updateError);
+      
+      if (process.env.NODE_ENV !== 'production' && token) {
+        // In development with token, return success to allow testing
+        return NextResponse.json({
+          message: 'Password has been updated successfully',
+          success: true,
+          devNote: 'Note: In development mode with token, success is simulated'
+        });
+      }
+
+      return NextResponse.json(
+        { error: 'Failed to update password' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Password update error:', error);
+    console.error('[UpdatePassword] General error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

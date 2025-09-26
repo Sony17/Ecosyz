@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '../../../src/lib/auth';
+import { getCurrentUser, ensureUserInDb } from '../../../src/lib/auth';
 import { prisma } from '../../../src/lib/db';
 import { UpdateProfile } from '../../../src/lib/validation';
 
@@ -14,16 +14,31 @@ export async function GET() {
       );
     }
 
+    // Ensure user exists in database before profile operations
+    await ensureUserInDb(user);
+
+    // Get the Prisma user record to get the correct ID
+    const prismaUser = await prisma.user.findUnique({
+      where: { supabaseId: user.id },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      );
+    }
+
     // Get or create profile
     let profile = await prisma.profile.findUnique({
-      where: { userId: user.id },
+      where: { userId: prismaUser.id },
     });
 
     if (!profile) {
       // Create default profile
       profile = await prisma.profile.create({
         data: {
-          userId: user.id,
+          userId: prismaUser.id,
           displayName: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
           preferences: {
             theme: 'system',
@@ -66,6 +81,21 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Ensure user exists in our database before creating profile
+    await ensureUserInDb(user);
+
+    // Get the Prisma user record to get the correct ID
+    const prismaUser = await prisma.user.findUnique({
+      where: { supabaseId: user.id },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      );
+    }
+
     const body = await req.json();
 
     // Validate input
@@ -81,7 +111,7 @@ export async function PUT(req: NextRequest) {
 
     // Upsert profile
     const profile = await prisma.profile.upsert({
-      where: { userId: user.id },
+      where: { userId: prismaUser.id },
       update: {
         displayName,
         bio,
@@ -89,7 +119,7 @@ export async function PUT(req: NextRequest) {
         updatedAt: new Date(),
       },
       create: {
-        userId: user.id,
+        userId: prismaUser.id,
         displayName,
         bio,
         preferences,

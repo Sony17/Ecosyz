@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 import { prisma } from './db';
 import { supabase } from './supabase';
-import { NextRequest, NextResponse } from 'next/server';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 
 const SESSION_COOKIE = 'sb-access-token';
 const REFRESH_COOKIE = 'sb-refresh-token';
@@ -82,30 +82,12 @@ async function getAnonymousUid(): Promise<string> {
   return uid;
 }
 
-function newAnonymousSessionId() {
-  // Use crypto.randomUUID when available
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-  // Secure fallback using Web Crypto
-  if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
-    const bytes = new Uint8Array(16);
-    (crypto as Crypto).getRandomValues(bytes);
-    let bin = '';
-    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
-    const b64 = typeof btoa !== 'undefined' ? btoa(bin) : Buffer.from(bytes).toString('base64');
-    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-  }
-  // If secure randomness is not available, fail rather than issue weak IDs
-  throw new Error('Secure randomness unavailable');
-}
-
-async function ensureUserInDb(user: SupabaseUser) {
+export async function ensureUserInDb(user: SupabaseUser) {
   if (!user.email) {
     console.error('User email is required');
     return;
   }
-  
+
   try {
     await prisma.user.upsert({
       where: { supabaseId: user.id },
@@ -125,6 +107,24 @@ async function ensureUserInDb(user: SupabaseUser) {
   } catch (error) {
     console.error('Error ensuring user in database:', error);
   }
+}
+
+function newAnonymousSessionId() {
+  // Use crypto.randomUUID when available
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  // Secure fallback using Web Crypto
+  if (typeof crypto !== 'undefined' && 'getRandomValues' in crypto) {
+    const bytes = new Uint8Array(16);
+    (crypto as Crypto).getRandomValues(bytes);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    const b64 = typeof btoa !== 'undefined' ? btoa(bin) : Buffer.from(bytes).toString('base64');
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }
+  // If secure randomness is not available, fail rather than issue weak IDs
+  throw new Error('Secure randomness unavailable');
 }
 
 export async function ensureOwner(workspaceId: string) {
