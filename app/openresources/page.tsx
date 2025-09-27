@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
+import AuthModal from '../components/AuthModal';
+import SaveToWorkspace from '../components/workspace/SaveToWorkspace';
+import { useSupabaseUser } from '../../src/lib/useSupabaseUser';
 
 const TABS = [
   { label: 'All', value: 'all' },
@@ -48,13 +51,50 @@ function OpenResourcesPage() {
     key: string | null;
     data: {
       modeUsed?: 'quick'|'deep';
+      summary?: string;
+      error?: string;
       fromCache?: boolean;
-      cache?: 'kv'|'memory'|'none';
+      cache?: string;
       tldr?: string;
       bullets?: string[];
       tags?: string[];
-    } | null;
-  }>({ open: false, key: null, data: null });
+    };
+  }>({
+    open: false,
+    key: null,
+    data: {},
+  });
+
+  // Authentication and modal state
+  const { user, loading: authLoading } = useSupabaseUser();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [resourceToSave, setResourceToSave] = useState<any>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+
+  // Handle save button click
+  const handleSaveClick = (resource: any) => {
+    if (!user) {
+      setResourceToSave(resource);
+      setAuthModalOpen(true);
+    } else {
+      setResourceToSave(resource);
+      setShowSaveModal(true);
+    }
+  };
+
+  // Handle successful authentication
+  const handleAuthSuccess = () => {
+    setAuthModalOpen(false);
+    if (resourceToSave) {
+      setShowSaveModal(true);
+    }
+  };
+
+  // Handle save modal close
+  const handleSaveModalClose = () => {
+    setShowSaveModal(false);
+    setResourceToSave(null);
+  };
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   // Friendly display names for providers
@@ -361,7 +401,13 @@ function OpenResourcesPage() {
                             ) : (
                               <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed" title="No link available" disabled>Open</button>
                             )}
-                            <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold" disabled>Save</button>
+                            <button
+                              className="px-4 py-1.5 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
+                              disabled={authLoading}
+                              onClick={() => handleSaveClick(r)}
+                            >
+                              Save
+                            </button>
                             {r.type === 'paper' ? (
                               <button
                                 className="px-4 py-1.5 bg-blue-600/80 hover:bg-blue-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
@@ -521,16 +567,16 @@ function OpenResourcesPage() {
               className="fixed inset-0 z-40 flex items-center justify-center p-4"
               role="dialog"
               aria-modal="true"
-              onKeyDown={(e) => { if (e.key === 'Escape') setSummaryModal({ open: false, key: null, data: null }); }}
+              onKeyDown={(e) => { if (e.key === 'Escape') setSummaryModal({ open: false, key: null, data: {} }); }}
               tabIndex={-1}
             >
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSummaryModal({ open: false, key: null, data: null })} />
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSummaryModal({ open: false, key: null, data: {} })} />
               <div ref={modalRef} className="relative z-10 w-full max-w-3xl rounded-2xl glass-strong glass-border max-h-[90vh] flex flex-col" aria-labelledby="summary-modal-title">
                 {/* Top-right close button */}
                 <button
                   aria-label="Close"
                   className="absolute top-2 right-2 p-2 rounded-md bg-white/10 hover:bg-white/15 text-white"
-                  onClick={() => setSummaryModal({ open: false, key: null, data: null })}
+                  onClick={() => setSummaryModal({ open: false, key: null, data: {} })}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -606,7 +652,7 @@ function OpenResourcesPage() {
                     >
                       Print
                     </button>
-                    <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setSummaryModal({ open: false, key: null, data: null })}>Close</button>
+                    <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setSummaryModal({ open: false, key: null, data: {} })}>Close</button>
                   </div>
                 </div>
               </div>
@@ -667,6 +713,31 @@ function OpenResourcesPage() {
           {/* --- End Original Resource Cards --- */}
         </Container>
       </section>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+      />
+
+      {/* Save to Workspace Modal */}
+      {showSaveModal && resourceToSave && (
+        <SaveToWorkspace
+          result={{
+            title: resourceToSave.title || '',
+            url: resourceToSave.url || '',
+            type: resourceToSave.type,
+            tags: resourceToSave.tags,
+            description: resourceToSave.description,
+            authors: resourceToSave.authors,
+            year: resourceToSave.year,
+            source: resourceToSave.source,
+          }}
+          onSaved={handleSaveModalClose}
+        />
+      )}
+
       <Footer />
     </div>
   );

@@ -12,7 +12,7 @@
     "NODE_ENV": "production",
     "PRISMA_MIGRATE_ALLOW_RESET": "false"
   },
-  "version": 3,
+  "version": 2,
   "regions": ["iad1"],
   "build": {
     "env": {

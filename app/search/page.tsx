@@ -33,30 +33,29 @@ const TABS = [
   { label: 'Videos', value: 'video' },
 ] as const;
 
+type TabValue = typeof TABS[number]['value'];
+
 export default function SearchPage() {
   // Prevent double search when sort changes
   const isInitialMount = useRef(true);
   
-  // Define the tab type structure
-  type TabValue = typeof TABS[number]['value'];
-
   // State hooks
-  const [q, setQ] = useState('');
-  const [type, setType] = useState('all');
+  const [query, setQuery] = useState('');
+  const [resourceType, setResourceType] = useState<TabValue>('all');
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [sort, setSort] = useState<SortOption>('relevance');
+  const [sortOption, setSortOption] = useState<SortOption>('relevance');
   const [hasMore, setHasMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   // Define the search function
   const search = useCallback(async (resetResults = true) => {
-    if (!q) return;
-    setLoading(true);
+    if (!query) return;
+    setIsLoading(true);
     setError('');
 
-    const cacheKey = `${q}:${type}:${sort}`;
+    const cacheKey = `${query}:${resourceType}:${sortOption}`;
     const now = Date.now();
     const cached = resultCache.get(cacheKey);
 
@@ -64,15 +63,15 @@ export default function SearchPage() {
       setResults(cached.results);
       setHasMore(cached.hasMore);
       setNextCursor(cached.nextCursor);
-      setLoading(false);
+      setIsLoading(false);
       return;
     }
 
     try {
       const params = new URLSearchParams({
-        q: q,
-        type: type,
-        sort: sort,
+        q: query,
+        type: resourceType,
+        sort: sortOption,
         ...(resetResults ? {} : { cursor: nextCursor || '' })
       });
 
@@ -96,9 +95,9 @@ export default function SearchPage() {
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }, [q, type, sort, nextCursor, results]);
+  }, [query, resourceType, sortOption, nextCursor, results]);
 
   // Clear cache entries older than CACHE_TTL
   useEffect(() => {
@@ -108,16 +107,16 @@ export default function SearchPage() {
         resultCache.delete(key);
       }
     }
-  }, [q]); // Only run when query changes
+  }, [query]); // Only run when query changes
 
   // Effect for sort changes
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
-    } else if (q && results.length > 0) {
+    } else if (query && results.length > 0) {
       search(true);
     }
-  }, [sort, search]);
+  }, [sortOption, search]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -130,12 +129,12 @@ export default function SearchPage() {
             {TABS.map(tab => (
               <button
                 key={tab.value}
-                className={`px-5 py-2 rounded-full font-bold border-2 transition text-lg ${type === tab.value ? 'bg-emerald-500 text-white border-emerald-500 shadow' : 'bg-black/60 text-gray-200 border-emerald-900 hover:bg-emerald-900/20'}`}
+                className={`px-5 py-2 rounded-full font-bold border-2 transition text-lg ${resourceType === tab.value ? 'bg-emerald-500 text-white border-emerald-500 shadow' : 'bg-black/60 text-gray-200 border-emerald-900 hover:bg-emerald-900/20'}`}
                 onClick={() => {
-                  setType(tab.value);
-                  if (q) search(true);
+                  setResourceType(tab.value);
+                  if (query) search(true);
                 }}
-                disabled={loading}
+                disabled={isLoading}
               >
                 {tab.label}
               </button>
@@ -148,26 +147,26 @@ export default function SearchPage() {
                   id="query"
                   className="flex-1 border border-emerald-400/40 rounded-lg px-4 py-3 text-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow"
                   placeholder="Search papers, datasets, code, models, videos..."
-                  value={q}
-                  onChange={e => setQ(e.target.value)}
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && search(true)}
                 />
                 <button 
                   className="w-full md:w-auto bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-emerald-600 transition" 
                   onClick={() => search(true)} 
-                  disabled={loading}
+                  disabled={isLoading}
                 >
-                  {loading && !hasMore ? 'Searching...' : 'Search'}
+                  {isLoading && !hasMore ? 'Searching...' : 'Search'}
                 </button>
               </div>
               <div className="flex justify-between items-center">
                 <SortOptions
-                  currentSort={sort}
+                  currentSort={sortOption}
                   onSortChange={(newSort) => {
-                    setSort(newSort);
-                    if (q) search(true);
+                    setSortOption(newSort);
+                    if (query) search(true);
                   }}
-                  disabled={loading || !results.length}
+                  disabled={isLoading || !results.length}
                 />
               </div>
             </div>
@@ -179,7 +178,7 @@ export default function SearchPage() {
             </div>
           )}
 
-          {!loading && q && results.length === 0 && (
+          {!isLoading && query && results.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="text-gray-400 text-lg mb-2">No results found</div>
               <div className="text-gray-600">Try adjusting your search or filters</div>
@@ -187,10 +186,10 @@ export default function SearchPage() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {loading && [...Array(6)].map((_, i) => (
+            {isLoading && [...Array(6)].map((_, i) => (
               <SearchResultSkeleton key={i} />
             ))}
-            {!loading && results.map((r: SearchResult, i: number) => (
+            {!isLoading && results.map((r: SearchResult, i: number) => (
               <div key={r.id || i} className="border border-emerald-900/20 rounded-2xl p-6 bg-gradient-to-br from-[#121f22] via-[#0c2321] to-[#0a1016] shadow-lg flex flex-col gap-2 relative hover:border-emerald-500/30 transition-all duration-200">
                 <div className="flex gap-2 items-center mb-1">
                   <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{r.source}</span>
@@ -245,14 +244,14 @@ export default function SearchPage() {
             ))}
           </div>
 
-          {hasMore && !loading && results.length > 0 && (
+          {hasMore && !isLoading && results.length > 0 && (
             <div className="flex justify-center mt-8">
               <button
                 className="px-6 py-2 bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 rounded-lg hover:bg-emerald-600/30 transition"
                 onClick={() => search(false)}
-                disabled={loading}
+                disabled={isLoading}
               >
-                {loading ? 'Loading more...' : 'Load more results'}
+                {isLoading ? 'Loading more...' : 'Load more results'}
               </button>
             </div>
           )}
