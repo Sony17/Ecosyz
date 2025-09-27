@@ -32,7 +32,7 @@ export default function FeedbackForm() {
       }
 
       // Send email via Supabase Edge Function
-      const { data, error } = await supabase.functions.invoke('send-email', {
+      const { error } = await supabase.functions.invoke('send-email', {
         body: {
           to: COMPANY_EMAIL,
           subject: 'New feedback from Open Idea website',

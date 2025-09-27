@@ -26,11 +26,6 @@ export default function WorkspaceHeader({ id, title: initialTitle }: WorkspaceHe
   const [shareLinks, setShareLinks] = useState<ShareLink[]>([])
   const [creatingShare, setCreatingShare] = useState(false)
 
-  // Fetch share links on mount
-  useEffect(() => {
-    fetchShareLinks()
-  }, [id])
-
   const fetchShareLinks = useCallback(async () => {
     try {
       const data = await json<ShareLink[]>(await fetch(`/api/workspaces/${id}/share`))
@@ -39,6 +34,11 @@ export default function WorkspaceHeader({ id, title: initialTitle }: WorkspaceHe
       console.error('Failed to fetch share links:', error)
     }
   }, [id])
+  
+  // Fetch share links on mount
+  useEffect(() => {
+    fetchShareLinks()
+  }, [fetchShareLinks])
 
   const saveTitle = useCallback(async (newTitle: string) => {
     if (newTitle.trim() === initialTitle) return
@@ -85,104 +85,62 @@ export default function WorkspaceHeader({ id, title: initialTitle }: WorkspaceHe
 
       const shareUrl = `${window.location.origin}/share/${data.token}`
       await copy(shareUrl)
-      toast.success('Share link created and copied to clipboard!')
-      fetchShareLinks()
+      await fetchShareLinks()
+      toast.success('Share link copied to clipboard')
     } catch (error) {
       toast.error('Failed to create share link')
-      console.error('Share creation error:', error)
+      console.error('Create share link error:', error)
     } finally {
       setCreatingShare(false)
     }
   }
 
-  const copyLatestShareUrl = async () => {
-    if (shareLinks.length === 0) {
-      toast.error('No share links available')
-      return
-    }
-
-    const latest = shareLinks[0] // Assuming sorted by creation date
-    const shareUrl = `${window.location.origin}/share/${latest.token}`
-    try {
-      await copy(shareUrl)
-      toast.success('Share URL copied to clipboard!')
-    } catch {
-      // Error already handled by fetchShareLinks
-      toast.error('Failed to copy URL')
-    }
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative mb-8"
-    >
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl" />
-
-      <div className="relative bg-zinc-900/60 backdrop-blur-sm border border-zinc-800 rounded-2xl p-6 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 mr-4">
-            <input
-              type="text"
-              value={title}
-              onChange={handleTitleChange}
-              onKeyDown={handleKeyDown}
-              className={cn(
-                "w-full text-2xl font-bold bg-transparent border-none outline-none",
-                "text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text",
-                "placeholder-zinc-400 focus:ring-2 focus:ring-emerald-500/60 rounded-lg px-3 py-2"
-              )}
-              placeholder="Workspace title..."
-            />
-            {saving && (
-              <div className="flex items-center mt-2 text-sm text-zinc-400">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Saving...
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={createShareLink}
-              disabled={creatingShare}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all",
-                "bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30",
-                "hover:shadow-lg hover:shadow-emerald-500/20",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
-            >
-              {creatingShare ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Share className="w-4 h-4" />
-              )}
-              Create Share Link
-            </button>
-
-            {shareLinks.length > 0 && (
-              <button
-                onClick={copyLatestShareUrl}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all",
-                  "bg-zinc-700/50 hover:bg-zinc-600/50 text-zinc-300 border border-zinc-600/30",
-                  "hover:shadow-lg hover:shadow-zinc-900/50"
-                )}
-              >
-                <Copy className="w-4 h-4" />
-                Copy Latest Share URL
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-4 text-sm text-zinc-400">
-          Press <kbd className="px-2 py-1 bg-zinc-800 rounded text-xs">⌘S</kbd> or <kbd className="px-2 py-1 bg-zinc-800 rounded text-xs">Ctrl+S</kbd> to save
-        </div>
+    <header className="mb-4">
+      <div className="flex items-center gap-3">
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Untitled Workspace"
+          className={cn(
+            "flex-1 px-0 py-1 text-xl font-medium bg-transparent border-0 outline-none focus:outline-none",
+            saving && "opacity-50"
+          )}
+          disabled={saving}
+        />
+        {saving && <Loader2 className="h-5 w-5 animate-spin opacity-50" />}
       </div>
-    </motion.div>
+      <motion.div
+        className="mt-2 flex items-center gap-2 overflow-x-auto whitespace-nowrap py-1"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <button
+          onClick={createShareLink}
+          disabled={creatingShare}
+          className={cn(
+            "flex items-center gap-1 text-sm text-neutral-600 dark:text-neutral-300 transition-colors hover:text-neutral-900 dark:hover:text-neutral-100",
+            creatingShare && "opacity-50"
+          )}
+        >
+          <Share className="h-4 w-4" />
+          Share
+          {creatingShare && <Loader2 className="h-3 w-3 ml-1 animate-spin" />}
+        </button>
+
+        {shareLinks.map(link => (
+          <button
+            key={link.id}
+            onClick={() => copy(`${window.location.origin}/share/${link.token}`)}
+            className="flex items-center gap-1 text-sm text-neutral-400 dark:text-neutral-500 transition-colors hover:text-neutral-600 dark:hover:text-neutral-300"
+          >
+            <Copy className="h-3 w-3" />
+            {new Date(link.createdAt).toLocaleDateString()}
+          </button>
+        ))}
+      </motion.div>
+    </header>
   )
 }

@@ -2,35 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
 import { z } from 'zod';
 import { randomBytes } from 'crypto';
+import { resetTokens, TOKEN_EXPIRY, validateResetToken } from './utils';
 
 const ResetPasswordSchema = z.object({
   email: z.string().email(),
 });
-
-// Storage for tokens - this will be lost on server restart
-// In production with multiple instances, consider using Redis or a database
-const resetTokens = new Map();
-
-const TOKEN_EXPIRY = 60 * 60 * 1000; // 1 hour in milliseconds
-
-// Function to validate a reset token
-function validateResetToken(email: string, token: string): boolean {
-  const resetData = resetTokens.get(email);
-  
-  if (!resetData) {
-    return false;
-  }
-  
-  const { token: storedToken, expires } = resetData;
-  
-  if (Date.now() > expires.getTime()) {
-    // Token has expired, remove it
-    resetTokens.delete(email);
-    return false;
-  }
-  
-  return token === storedToken;
-}
 
 export async function POST(req: NextRequest) {
   if (!supabase) {

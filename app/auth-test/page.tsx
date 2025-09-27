@@ -1,5 +1,7 @@
 import { getCurrentUser, getUid } from '@/src/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AuthTestPage() {
   const user = await getCurrentUser();
   const uid = await getUid();

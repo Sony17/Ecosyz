@@ -1,45 +1,101 @@
 
-import Link from 'next/link';
-import Header from '@/app/components/Header';
-import Footer from '@/app/components/Footer';
+'use client'
+
+import Link from 'next/link'
+import { useState } from 'react'
+import dynamicImport from 'next/dynamic'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+
+export const dynamic = 'force-dynamic'
+
+// Dynamically import PaymentComponent with SSR disabled
+const PaymentComponent = dynamicImport(() => import('../components/PaymentComponent'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full text-center px-4 py-3 rounded-md font-medium bg-gray-600 text-white cursor-not-allowed">
+      Loading payment options...
+    </div>
+  )
+})
 
 
-export const metadata = {
-  title: 'Pricing • Open Idea',
-  description: 'Flexible pricing for individuals, teams, and organizations.',
-};
 
-
-
-function Tier({ title, price, description, features, badge, cta, ctaHref }: {
+function Tier({ title, price, description, features, ctaHref, isPopular }: {
   title: string;
   price: string;
   description: string;
   features: string[];
-  badge?: string;
-  cta?: string;
   ctaHref?: string;
+  isPopular?: boolean;
 }) {
   return (
-    <div className="p-8 rounded-xl glass-card glass-border flex flex-col text-white shadow-lg transition hover:-translate-y-1 bg-gradient-to-br from-[#0c2321]/80 via-[#121f22]/80 to-[#0a1016]/90">
-      <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-xl font-bold gradient-text">{title}</h3>
-        {badge && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">{badge}</span>}
+    <div className={`p-8 rounded-xl flex flex-col border ${
+      isPopular 
+        ? 'border-emerald-500 bg-emerald-500/10' 
+        : 'border-gray-700 hover:border-gray-600'
+    } transition-all duration-300`}>
+      {isPopular && (
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <span className="bg-emerald-500 text-xs font-medium px-3 py-1 rounded-full text-white">
+            Most popular
+          </span>
+        </div>
+      )}
+      <div className="mb-4">
+        <h3 className="text-lg font-medium text-white mb-1">{title}</h3>
+        <p className="text-gray-400 text-sm">{description}</p>
       </div>
-      <p className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">{price}</p>
-      <p className="opacity-90 mb-4 text-teal-100/90">{description}</p>
-      <ul className="space-y-2 text-sm flex-1">
-        {features.map((f) => (
-          <li key={f} className="flex items-start gap-2">
-            <span className="mt-1 text-emerald-400">✓</span>
-            <span className="text-teal-100/90">{f}</span>
+      <div className="mb-6">
+        <div className="flex items-baseline">
+          <span className="text-4xl font-bold text-white">{price}</span>
+          {price !== 'Custom' && <span className="text-gray-400 ml-1">/month</span>}
+        </div>
+      </div>
+      <ul className="space-y-3 text-sm flex-1 mb-6">
+        {features.map((feature) => (
+          <li key={feature} className="flex gap-3 items-start text-gray-300">
+            <svg className="h-5 w-5 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none">
+              <path d="M7.75 12.75L10 15.25L16.25 8.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>{feature}</span>
           </li>
         ))}
       </ul>
-      {cta && ctaHref && (
-        <div className="mt-6">
-          <Link href={ctaHref} className="inline-block w-full text-center px-6 py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold shadow-lg transition hover:scale-105 hover:shadow-neon focus:outline-none focus:ring-2 focus:ring-emerald-400/60">{cta}</Link>
-        </div>
+      {price === 'Free' ? (
+        <Link 
+          href={ctaHref || '/auth?plan=free'}
+          className={`w-full text-center px-4 py-3 rounded-md font-medium transition-all duration-300 ${
+            isPopular
+              ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+              : 'bg-white text-gray-900 hover:bg-gray-100'
+          }`}
+        >
+          Get Started
+        </Link>
+      ) : price === 'Custom' ? (
+        <Link 
+          href="/contact?enquiry=enterprise"
+          className="w-full text-center px-4 py-3 rounded-md font-medium bg-white text-gray-900 hover:bg-gray-100 transition-all duration-300"
+        >
+          Contact Sales
+        </Link>
+      ) : (
+        <PaymentComponent
+          amount={parseInt(price.replace('₹', ''))}
+          planType={title}
+          merchantUpiId="7838832332@hdfcbank"
+          merchantName="Open Idea"
+          onSuccess={() => {
+            // Navigate to success page
+            window.location.href = '/thank-you';
+          }}
+          onError={(error: any) => {
+            console.error('Payment failed:', error);
+            // Show error message
+            alert('Payment failed. Please try again.');
+          }}
+        />
       )}
     </div>
   );
@@ -47,90 +103,120 @@ function Tier({ title, price, description, features, badge, cta, ctaHref }: {
 
 
 export default function PricingPage() {
+  const tiers = [
+    {
+      title: "Free",
+      price: "₹0",
+      description: "Basic access for individuals getting started",
+      features: [
+        "3 workspaces",
+        "Basic AI search capabilities",
+        "Public knowledge graph access",
+        "Standard support",
+        "Community features",
+        "1GB storage per workspace"
+      ],
+      cta: "Get started",
+      ctaHref: "/auth?plan=free"
+    },
+    {
+      title: "Plus",
+      price: "₹999",
+      description: "Enhanced capabilities for power users",
+      features: [
+        "Everything in Free",
+        "Unlimited workspaces",
+        "Advanced AI research tools",
+        "Full knowledge graph access",
+        "Priority support",
+        "5GB storage per workspace",
+        "API access (100K requests/month)"
+      ],
+      cta: "Upgrade to Plus",
+      ctaHref: "/auth?plan=plus",
+      isPopular: true
+    },
+    {
+      title: "Enterprise",
+      price: "Custom",
+      description: "Advanced features for organizations",
+      features: [
+        "Everything in Plus",
+        "Custom workspace limits",
+        "Dedicated support",
+        "Custom AI model training",
+        "Advanced security & compliance",
+        "Unlimited storage",
+        "Custom API limits",
+        "SSO & team management"
+      ],
+      cta: "Contact sales",
+      ctaHref: "/contact?enquiry=enterprise"
+    }
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-900">
       <Header />
-      <main className="flex-grow p-8">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-8">
-          <header className="text-center mb-14">
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-3 uppercase" style={{background: 'linear-gradient(90deg, #4ef2a7 0%, #6ec6ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}}>
-              PLANS & ACCESS
-            </h1>
-            <p className="text-lg text-teal-100/90 font-medium max-w-2xl mx-auto">Choose your path to join the Open Idea community. Whether you’re exploring, building, or leading change, there’s a place for you.</p>
-          </header>
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-semibold text-white mb-3">
+            Get Access to Open Idea
+          </h1>
+          <p className="text-gray-400 max-w-2xl mx-auto">
+            Simple, transparent pricing that grows with you. Try any plan free for 14 days.
+          </p>
+        </div>
 
-          <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
-            <Tier
-              title="Open Access"
-              price="Free"
-              description="For curious minds and contributors. Access open resources, join discussions, and start your journey."
-              features={[
-                'Unified search across open research, code, and data',
-                'AI-powered quick summaries',
-                'Public projects and collections',
-                'Integrations with open platforms',
-                'Community Q&A and feedback',
-              ]}
-              badge="Community"
-              cta="Start Exploring"
-              ctaHref="/openresources"
-            />
+        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto relative">
+          {tiers.map((tier) => (
+            <Tier key={tier.title} {...tier} />
+          ))}
+        </div>
 
-            <Tier
-              title="Pro"
-              price="$12 / month"
-              description="For active builders and teams. Unlock private workspaces, advanced AI, and deeper insights."
-              features={[
-                'Private and shared workspaces',
-                'Advanced AI summarization and analytics',
-                'Trend and impact reports',
-                'Priority support',
-                'Early access to new features',
-              ]}
-              badge="Pro"
-              cta="Go Pro"
-              ctaHref="/feedback"
-            />
+        <div className="mt-16 max-w-3xl mx-auto">
+          <div className="rounded-lg bg-gray-800 p-6">
+            <h2 className="text-lg font-medium text-white mb-4">Payment methods</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 5H3V19H21V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M3 9H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Credit card
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 4V20M4 12H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                UPI
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <path d="M19 5H5V19H19V5Z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M5 9H19" stroke="currentColor" strokeWidth="2"/>
+                </svg>
+                Net banking
+              </div>
+              <div className="flex items-center gap-2 text-gray-300 text-sm">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 8V16M8 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                International
+              </div>
+            </div>
+          </div>
 
-            <Tier
-              title="Sponsored Challenges"
-              price="Custom"
-              description="For organizations and funders to host innovation challenges and crowdsource solutions."
-              features={[
-                'Host branded innovation challenges',
-                'Custom challenge curation and moderation',
-                'Community engagement and reporting',
-                'Sponsor recognition and impact metrics',
-                'Direct access to top contributors',
-              ]}
-              badge="Sponsor"
-              cta="Sponsor a Challenge"
-              ctaHref="/feedback"
-            />
-
-            <Tier
-              title="Enterprise"
-              price="Contact us"
-              description="For large organizations needing private deployments, advanced governance, and custom integrations."
-              features={[
-                'Private cloud or on-premise deployment',
-                'Admin dashboards and SSO',
-                'Custom ingestion pipelines',
-                'Compliance and security features',
-                'Dedicated onboarding and SLAs',
-              ]}
-              badge="Enterprise"
-              cta="Contact Sales"
-              ctaHref="/feedback"
-            />
-          </section>
-
-          <section className="mt-16 text-center">
-            <p className="text-teal-100/80">Have a question or need a custom plan?</p>
-            <Link href="/feedback" className="inline-block mt-4 px-6 py-2 rounded-lg border border-emerald-400 text-emerald-300 font-semibold transition hover:bg-emerald-400/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/60">Contact Us</Link>
-          </section>
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-400">
+              Have questions about pricing? <Link href="/contact" className="text-emerald-500 hover:text-emerald-400">Talk to us</Link>
+            </p>
+          </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

@@ -5,6 +5,8 @@ import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
 import ProfileForm from '../components/profile/ProfileForm';
 
+export const dynamic = 'force-dynamic';
+
 async function getProfileData() {
   const user = await getCurrentUser();
 

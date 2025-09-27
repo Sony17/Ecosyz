@@ -1,0 +1,169 @@
+'use client';
+
+import Link from 'next/link';
+import Header from '@/app/components/Header';
+import Footer from '@/app/components/Footer';
+
+export const metadata = {
+  title: 'Pricing • Open Idea',
+  description: 'Flexible pricing for individuals, teams, and organizations.',
+};
+
+function PaymentMethod({ method, icon }: { method: string; icon?: string }) {
+  return (
+    <div className="px-4 py-2 bg-gray-800 rounded-lg flex items-center gap-2">
+      {icon && <span className="text-xl">{icon}</span>}
+      <span className="text-teal-100/90">{method}</span>
+    </div>
+  );
+}
+
+function Tier({ title, price, description, features, badge, cta, ctaHref }: {
+  title: string;
+  price: string;
+  description: string;
+  features: string[];
+  badge?: string;
+  cta?: string;
+  ctaHref?: string;
+}) {
+  return (
+    <div className="p-8 rounded-xl glass-card glass-border flex flex-col text-white shadow-lg transition hover:-translate-y-1 bg-gradient-to-br from-[#0c2321]/80 via-[#121f22]/80 to-[#0a1016]/90">
+      <div className="flex items-center gap-2 mb-2">
+        <h3 className="text-xl font-bold gradient-text">{title}</h3>
+        {badge && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">{badge}</span>}
+      </div>
+      <p className="text-3xl font-extrabold mb-3 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">{price}</p>
+      <p className="opacity-90 mb-4 text-teal-100/90">{description}</p>
+      <ul className="space-y-2 text-sm flex-1">
+        {features.map((f) => (
+          <li key={f} className="flex items-start gap-2">
+            <span className="mt-1 text-emerald-400">✓</span>
+            <span className="text-teal-100/90">{f}</span>
+          </li>
+        ))}
+      </ul>
+      {cta && ctaHref && (
+        <div className="mt-6">
+          <Link href={ctaHref} className="inline-block w-full text-center px-6 py-2 rounded-lg bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold shadow-lg transition hover:scale-105 hover:shadow-neon focus:outline-none focus:ring-2 focus:ring-emerald-400/60">{cta}</Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function PricingPage() {
+  const tiers = [
+    {
+      title: "Free",
+      price: "₹0/month",
+      badge: "Get Started",
+      description: "Perfect for individual researchers and innovators",
+      features: [
+        "5 Active Workspaces",
+        "Basic AI-powered search",
+        "Limited knowledge graph access",
+        "Community support",
+        "Basic collaboration tools",
+        "2GB storage per workspace"
+      ],
+      cta: "Start Free",
+      ctaHref: "/auth?plan=free"
+    },
+    {
+      title: "Pro",
+      price: "₹999/month",
+      badge: "Most Popular",
+      description: "Ideal for research teams and small organizations",
+      features: [
+        "Unlimited Workspaces",
+        "Advanced AI search & analytics",
+        "Full knowledge graph access",
+        "Priority support",
+        "Team collaboration tools",
+        "10GB storage per workspace",
+        "Custom domain support",
+        "API access",
+        "Enhanced security features"
+      ],
+      cta: "Start 14-Day Trial",
+      ctaHref: "/auth?plan=pro"
+    },
+    {
+      title: "Enterprise",
+      price: "Custom",
+      badge: "Contact Sales",
+      description: "For large organizations with custom needs",
+      features: [
+        "Everything in Pro",
+        "Unlimited storage",
+        "Dedicated support",
+        "Custom integrations",
+        "Advanced analytics",
+        "SLA guarantees",
+        "On-premise deployment option",
+        "Custom AI model training",
+        "Compliance & security features"
+      ],
+      cta: "Contact Sales",
+      ctaHref: "/contact?enquiry=enterprise"
+    }
+  ];
+
+  const paymentMethods = [
+    { method: "Credit/Debit Cards", icon: "💳" },
+    { method: "UPI", icon: "🇮🇳" },
+    { method: "Net Banking", icon: "🏦" },
+    { method: "International Cards", icon: "🌍" }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-16">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            Choose Your Plan
+          </h1>
+          <p className="text-lg text-teal-100/90 max-w-2xl mx-auto">
+            Flexible pricing for every stage of your innovation journey. All plans include core features with pricing that scales with your needs.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {tiers.map((tier) => (
+            <Tier key={tier.title} {...tier} />
+          ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-4 text-teal-100">Payment Methods</h2>
+          <div className="flex justify-center items-center gap-4 flex-wrap">
+            {paymentMethods.map((pm) => (
+              <PaymentMethod key={pm.method} {...pm} />
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-teal-100/70">
+            Secure payments powered by Stripe and Razorpay
+          </p>
+        </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold mb-4 text-teal-100">Have Questions?</h2>
+          <p className="text-teal-100/90 mb-4">
+            Contact our sales team for custom pricing or to learn more about our plans.
+          </p>
+          <Link 
+            href="/contact" 
+            className="inline-block px-6 py-2 rounded-lg bg-gray-800 text-teal-100 hover:bg-gray-700 transition"
+          >
+            Contact Sales
+          </Link>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

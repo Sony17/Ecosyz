@@ -9,7 +9,7 @@ import { json } from '../../../src/lib/api'
 
 interface AddAnnotationFormProps {
   resourceId: string
-  onCreated?: (annotation: { id: string; resourceId: string; body: string; highlights: any; createdAt: string }) => void
+  onCreated?: (annotation: { id: string; resourceId: string; body: string; highlights: Array<{ start: number; end: number; text: string }>; createdAt: string }) => void
   onCancel?: () => void
 }
 
@@ -23,7 +23,7 @@ export default function AddAnnotationForm({ resourceId, onCreated, onCancel }: A
 
     setCreating(true)
     try {
-      const data = await json<{ id: string; resourceId: string; body: string; highlights: any; createdAt: string }>(await fetch(`/api/resources/${resourceId}/annotations`, {
+      const data = await json<{ id: string; resourceId: string; body: string; highlights: Array<{ start: number; end: number; text: string }>; createdAt: string }>(await fetch(`/api/resources/${resourceId}/annotations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

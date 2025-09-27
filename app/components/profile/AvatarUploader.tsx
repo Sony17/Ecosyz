@@ -41,7 +41,7 @@ export default function AvatarUploader({ currentAvatarUrl, onAvatarUpdate }: Ava
     await handleUpload(file);
   };
 
-  const handleUpload = async (_file: File) => {
+  const handleUpload = async (file: File) => {
     setUploading(true);
     try {
       // For now, just use a placeholder URL since storage isn't set up

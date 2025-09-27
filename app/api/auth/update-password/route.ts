@@ -2,32 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/src/lib/supabase';
 import { z } from 'zod';
 
-// Map to store reset tokens
-const resetTokens = new Map();
-
-// Function to validate a reset token
-function validateResetToken(email: string, token: string): boolean {
-  const resetData = resetTokens.get(email);
-  
-  if (!resetData) {
-    return false;
-  }
-  
-  const { token: storedToken, expires } = resetData;
-  
-  if (Date.now() > expires.getTime()) {
-    // Token has expired, remove it
-    resetTokens.delete(email);
-    return false;
-  }
-  
-  return token === storedToken;
-}
+import { validateResetToken } from '../reset-password/utils';
 
 const UpdatePasswordSchema = z.object({
-  password: z.string().min(6),
   email: z.string().email(),
-  token: z.string().optional(),
+  token: z.string(),
+  password: z.string().min(8),
 });
 
 export async function POST(req: NextRequest) {
@@ -79,7 +59,7 @@ export async function POST(req: NextRequest) {
 
       if (token) {
         // If we have a token, use the password reset flow
-        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: process.env.NEXT_PUBLIC_BASE_URL ? 
             `${process.env.NEXT_PUBLIC_BASE_URL}/auth` : 
             'http://localhost:3000/auth'

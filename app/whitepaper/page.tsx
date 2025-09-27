@@ -99,7 +99,7 @@ export default function WhitepaperPage() {
 
     <div className="bg-[#172921]/80 border-l-4 border-cyan-400 p-6 rounded-xl shadow mb-8">
       <p className="text-lg font-medium text-teal-100/90">
-        Open source and open knowledge are growing exponentially – GitHub's 2024 data shows over 518 million projects (25% YoY growth) and nearly 1 billion contributions to open source, alongside a surge in AI projects.
+        Open source and open knowledge are growing exponentially – GitHub&apos;s 2024 data shows over 518 million projects (25% YoY growth) and nearly 1 billion contributions to open source, alongside a surge in AI projects.
       </p>
     </div>
 
@@ -152,7 +152,7 @@ export default function WhitepaperPage() {
     </div>
 
     <p className="mt-6 text-teal-100/80">
-      These fragmentation issues mean lost opportunities – innovations that could happen if disparate knowledge were easier to find and integrate often don't happen. In short, open knowledge is abundant but disjointed, limiting its potential impact.
+      These fragmentation issues mean lost opportunities – innovations that could happen if disparate knowledge were easier to find and integrate often don&apos;t happen. In short, open knowledge is abundant but disjointed, limiting its potential impact.
     </p>
   </div>
 </section>
@@ -226,7 +226,7 @@ export default function WhitepaperPage() {
     </h2>
 
     <p className="mb-6 text-teal-100/90">
-      Open Idea's platform workflow combines powerful search technology, AI-driven enrichment, and collaborative project workspaces. From a user's perspective, the journey on Open Idea might look like this:
+      Open Idea&apos;s platform workflow combines powerful search technology, AI-driven enrichment, and collaborative project workspaces. From a user&apos;s perspective, the journey on Open Idea might look like this:
     </p>
     <div className="space-y-8">
       {/* Step 1 */}
@@ -363,7 +363,7 @@ export default function WhitepaperPage() {
       </div>
     </div>
     <div className="mt-10 bg-[#162322]/90 p-6 rounded-lg border border-emerald-400/10 shadow text-teal-100/90 text-lg italic">
-      True to its philosophy, Open Idea's architecture is being developed as open-source modules—ready for the world to inspect, contribute, or run themselves.
+      True to its philosophy, Open Idea&apos;s architecture is being developed as open-source modules—ready for the world to inspect, contribute, or run themselves.
     </div>
   </div>
 </section>
@@ -478,7 +478,7 @@ export default function WhitepaperPage() {
         9. Call to Action
     </h2>
     <p className="mb-4 text-teal-100/90">
-      Open Idea is more than just a product—it's a movement to unlock the world's knowledge for collective progress. We invite you to join us on this journey:
+      Open Idea is more than just a product—it&apos;s a movement to unlock the world&apos;s knowledge for collective progress. We invite you to join us on this journey:
     </p>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
       {/* Card 1 */}
@@ -521,7 +521,7 @@ export default function WhitepaperPage() {
     <div className="mt-10 bg-[#162322]/90 p-6 rounded-lg border border-emerald-400/10 shadow text-teal-100/90 text-lg italic text-center">
       Visit our website (openidea.world) to sign up for early access, contribute to our open whitepaper discussions, or reach out directly at <span className="underline decoration-dotted decoration-cyan-400">info@openidea.world</span>.
       <br />
-      Let's build the future of open innovation together.
+      Let&apos;s build the future of open innovation together.
     </div>
   </div>
 </section>

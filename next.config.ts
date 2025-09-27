@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Build output directory
+  distDir: '.next',
+  // Optionally enable compression
+  compress: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb'
+    }
+  },
+  serverExternalPackages: ['@prisma/client'],
   images: {
     remotePatterns: [
       {

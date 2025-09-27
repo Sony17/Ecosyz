@@ -7,9 +7,19 @@ import { toast } from 'sonner'
 import { cn } from '../../../src/lib/ui'
 import { json } from '../../../src/lib/api'
 
+interface Resource {
+  id: string
+  workspaceId: string
+  title: string
+  url?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
 interface AddResourceFormProps {
   workspaceId: string
-  onCreated?: (resource: any) => void
+  onCreated?: (resource: Resource) => void
 }
 
 export default function AddResourceForm({ workspaceId, onCreated }: AddResourceFormProps) {
@@ -25,7 +35,7 @@ export default function AddResourceForm({ workspaceId, onCreated }: AddResourceF
 
     setCreating(true)
     try {
-      const data = await json(await fetch(`/api/workspaces/${workspaceId}/resources`, {
+      const data = await json<Resource>(await fetch(`/api/workspaces/${workspaceId}/resources`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

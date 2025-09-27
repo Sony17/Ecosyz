@@ -5,11 +5,18 @@
     }
   },
   "framework": "nextjs",
-  "buildCommand": "npm run vercel-build",
-  "installCommand": "npm install",
+  "buildCommand": "npx prisma generate && next build",
+  "installCommand": "npm ci",
   "env": {
     "PRISMA_GENERATE": "true",
     "NODE_ENV": "production",
     "PRISMA_MIGRATE_ALLOW_RESET": "false"
+  },
+  "version": 3,
+  "regions": ["iad1"],
+  "build": {
+    "env": {
+      "NODE_VERSION": "20.x"
+    }
   }
 }
