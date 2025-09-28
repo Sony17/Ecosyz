@@ -43,6 +43,7 @@ theme:
   language: en
   logo: assets/eco.png
   favicon: assets/favicon.svg
+  custom_dir: docs/
 
 extra_css:
   - stylesheets/extra.css
