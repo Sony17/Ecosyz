@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Container } from "./ui/Container";
 import { toast } from "sonner";
 
+// Central nav definition; label for docs shortened to match design direction.
 const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/openresources", label: "Resources" },
@@ -15,7 +16,7 @@ const NAV_LINKS = [
   { href: "/community", label: "Community" },
   { href: "/whitepaper", label: "Whitepaper" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/docs", label: "Documentation" },
+  { href: "/docs", label: "Docs" },
 ];
 
 export default function Header() {
@@ -132,6 +133,19 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Derive active segment for highlighting (first path part)
+  const activeRoot = pathname === "/" ? "/" : `/${pathname.split('/')[1]}`;
+
+  // Keyboard handler for user dropdown accessibility
+  function onDropdownKey(e: React.KeyboardEvent<HTMLButtonElement>) {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setDropdownOpen(o => !o);
+    } else if (e.key === 'Escape') {
+      setDropdownOpen(false);
+    }
+  }
+
   return (
     <header className="sticky top-0 z-50 glass h-14 border-b glass-border">
       <Container>
@@ -143,15 +157,19 @@ export default function Header() {
           </Link>
           {/* Desktop nav center */}
           <nav className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2" aria-label="Main">
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="focus:outline-none focus:ring-2 focus:ring-emerald-400/60 px-2 py-1 rounded transition hover:text-emerald-400/90"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map(link => {
+              const isActive = activeRoot === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`focus:outline-none focus:ring-2 focus:ring-emerald-400/60 px-2 py-1 rounded transition hover:text-emerald-400/90 ${isActive ? 'text-emerald-400 font-semibold' : 'text-gray-300 dark:text-gray-200'}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
           {/* Utilities right */}
           <div className="hidden md:flex items-center gap-3">
@@ -159,8 +177,11 @@ export default function Header() {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
+                  onKeyDown={onDropdownKey}
                   className="flex items-center gap-2 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-gray-100 dark:hover:bg-gray-700"
                   aria-label="User menu"
+                  aria-haspopup="menu"
+                  aria-expanded={dropdownOpen}
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                     {userData.avatarUrl ? (
@@ -191,16 +212,22 @@ export default function Header() {
                 </button>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+                  <div
+                    role="menu"
+                    aria-label="User menu"
+                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                  >
                     <div className="py-1">
                       <Link
                         href="/profile"
+                        role="menuitem"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => setDropdownOpen(false)}
                       >
                         Profile
                       </Link>
                       <button
+                        role="menuitem"
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
@@ -256,17 +283,21 @@ export default function Header() {
           tabIndex={mobileOpen ? 0 : -1}
           aria-label="Main"
         >
-          {NAV_LINKS.map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white"
-              onClick={() => setMobileOpen(false)}
-              tabIndex={mobileOpen ? 0 : -1}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map(link => {
+            const isActive = activeRoot === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={`block w-full text-lg px-3 py-3 rounded focus:outline-none focus:ring-2 focus:ring-emerald-400/60 hover:bg-white/10 text-white ${isActive ? 'bg-white/10 font-semibold' : ''}`}
+                onClick={() => setMobileOpen(false)}
+                tabIndex={mobileOpen ? 0 : -1}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <button
             onClick={toggleTheme}
             aria-label="Toggle Theme"
