@@ -1,5 +1,6 @@
-site_name: Open Idea Documentation
-site_description: Documentation for the Open Idea platform
+site_name: Ecosyz Documentation
+site_description: Documentation for the Ecosyz platform
+site_url: https://sony17.github.io/Ecosyz/
 repo_url: https://github.com/Sony17/Ecosyz
 repo_name: Sony17/Ecosyz
 
@@ -43,7 +44,6 @@ theme:
   language: en
   logo: assets/eco.png
   favicon: assets/favicon.svg
-  custom_dir: docs/
 
 extra_css:
   - stylesheets/extra.css
