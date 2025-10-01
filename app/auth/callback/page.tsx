@@ -54,7 +54,7 @@ export default function OAuthCallback() {
                 description: 'Welcome to Ecosyz',
                 duration: 3000,
               });
-              router.push('/profile');
+              router.push('/workspaces');
               return;
             } else {
               const errorData = await response.json();
@@ -77,7 +77,7 @@ export default function OAuthCallback() {
               description: 'Welcome to Ecosyz',
               duration: 3000,
             });
-            router.push('/profile');
+            router.push('/workspaces');
             return;
           } else {
             const errorData = await response.json();
