@@ -10,13 +10,11 @@ import { toast } from "sonner";
 
 // Central nav definition
 const NAV_LINKS = [
-  { href: "/about", label: "About" },
   { href: "/openresources", label: "Resources" },
   { href: "/projects", label: "Projects" },
   { href: "/community", label: "Community" },
   { href: "/whitepaper", label: "Whitepaper" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/docs", label: "Docs" },
 ];
 
 export default function Header() {

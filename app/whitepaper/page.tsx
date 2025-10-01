@@ -22,12 +22,25 @@ export default function WhitepaperPage() {
       </p>
       <div className="mt-8 flex justify-center space-x-4">
         <a
+          href="/about"
+          className="px-6 py-3 rounded-md bg-gradient-to-r from-purple-400 to-emerald-400 text-gray-900 font-semibold shadow hover:scale-105 transition"
+        >
+          About
+        </a>
+        <a
           href="https://github.com/Sony17/Ecosyz/blob/main/Open%20Idea.pdf?raw=true"
           download="Open_Idea_Whitepaper.pdf"
           className="px-6 py-3 rounded-md bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold shadow hover:scale-105 transition"
         >
           Download PDF
         </a>
+        <a
+          href="/docs"
+          className="px-6 py-3 rounded-md bg-gradient-to-r from-cyan-400 to-blue-400 text-gray-900 font-semibold shadow hover:scale-105 transition"
+        >
+          View Docs
+        </a>
+       
       </div>
     </div>
   </section>
