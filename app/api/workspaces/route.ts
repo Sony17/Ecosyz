@@ -1,24 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../src/lib/db';
-import { getCurrentUser } from '../../../src/lib/auth';
+import { getCurrentUser, ensureUserInDb } from '../../../src/lib/auth';
 import { CreateWorkspace } from '../../../src/lib/validation';
 
 export async function GET() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json(
-      { error: 'Not authenticated' },
-      { status: 401 }
-    );
-  }
-
+  // Return all workspaces for public project discovery
   const workspaces = await prisma.workspace.findMany({
-    where: { ownerId: user.id },
     select: {
       id: true,
       title: true,
       createdAt: true,
+      owner: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
       _count: {
         select: { resources: true, shares: true },
       },
@@ -38,6 +35,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Ensure user exists in our database
+  await ensureUserInDb(user);
+
+  // Find the Prisma user record by supabaseId
+  const prismaUser = await prisma.user.findUnique({
+    where: { supabaseId: user.id },
+  });
+
+  if (!prismaUser) {
+    return NextResponse.json(
+      { error: 'User not found in database' },
+      { status: 404 }
+    );
+  }
+
   const body = await req.json();
   const parse = CreateWorkspace.safeParse(body);
   if (!parse.success) {
@@ -46,7 +58,7 @@ export async function POST(req: NextRequest) {
   const ws = await prisma.workspace.create({
     data: {
       title: parse.data.title,
-      ownerId: user.id,
+      ownerId: prismaUser.id,
     },
     select: { id: true, title: true, createdAt: true },
   });

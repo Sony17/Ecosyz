@@ -87,7 +87,7 @@ export default function AuthPage() {
           fontWeight: '600',
         },
       });
-      router.push('/profile');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Sign in error:', error);
       toast.error(error instanceof Error ? error.message : 'Sign in failed', {
