@@ -84,5 +84,5 @@ export default async function WorkspacePage({
     })),
   }
 
-  return <WorkspacePageClient workspaceData={workspaceData} />
+  return <WorkspacePageClient workspace={workspaceData} />
 }

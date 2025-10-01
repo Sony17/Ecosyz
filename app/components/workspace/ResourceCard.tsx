@@ -20,11 +20,12 @@ interface Resource {
 
 interface ResourceCardProps {
   resource: Resource
+  workspaceId: string
   onDeleted?: (id: string) => void
   onAnnotationCreated?: (resourceId: string) => void
 }
 
-export default function ResourceCard({ resource, onDeleted, onAnnotationCreated }: ResourceCardProps) {
+export default function ResourceCard({ resource, workspaceId, onDeleted, onAnnotationCreated }: ResourceCardProps) {
   const [deleting, setDeleting] = useState(false)
   const [showAnnotationForm, setShowAnnotationForm] = useState(false)
 
