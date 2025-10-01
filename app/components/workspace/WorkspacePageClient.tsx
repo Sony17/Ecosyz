@@ -1,6 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { Plus, FileText } from 'lucide-react'
 import WorkspaceHeader from './WorkspaceHeader'
 import ResourceCard from './ResourceCard'
 import AddResourceForm from './AddResourceForm'
@@ -26,10 +28,24 @@ interface Workspace {
 }
 
 interface WorkspacePageClientProps {
-  workspaceData: Workspace
+  workspace?: Workspace | null
 }
 
-export default function WorkspacePageClient({ workspaceData }: WorkspacePageClientProps) {
+export default function WorkspacePageClient({ workspace }: WorkspacePageClientProps) {
+  const [showAddResourceModal, setShowAddResourceModal] = useState(false)
+
+  if (!workspace) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex items-center justify-center">
+        <p className="text-gray-400">Select a workspace or create a new one</p>
+      </div>
+    )
+  }
+
+  // Ensure we have arrays even if undefined
+  const resources = workspace.resources || []
+  const shareLinks = workspace.shareLinks || []
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       <ToastProvider />
@@ -40,96 +56,63 @@ export default function WorkspacePageClient({ workspaceData }: WorkspacePageClie
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-8 max-w-7xl"
       >
-        <WorkspaceHeader id={workspaceData.id} title={workspaceData.title} />
+        <WorkspaceHeader
+          title={workspace.title}
+          id={workspace.id}
+        />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          {/* Resources Section */}
-          <div className="lg:col-span-2 space-y-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-200">Resources</h2>
+            <button
+              onClick={() => setShowAddResourceModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <h2 className="text-2xl font-bold text-zinc-100 mb-6">Resources</h2>
-
-              <AddResourceForm
-                workspaceId={workspaceData.id}
-                onCreated={() => {
-                  // This will trigger a re-fetch on the client side
-                  window.location.reload()
-                }}
-              />
-            </motion.div>
-
-            {workspaceData.resources.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-center py-12 bg-zinc-900/60 backdrop-blur-sm border border-zinc-800 rounded-2xl"
-              >
-                <div className="text-zinc-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-zinc-300 mb-2">No resources yet</h3>
-                <p className="text-zinc-500 text-sm max-w-md mx-auto">
-                  Add your first resource using the form above, or save resources from the search page.
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial="hidden"
-                animate="show"
-                variants={{
-                  hidden: {},
-                  show: {
-                    transition: {
-                      staggerChildren: 0.06,
-                    },
-                  },
-                }}
-                className="space-y-4"
-              >
-                {workspaceData.resources.map((resource: Resource) => (
-                  <motion.div
-                    key={resource.id}
-                    variants={{
-                      hidden: { opacity: 0, y: 8 },
-                      show: { opacity: 1, y: 0 },
-                    }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 24 }}
-                  >
-                    <ResourceCard
-                      resource={resource}
-                      onDeleted={() => {
-                        // This will trigger a re-fetch on the client side
-                        window.location.reload()
-                      }}
-                      onAnnotationCreated={() => {
-                        // This will trigger a re-fetch on the client side
-                        window.location.reload()
-                      }}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+              <Plus className="w-5 h-5" />
+              Add Resource
+            </button>
           </div>
 
-          {/* Share Links Panel */}
-          <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <ShareLinksPanel workspaceId={workspaceData.id} />
-            </motion.div>
-          </div>
+          {/* Resources Grid */}
+          {resources.length === 0 ? (
+            <div className="text-center py-12 bg-white/5 rounded-xl">
+              <div className="mb-4">
+                <FileText className="w-12 h-12 text-gray-400 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-300 mb-2">No resources yet</h3>
+              <p className="text-gray-400 text-sm mb-6">
+                Add your first resource to get started
+              </p>
+              <button
+                onClick={() => setShowAddResourceModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500/20 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Add Resource
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {resources.map((resource) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  workspaceId={workspace.id}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </motion.div>
+
+      {/* Add Resource Modal */}
+      {showAddResourceModal && (
+        <AddResourceForm
+          workspaceId={workspace.id}
+          onCreated={() => setShowAddResourceModal(false)}
+          onClose={() => setShowAddResourceModal(false)}
+        />
+      )}
     </div>
   )
 }

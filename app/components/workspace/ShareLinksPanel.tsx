@@ -16,6 +16,7 @@ interface ShareLink {
 
 interface ShareLinksPanelProps {
   workspaceId: string
+  onClose: () => void
 }
 
 export default function ShareLinksPanel({ workspaceId }: ShareLinksPanelProps) {

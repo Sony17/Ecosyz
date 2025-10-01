@@ -20,6 +20,7 @@ interface Resource {
 interface AddResourceFormProps {
   workspaceId: string
   onCreated?: (resource: Resource) => void
+  onClose: () => void
 }
 
 export default function AddResourceForm({ workspaceId, onCreated }: AddResourceFormProps) {

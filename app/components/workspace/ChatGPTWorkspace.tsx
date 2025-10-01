@@ -20,7 +20,6 @@ import {
   LogOut,
   Edit,
   Bell,
-  MoreVertical,
   Star,
   Clock,
   TrendingUp,
@@ -49,694 +48,167 @@ interface Workspace {
   shareLinks: any[];
 }
 
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar_url?: string;
-}
-
-interface DashboardProps {
-  initialWorkspace?: Workspace;
-}
-
-type ViewType = 'home' | 'ai-assistant' | 'notes' | 'analytics' | 'calendar' | 'resources' | 'workspace' | 'project' | 'profile' | 'integrations' | 'settings';
-
-export default function ChatGPTWorkspace({ initialWorkspace }: DashboardProps) {
-  const [currentView, setCurrentView] = useState<ViewType>('home');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(initialWorkspace || null);
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+export default function ChatGPTWorkspace() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [showAddResourceModal, setShowAddResourceModal] = useState(false);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
-    fetchUser();
-    fetchWorkspaces();
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+    };
+    checkAuth();
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      const res = await fetch('/api/auth/session');
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const response = await fetch('/api/workspaces');
+        if (response.ok) {
+          const data = await response.json();
+          setWorkspaces(data);
+          if (data.length > 0 && !selectedWorkspace) {
+            setSelectedWorkspace(data[0].id);
+            setActiveWorkspace(data[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching workspaces:', error);
       }
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-    }
-  };
-
-  const fetchWorkspaces = async () => {
-    try {
-      const res = await fetch('/api/workspaces');
-      if (res.ok) {
-        const data = await res.json();
-        setWorkspaces(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch workspaces:', error);
-    }
-  };
+    };
+    fetchWorkspaces();
+  }, [selectedWorkspace]);
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/signout', { method: 'POST' });
-      router.push('/auth');
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        router.push('/');
+      }
     } catch (error) {
       console.error('Sign out error:', error);
     }
   };
 
-  const navigationItems = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'ai-assistant', label: 'AI Assistant', icon: Brain },
-    { id: 'resources', label: 'Resources', icon: BookOpen },
-    { id: 'notes', label: 'Notes', icon: StickyNote },
-    { id: 'workspace', label: 'Workspace', icon: FileText },
-    { id: 'project', label: 'Project', icon: Sparkles },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'integrations', label: 'Integrations', icon: Zap },
-    { id: 'settings', label: 'Settings', icon: Settings },
-  ];
+  const handleWorkspaceSelect = (workspace: Workspace) => {
+    setSelectedWorkspace(workspace.id);
+    setActiveWorkspace(workspace);
+  };
+
+  const filteredWorkspaces = workspaces.filter(workspace =>
+    workspace.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-  <div className="h-screen bg-[#181c20] flex text-white">
+    <div className="flex h-screen bg-gray-900 text-white">
       {/* Sidebar */}
       <motion.div
-        initial={{ width: 280 }}
-        animate={{ width: sidebarCollapsed ? 80 : 280 }}
-        className="bg-black/20 backdrop-blur-xl border-r border-white/10 flex flex-col"
+        initial={false}
+        animate={{ width: sidebarOpen ? '280px' : '0px' }}
+        className={`relative flex-shrink-0 border-r border-white/10 overflow-hidden ${
+          sidebarOpen ? 'flex flex-col' : 'hidden'
+        }`}
       >
-        {/* Logo */}
-        <div className="p-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
-              <span className="text-black font-bold text-sm">E</span>
-            </div>
-            {!sidebarCollapsed && (
-              <span className="text-white font-semibold text-lg">Ecosyz</span>
-            )}
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-white/10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Workspaces</h2>
+            <button
+              onClick={() => setShowAddResourceModal(true)}
+              className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search workspaces..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 bg-white/5 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-500" />
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <motion.button
-                key={item.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setCurrentView(item.id as ViewType)}
-                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
-                  currentView === item.id
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+        {/* Workspace List */}
+        <div className="flex-grow overflow-y-auto">
+          <nav className="p-2 space-y-1">
+            {filteredWorkspaces.map((workspace) => (
+              <button
+                key={workspace.id}
+                onClick={() => handleWorkspaceSelect(workspace)}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                  selectedWorkspace === workspace.id
+                    ? 'bg-emerald-500/10 text-emerald-400'
+                    : 'hover:bg-white/5'
                 }`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {!sidebarCollapsed && (
-                  <span className="text-sm font-medium">{item.label}</span>
-                )}
-              </motion.button>
-            );
-          })}
-        </nav>
-
-        {/* Workspaces Section */}
-        {!sidebarCollapsed && (
-          <div className="p-4 border-t border-white/10">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Workspaces</span>
-              <button
-                onClick={() => setCurrentView('workspace')}
-                className="text-emerald-400 hover:text-emerald-300 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
+                <FileText className="w-5 h-5" />
+                <span className="text-sm">{workspace.title}</span>
               </button>
-            </div>
-            <div className="space-y-1 max-h-32 overflow-y-auto">
-              {workspaces.slice(0, 5).map((workspace) => (
-                <button
-                  key={workspace.id}
-                  onClick={() => {
-                    setSelectedWorkspace(workspace);
-                    setCurrentView('workspace');
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg truncate"
-                >
-                  {workspace.title}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+            ))}
+          </nav>
+        </div>
 
-        {/* Toggle Button */}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="p-4 border-t border-white/10 text-gray-400 hover:text-white transition-colors"
-        >
-          {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-        </button>
+        {/* Sidebar Footer */}
+        <div className="p-4 border-t border-white/10">
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="text-sm">Sign Out</span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header - Gmail-like with round profile image */}
-        <header className="bg-black/20 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-white">
-              {currentView === 'home' && 'Dashboard'}
-              {currentView === 'ai-assistant' && 'AI Assistant'}
-              {currentView === 'resources' && 'Resources'}
-              {currentView === 'notes' && 'Notes & Knowledge'}
-              {currentView === 'workspace' && (selectedWorkspace?.title || 'Workspace')}
-              {currentView === 'project' && 'Project Management'}
-              {currentView === 'analytics' && 'Analytics'}
-              {currentView === 'calendar' && 'Calendar & Tasks'}
-              {currentView === 'profile' && 'Profile'}
-              {currentView === 'integrations' && 'Integrations'}
-              {currentView === 'settings' && 'Settings'}
-            </h1>
-          </div>
+      <div className="flex-grow flex flex-col overflow-hidden">
 
-          {/* Quick Actions Bar */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => {/* TODO: Implement save current page */}}
-              className="p-2 text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all"
-              title="Save current page"
-            >
-              <Save className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCurrentView('notes')}
-              className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all"
-              title="Quick note"
-            >
-              <StickyNote className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setCurrentView('ai-assistant')}
-              className="p-2 text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-all"
-              title="AI Assistant"
-            >
-              <Sparkles className="w-5 h-5" />
-            </button>
-
-            <div className="w-px h-6 bg-white/10 mx-2"></div>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Search */}
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* Notifications */}
-            <button className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full"></span>
-            </button>
-
-            {/* User Menu - Gmail-like round image */}
-            <div className="relative">
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-3 p-1 rounded-full hover:bg-white/5 transition-all"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-black font-semibold text-sm">
-                  {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                {!sidebarCollapsed && (
-                  <div className="text-left hidden md:block">
-                    <p className="text-sm font-medium text-white">{user?.name || 'User'}</p>
-                    <p className="text-xs text-gray-400">{user?.email}</p>
-                  </div>
-                )}
-                <MoreVertical className="w-4 h-4 text-gray-400" />
-              </button>
-
-              {/* User Dropdown Menu */}
-              <AnimatePresence>
-                {showUserMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 top-full mt-2 w-64 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50"
-                  >
-                    <div className="p-4 border-b border-white/10">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-black font-semibold">
-                          {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                        <div>
-                          <p className="text-white font-medium">{user?.name || 'User'}</p>
-                          <p className="text-gray-400 text-sm">{user?.email}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 space-y-2">
-                      <button
-                        onClick={() => setCurrentView('profile')}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                      >
-                        <User className="w-4 h-4" />
-                        <span className="text-sm">Profile</span>
-                      </button>
-                      <button
-                        onClick={() => setCurrentView('settings')}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span className="text-sm">Settings</span>
-                      </button>
-                      <div className="border-t border-white/10 my-2"></div>
-                      <button
-                        onClick={handleSignOut}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span className="text-sm">Sign Out</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <main className="flex-1 overflow-hidden">
-          <AnimatePresence mode="wait">
-            {currentView === 'home' && (
-              <motion.div
-                key="home"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-6xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-white mb-2">Welcome to Ecosyz</h1>
-                    <p className="text-gray-400 text-lg">Your AI-powered workspace for ideas, resources, and collaboration</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-black/30 transition-all group"
-                      onClick={() => setCurrentView('resources')}
-                    >
-                      <BookOpen className="w-8 h-8 text-emerald-400 mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-xl font-semibold text-white mb-2">Resources</h3>
-                      <p className="text-gray-400">Save and organize your research materials with AI-powered insights</p>
-                    </motion.div>
-
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-black/30 transition-all group"
-                      onClick={() => setCurrentView('workspace')}
-                    >
-                      <FileText className="w-8 h-8 text-cyan-400 mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-xl font-semibold text-white mb-2">Workspace</h3>
-                      <p className="text-gray-400">Collaborate on projects and ideas with your team</p>
-                    </motion.div>
-
-                    <motion.div
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6 cursor-pointer hover:bg-black/30 transition-all group"
-                      onClick={() => setCurrentView('integrations')}
-                    >
-                      <Zap className="w-8 h-8 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-                      <h3 className="text-xl font-semibold text-white mb-2">Integrations</h3>
-                      <p className="text-gray-400">Connect your favorite tools and services</p>
-                    </motion.div>
-                  </div>
-
-                  {/* Recent Activity */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6"
-                  >
-                    <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
-                    <div className="space-y-4">
-                      {workspaces.slice(0, 3).map((workspace, index) => (
-                        <motion.div
-                          key={workspace.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="flex items-center justify-between p-4 bg-black/30 rounded-xl hover:bg-black/40 transition-all cursor-pointer"
-                          onClick={() => {
-                            setSelectedWorkspace(workspace);
-                            setCurrentView('workspace');
-                          }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-black" />
-                            </div>
-                            <div>
-                              <p className="text-white font-medium">{workspace.title}</p>
-                              <p className="text-gray-400 text-sm">{workspace.resources?.length || 0} resources • Updated recently</p>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
-                        </motion.div>
-                      ))}
-
-                      {workspaces.length === 0 && (
-                        <div className="text-center py-8">
-                          <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                          <p className="text-gray-400">No workspaces yet. Create your first workspace to get started!</p>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'ai-assistant' && (
-              <motion.div
-                key="ai-assistant"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">AI Assistant</h1>
-                    <p className="text-gray-400">Ask me anything about your workspace</p>
-                  </div>
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <p className="text-gray-300">AI Assistant interface coming soon...</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'notes' && (
-              <motion.div
-                key="notes"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Notes & Knowledge Base</h1>
-                    <p className="text-gray-400">Capture your thoughts and ideas</p>
-                  </div>
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <p className="text-gray-300">Notes interface coming soon...</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'analytics' && (
-              <motion.div
-                key="analytics"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Analytics & Insights</h1>
-                    <p className="text-gray-400">Track your productivity and usage</p>
-                  </div>
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <p className="text-gray-300">Analytics dashboard coming soon...</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'calendar' && (
-              <motion.div
-                key="calendar"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Calendar & Tasks</h1>
-                    <p className="text-gray-400">Plan your research and manage deadlines</p>
-                  </div>
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                    <p className="text-gray-300">Calendar interface coming soon...</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'resources' && (
-              <motion.div
-                key="resources"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-6xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Resources</h1>
-                    <p className="text-gray-400">Save and organize your research materials</p>
-                  </div>
-
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6 mb-6">
-                    <AddResourceForm
-                      workspaceId={selectedWorkspace?.id || workspaces[0]?.id}
-                      onCreated={() => {
-                        // Refresh logic would go here
-                        console.log('Resource created');
-                      }}
-                    />
-                  </div>
-
-                  <div className="text-center py-12">
-                    <BookOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400">Select a workspace to view resources</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'workspace' && selectedWorkspace && (
-              <motion.div
-                key="workspace"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full"
-              >
-                <WorkspacePageClient workspaceData={selectedWorkspace} />
-              </motion.div>
-            )}
-
-            {currentView === 'project' && (
-              <motion.div
-                key="project"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-6xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Project Management</h1>
-                    <p className="text-gray-400">Create and manage your projects with brainstorming, resources, and collaboration</p>
-                  </div>
-                  <ProjectPanel workspaces={workspaces} onSelectWorkspace={ws => { setSelectedWorkspace(ws); setCurrentView('workspace'); }} />
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'profile' && (
-              <motion.div
-                key="profile"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Profile Settings</h1>
-                    <p className="text-gray-400">Manage your account and preferences</p>
-                  </div>
-
-                  <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-                    <div className="flex items-center gap-6 mb-8">
-                      <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center text-black font-bold text-2xl">
-                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-semibold text-white">{user?.name || 'User'}</h2>
-                        <p className="text-gray-400">{user?.email}</p>
-                        <button className="mt-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/30 transition-all">
-                          <Edit className="w-4 h-4 inline mr-2" />
-                          Edit Profile
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
-                        <input
-                          type="text"
-                          defaultValue={user?.name || ''}
-                          className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-400 focus:outline-none transition-all"
-                          placeholder="Enter your display name"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                        <input
-                          type="email"
-                          defaultValue={user?.email || ''}
-                          className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-400 focus:outline-none transition-all"
-                          disabled
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
-                      </div>
-
-                      <div className="flex gap-4">
-                        <button className="px-6 py-3 bg-emerald-500 text-black font-semibold rounded-lg hover:bg-emerald-400 transition-all">
-                          Save Changes
-                        </button>
-                        <button className="px-6 py-3 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/30 transition-all">
-                          Delete Account
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'integrations' && (
-              <motion.div
-                key="integrations"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Integrations</h1>
-                    <p className="text-gray-400">Connect your favorite tools and services</p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                          <MessageSquare className="w-6 h-6 text-blue-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Slack</h3>
-                          <p className="text-gray-400 text-sm">Team communication</p>
-                        </div>
-                      </div>
-                      <button className="w-full px-4 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition-all">
-                        Connect
-                      </button>
-                    </div>
-
-                    <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                          <Users className="w-6 h-6 text-green-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-white">Notion</h3>
-                          <p className="text-gray-400 text-sm">Document collaboration</p>
-                        </div>
-                      </div>
-                      <button className="w-full px-4 py-2 bg-green-500/20 text-green-400 border border-green-500/30 rounded-lg hover:bg-green-500/30 transition-all">
-                        Connect
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {currentView === 'settings' && (
-              <motion.div
-                key="settings"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="h-full p-8 overflow-y-auto"
-              >
-                <div className="max-w-4xl mx-auto">
-                  <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
-                    <p className="text-gray-400">Configure your account preferences</p>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                      <h3 className="text-lg font-semibold text-white mb-4">Appearance</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">Theme</label>
-                          <select className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg text-white focus:border-emerald-400 focus:outline-none transition-all">
-                            <option value="dark">Dark</option>
-                            <option value="light">Light</option>
-                            <option value="system">System</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                      <h3 className="text-lg font-semibold text-white mb-4">Notifications</h3>
-                      <div className="space-y-4">
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-300">Email notifications</span>
-                          <input type="checkbox" defaultChecked className="rounded" />
-                        </label>
-                        <label className="flex items-center justify-between">
-                          <span className="text-gray-300">Push notifications</span>
-                          <input type="checkbox" className="rounded" />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
+        {/* Main Content Area */}
+        <div className="flex-grow overflow-hidden">
+          <WorkspacePageClient workspace={activeWorkspace} />
+        </div>
       </div>
+
+      {/* Add Resource Modal */}
+      <AnimatePresence>
+        {showAddResourceModal && (
+          <AddResourceForm
+            workspaceId={selectedWorkspace || ''}
+            onClose={() => setShowAddResourceModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Share Modal */}
+      <AnimatePresence>
+        {showShareModal && (
+          <ShareLinksPanel
+            workspaceId={selectedWorkspace || ''}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

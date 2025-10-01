@@ -98,7 +98,7 @@ export default function Header() {
   const activeRoot = pathname === "/" ? "/" : `/${pathname.split('/')[1]}`;
 
   return (
-    <header className="sticky top-0 z-50 glass h-14 border-b glass-border">
+    <header className="sticky top-0 z-[99] glass h-14 border-b glass-border">
       <Container>
         <div className="h-14 flex justify-between items-center gap-4 w-full">
           {/* Brand left */}
@@ -156,7 +156,7 @@ export default function Header() {
                   <div
                     role="menu"
                     aria-label="User menu"
-                    className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-2xl shadow-xl border border-gray-700/50 z-50"
+                    className="absolute right-0 mt-2 w-80 bg-gray-900 rounded-2xl shadow-xl border border-gray-700/50 z-[9999]"
                   >
                     {/* Header section with avatar and user info */}
                     <div className="p-6 border-b border-gray-700/50">
