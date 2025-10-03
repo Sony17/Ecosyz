@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ThemeProvider } from 'next-themes';
 import { Providers } from './components/Providers';
 
 export const metadata: Metadata = {
@@ -18,11 +17,9 @@ export default function RootLayout({
       <body
         className="antialiased bg-white text-slate-900 min-h-screen font-sans"
       >
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <Providers>
-            {children}
-          </Providers>
-        </ThemeProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
