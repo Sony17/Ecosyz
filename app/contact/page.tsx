@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -11,10 +11,10 @@ import Footer from '../components/Footer';
 // Company email configuration
 const COMPANY_EMAIL = 'sohni2012@gmail.com';
 
-export default function ContactPage() {
+function ContactForm() {
   const searchParams = useSearchParams();
   const enquiry = searchParams?.get('enquiry') || '';
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -227,5 +227,13 @@ export default function ContactPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ContactForm />
+    </Suspense>
   );
 }
