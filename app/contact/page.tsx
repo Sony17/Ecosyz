@@ -94,9 +94,9 @@ function ContactForm() {
     <div className="min-h-screen" style={{ backgroundColor: '#0c0f10' }}>
       <Header />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-16">
         {/* Breadcrumb */}
-        <nav className="mb-8">
+        <nav className="mb-6 sm:mb-8 overflow-x-auto whitespace-nowrap pb-2">
           <ol className="flex items-center space-x-2 text-sm text-gray-400">
             <li><Link href="/" className="hover:text-emerald-400">Home</Link></li>
             <li>/</li>
@@ -105,21 +105,21 @@ function ContactForm() {
         </nav>
 
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4">
             Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Touch</span>
           </h1>
-          <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">
             Have questions or need support? We&apos;re here to help. Send us a message and we&apos;ll get back to you soon.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Contact Form */}
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 md:p-8 border border-gray-700/50">
             <h2 className="text-2xl font-bold text-white mb-6">Send us a Message</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">Name</label>
                   <input
@@ -177,7 +177,7 @@ function ContactForm() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-emerald-400/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold py-3 sm:py-4 px-6 text-base sm:text-lg rounded-lg hover:shadow-lg hover:shadow-emerald-400/25 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
@@ -185,29 +185,29 @@ function ContactForm() {
           </div>
 
           {/* Quick Contact Options */}
-          <div className="space-y-8">
-            <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50">
-              <h3 className="text-xl font-bold text-white mb-6">Quick Contact</h3>
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="bg-emerald-400/10 p-3 rounded-lg">
+          <div className="space-y-6">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 md:p-8 border border-gray-700/50">
+              <h3 className="text-xl font-bold text-white mb-5">Quick Contact</h3>
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="bg-emerald-400/10 p-3 rounded-lg flex-shrink-0">
                     <svg className="h-6 w-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-white font-medium">Email</p>
-                    <p className="text-gray-400">sohni2012@gmail.com</p>
+                    <p className="text-gray-400 truncate">sohni2012@gmail.com</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="bg-purple-400/10 p-3 rounded-lg">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="bg-purple-400/10 p-3 rounded-lg flex-shrink-0">
                     <svg className="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-white font-medium">Location</p>
                     <p className="text-gray-400">Bangalore, India</p>
                   </div>
@@ -215,7 +215,7 @@ function ContactForm() {
               </div>
             </div>
 
-            <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700/50">
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 sm:p-6 md:p-8 border border-gray-700/50">
               <h3 className="text-xl font-bold text-white mb-4">Response Time</h3>
               <p className="text-gray-300">
                 We typically respond to all inquiries within 24 hours during business days. For urgent technical issues, please include &ldquo;URGENT&rdquo; in your subject line.
