@@ -4,7 +4,7 @@ import FeedbackForm from '../components/FeedbackForm';
 
 export default function FeedbackPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{backgroundColor: '#0c0f10'}}>
       <Header />
       <main className="flex-grow flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
