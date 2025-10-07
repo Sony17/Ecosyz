@@ -22,6 +22,7 @@ export default function Header() {
   const [userData, setUserData] = useState<{ name?: string; email?: string; avatarUrl?: string } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -46,6 +47,29 @@ export default function Header() {
   useEffect(() => { 
     setMobileOpen(false);
   }, [pathname]);
+  
+  // Close mobile menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setMobileOpen(false);
+      }
+    };
+    
+    if (mobileOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      // Prevent scrolling when mobile menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Re-enable scrolling when mobile menu is closed
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'auto';
+    };
+  }, [mobileOpen]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -101,6 +125,27 @@ export default function Header() {
             <span className="text-xl font-bold gradient-text ml-2">Open Idea</span>
           </Link>
 
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu"
+            aria-label="Main menu"
+          >
+            <span className="sr-only">{mobileOpen ? 'Close menu' : 'Open menu'}</span>
+            {mobileOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+
           {/* Desktop nav right */}
           <nav className="hidden md:flex items-center gap-6" aria-label="Main">
             {NAV_LINKS.map(link => {
@@ -121,7 +166,7 @@ export default function Header() {
           </nav>
 
           {/* User avatar, feedback, theme toggle */}
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             {isAuthenticated && userData ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -268,6 +313,62 @@ export default function Header() {
             )}
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div 
+            id="mobile-menu"
+            ref={mobileMenuRef}
+            className="md:hidden fixed inset-0 top-14 z-50 bg-gray-900/95 backdrop-blur-sm overflow-y-auto"
+          >
+            <div className="px-4 py-6 space-y-6">
+              <nav className="space-y-4 pb-6 border-b border-gray-700/50">
+                {NAV_LINKS.map(link => {
+                  const isActive = activeRoot === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={`block px-4 py-3 rounded-lg text-lg font-medium transition ${
+                        isActive ? 'bg-emerald-500/10 text-emerald-400' : 'hover:bg-gray-800/80 text-gray-200'
+                      }`}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              <div className="space-y-4 pb-6">
+                <Link
+                  href="/feedback"
+                  className="block px-4 py-3 rounded-lg text-lg font-medium hover:bg-gray-800/80 text-gray-200 transition"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Feedback
+                </Link>
+                <Link
+                  href="/contact"
+                  className="block px-4 py-3 rounded-lg text-lg font-medium hover:bg-gray-800/80 text-gray-200 transition"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Contact Us
+                </Link>
+                <div className="px-4 pt-4">
+                  <Link
+                    href="/auth"
+                    className="block w-full px-4 py-3 text-center bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg hover:shadow-lg transition-all"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </Container>
     </header>
   );
