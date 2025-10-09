@@ -14,7 +14,7 @@ import {
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface ChatMessageProps {
   message: {
@@ -103,9 +103,11 @@ export default function ChatMessage({
           <div className="prose prose-invert prose-sm max-w-none">
             <ReactMarkdown
               components={{
-                code({ node, inline, className, children, ...props }) {
+                code({ node, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '');
-                  return !inline && match ? (
+                  // Check if this is a code block (has language) vs inline code
+                  const isCodeBlock = match && className?.includes('language-');
+                  return isCodeBlock ? (
                     <div className="relative group">
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
@@ -121,7 +123,6 @@ export default function ChatMessage({
                       </div>
                       <SyntaxHighlighter
                         language={match[1]}
-                        style={vscDarkPlus}
                         customStyle={{
                           borderRadius: '0.375rem',
                           padding: '1rem',
@@ -129,7 +130,6 @@ export default function ChatMessage({
                           marginTop: '0.5rem',
                           marginBottom: '0.5rem'
                         }}
-                        {...props}
                       >
                         {String(children).replace(/\n$/, '')}
                       </SyntaxHighlighter>

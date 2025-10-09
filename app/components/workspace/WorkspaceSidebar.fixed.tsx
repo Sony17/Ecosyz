@@ -608,6 +608,7 @@ export default function WorkspaceSidebar({
       <AnimatePresence>
         {showProfileModal && (
           <UserProfileModal
+            isOpen={showProfileModal}
             onClose={() => setShowProfileModal(false)}
           />
         )}
@@ -617,13 +618,11 @@ export default function WorkspaceSidebar({
       <AnimatePresence>
         {showCreateWorkspaceModal && (
           <NewWorkspaceModal
-            title={newWorkspaceTitle}
-            setTitle={setNewWorkspaceTitle}
-            description={newWorkspaceDesc}
-            setDescription={setNewWorkspaceDesc}
-            onSubmit={handleCreateDemoWorkspace}
             onClose={() => setShowCreateWorkspaceModal(false)}
-            isLoading={loading}
+            onWorkspaceCreated={(workspaceId) => {
+              setShowCreateWorkspaceModal(false);
+              // Handle workspace creation if needed
+            }}
           />
         )}
       </AnimatePresence>
@@ -642,6 +641,7 @@ export default function WorkspaceSidebar({
       <AnimatePresence>
         {showProjectsManager && (
           <ProjectsManager
+            isOpen={showProjectsManager}
             workspaceId={selectedWorkspaceId || ''}
             onClose={() => setShowProjectsManager(false)}
           />

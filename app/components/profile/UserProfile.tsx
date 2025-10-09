@@ -8,6 +8,38 @@ import Link from 'next/link';
 import { cn } from '../../../src/lib/ui';
 import useResponsive from '../../../src/lib/hooks/useResponsive';
 
+interface UserProfileData {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  bio: string;
+  avatar: string;
+  location: string;
+  website: string;
+  joinedAt: string;
+  stats: {
+    projects: number;
+    resources: number;
+    followers: number;
+    following: number;
+  };
+  skills: string[];
+  activity: Array<{
+    id: string;
+    type: string;
+    title: string;
+    timestamp: string;
+  }>;
+  resources: Array<{
+    id: string;
+    title: string;
+    type: string;
+    createdAt: string;
+    views: number;
+  }>;
+}
+
 interface UserProfileProps {
   userId?: string;
   editable?: boolean;
@@ -17,8 +49,8 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [editableData, setEditableData] = useState<any>({});
+  const [userData, setUserData] = useState<UserProfileData | null>(null);
+  const [editableData, setEditableData] = useState<UserProfileData | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'resources' | 'activity'>('overview');
   
   // Responsive
@@ -142,10 +174,13 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
   
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
-    setEditableData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setEditableData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        [field]: value
+      };
+    });
   };
 
   if (isLoading) {
@@ -214,7 +249,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                   ) : (
                     <input
                       type="text"
-                      value={editableData.name}
+                      value={editableData?.name || ''}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       className="text-2xl sm:text-3xl font-bold bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white w-full sm:w-auto"
                     />
@@ -270,7 +305,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                 <p className="text-zinc-300 text-sm whitespace-pre-wrap">{userData.bio}</p>
               ) : (
                 <textarea
-                  value={editableData.bio}
+                  value={editableData?.bio || ''}
                   onChange={(e) => handleInputChange('bio', e.target.value)}
                   className="w-full h-32 bg-zinc-800 border border-zinc-700 rounded p-2 text-sm text-zinc-200"
                   placeholder="Tell us about yourself..."
@@ -290,7 +325,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                   ) : (
                     <input
                       type="text"
-                      value={editableData.name}
+                      value={editableData?.name || ''}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       className="flex-grow bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-sm text-zinc-200"
                     />
@@ -304,7 +339,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                   ) : (
                     <input
                       type="email"
-                      value={editableData.email}
+                      value={editableData?.email || ''}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       className="flex-grow bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-sm text-zinc-200"
                     />
@@ -318,7 +353,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                   ) : (
                     <input
                       type="text"
-                      value={editableData.location}
+                      value={editableData?.location || ''}
                       onChange={(e) => handleInputChange('location', e.target.value)}
                       className="flex-grow bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-sm text-zinc-200"
                     />
@@ -338,7 +373,7 @@ export default function UserProfile({ userId, editable = false }: UserProfilePro
                   ) : (
                     <input
                       type="text"
-                      value={editableData.website}
+                      value={editableData?.website || ''}
                       onChange={(e) => handleInputChange('website', e.target.value)}
                       className="flex-grow bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-sm text-zinc-200"
                       placeholder="https://"

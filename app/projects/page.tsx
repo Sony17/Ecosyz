@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -8,27 +9,23 @@ import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/ui';
 import ProjectCard, { Project } from '../components/projects/ProjectCard';
 
-interface ProjectsPageProps {
-  initialView?: 'grid' | 'list';
-  initialFilter?: string;
-  initialSort?: 'newest' | 'oldest' | 'name' | 'progress';
-}
+// Dynamically import to avoid SSR issues
+const ProjectsPageContent = dynamic(() => Promise.resolve(ProjectsPageComponent), {
+  ssr: false,
+  loading: () => <div>Loading...</div>
+});
 
-export default function ProjectsPage({
-  initialView = 'grid',
-  initialFilter = 'all',
-  initialSort = 'newest'
-}: ProjectsPageProps) {
+function ProjectsPageComponent() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
   // State
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(initialView);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState(initialFilter);
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'progress'>(initialSort);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'progress'>('newest');
   const [showFilters, setShowFilters] = useState(false);
 
   // Load projects
@@ -346,3 +343,5 @@ export default function ProjectsPage({
     </div>
   );
 }
+
+export default ProjectsPageContent;

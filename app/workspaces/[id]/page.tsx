@@ -8,8 +8,9 @@ export async function generateStaticParams() {
 export default async function WorkspacePage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params;
   // For now, we just return the client component wrapper
   // In a real app, you would check authentication and perform server-side data fetching
   
