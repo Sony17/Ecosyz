@@ -1,0 +1,195 @@
+/* Custom color scheme with glassmorphism */
+:root {
+  --md-primary-fg-color: rgba(12, 35, 33, 0.8);
+  --md-primary-fg-color--light: rgba(18, 31, 34, 0.8);
+  --md-primary-fg-color--dark: rgba(10, 16, 22, 0.9);
+  --md-accent-fg-color: #10b981;  /* emerald-500 */
+  --glass-background: rgba(10, 16, 22, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+}
+
+/* Dark mode specific overrides with glassmorphism */
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0a1016;
+  --md-default-fg-color: #ffffff;
+  --md-default-fg-color--light: rgba(255, 255, 255, 0.87);
+  --md-default-fg-color--lighter: rgba(255, 255, 255, 0.72);
+  --md-default-fg-color--lightest: rgba(255, 255, 255, 0.12);
+  --md-code-bg-color: rgba(12, 35, 33, 0.6);
+  --md-code-fg-color: #a5f3fc;  /* cyan-200 */
+  
+  /* Navigation */
+  --md-typeset-a-color: #34d399;  /* emerald-400 */
+  --md-accent-fg-color: #34d399;  /* emerald-400 */
+}
+
+/* Hide header and tabs */
+.md-header {
+  display: none;
+}
+
+.md-tabs {
+  display: none;
+}
+
+/* Main content adjustment to compensate for removed header */
+.md-main {
+  margin-top: 0;
+}
+
+.md-content {
+  padding-top: 2rem;
+}
+
+.md-sidebar {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--glass-border);
+}
+
+/* Navigation styling */
+.md-nav {
+  background: transparent;
+}
+
+.md-nav__link {
+  transition: all 0.3s ease;
+}
+
+.md-nav__link:hover {
+  color: var(--md-accent-fg-color) !important;
+  transform: translateX(4px);
+}
+
+/* Glass cards for content */
+.md-content article {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 1rem 0;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Code block styling with glass effect */
+.highlight {
+  background: rgba(12, 35, 33, 0.4) !important;
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--glass-shadow);
+}
+
+.highlight code {
+  background: transparent;
+  border-radius: 0.75rem;
+}
+
+/* Search modal with glass effect */
+.md-search {
+  padding: 0 1rem;
+}
+
+.md-search__form {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  height: 2.8rem;
+  width: 16rem;
+}
+
+.md-search__input {
+  font-size: 0.95rem;
+  padding: 0 2.4rem;
+  height: 100%;
+}
+
+.md-search__icon {
+  top: 0.7rem;
+  left: 0.8rem;
+}
+
+/* Logo adjustments */
+.md-header__button.md-logo {
+  padding: 0.4rem;
+  margin-right: 0.5rem;
+}
+
+.md-header__button.md-logo img {
+  height: 2.4rem;
+  width: auto;
+}
+
+.md-search__output {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Button styling with glass effect */
+.md-button {
+  background: rgba(16, 185, 129, 0.2) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.md-button:hover {
+  background: rgba(16, 185, 129, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+}
+
+.md-button--primary {
+  background: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Table styling with glass effect */
+table {
+  background: var(--glass-background);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--glass-shadow);
+}
+
+/* Active navigation item */
+.md-nav__item .md-nav__link--active {
+  color: var(--md-accent-fg-color);
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  margin-left: -0.5rem;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
