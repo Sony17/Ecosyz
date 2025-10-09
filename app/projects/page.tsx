@@ -1,171 +1,348 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { motion } from 'framer-motion';
+import { Plus, Search, Filter, Grid, List, SortAsc, SortDesc } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { cn } from '@/lib/ui';
+import ProjectCard, { Project } from '../components/projects/ProjectCard';
 
-interface Workspace {
-  id: string;
-  title: string;
-  createdAt: string;
-  owner: {
-    name: string | null;
-    email: string;
-  };
-  _count: {
-    resources: number;
-    shares: number;
-  };
+interface ProjectsPageProps {
+  initialView?: 'grid' | 'list';
+  initialFilter?: string;
+  initialSort?: 'newest' | 'oldest' | 'name' | 'progress';
 }
 
-export default function Projects() {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [authenticated, setAuthenticated] = useState<boolean>(true);
+export default function ProjectsPage({
+  initialView = 'grid',
+  initialFilter = 'all',
+  initialSort = 'newest'
+}: ProjectsPageProps) {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
+  // State
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(initialView);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState(initialFilter);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'progress'>(initialSort);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Load projects
   useEffect(() => {
-    fetchWorkspaces();
-    checkAuth();
+    const loadProjects = async () => {
+      setIsLoading(true);
+
+      try {
+        // In a real app, this would fetch from your API
+        // const response = await fetch('/api/projects');
+        // const data = await response.json();
+
+        // Mock data for demonstration
+        setTimeout(() => {
+          const mockProjects: Project[] = Array.from({ length: 12 }, (_, index) => ({
+            id: `project-${index + 1}`,
+            title: [
+              "E-commerce Platform Redesign",
+              "Mobile App Development",
+              "Data Analytics Dashboard",
+              "AI Chatbot Implementation",
+              "Content Management System",
+              "API Integration Project",
+              "User Research Study",
+              "Brand Identity Design",
+              "Database Optimization",
+              "Security Audit",
+              "Performance Monitoring",
+              "Team Collaboration Tool"
+            ][index % 12],
+            description: "A comprehensive project focused on delivering high-quality solutions with modern technologies and best practices.",
+            status: ['active', 'completed', 'archived', 'draft'][Math.floor(Math.random() * 4)] as Project['status'],
+            category: ['Web Development', 'Mobile', 'Data Science', 'AI/ML', 'Design', 'DevOps'][Math.floor(Math.random() * 6)],
+            createdAt: new Date(Date.now() - Math.floor(Math.random() * 90) * 24 * 60 * 60 * 1000).toISOString(),
+            updatedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
+            collaborators: Math.floor(Math.random() * 8) + 1,
+            tasks: Math.floor(Math.random() * 50) + 5,
+            progress: Math.floor(Math.random() * 100),
+            tags: ['React', 'TypeScript', 'Node.js', 'PostgreSQL', 'AWS', 'Docker'].slice(0, Math.floor(Math.random() * 4) + 1)
+          }));
+
+          setProjects(mockProjects);
+          setIsLoading(false);
+        }, 1000);
+      } catch (error) {
+        console.error('Error loading projects:', error);
+        setIsLoading(false);
+      }
+    };
+
+    loadProjects();
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('/api/workspaces', { method: 'POST', body: JSON.stringify({}) });
-      if (res.status === 401) {
-        setAuthenticated(false);
-      } else {
-        setAuthenticated(true);
+  // Filter and sort projects
+  const filteredAndSortedProjects = projects
+    .filter(project => {
+      const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          project.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'oldest':
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case 'name':
+          return a.title.localeCompare(b.title);
+        case 'progress':
+          return b.progress - a.progress;
+        default:
+          return 0;
       }
-    } catch {
-      setAuthenticated(false);
-    }
+    });
+
+  // Handle create new project
+  const handleCreateProject = () => {
+    router.push('/workspaces/projects/new');
   };
 
-  const fetchWorkspaces = async () => {
-    try {
-      const res = await fetch('/api/workspaces');
-      if (res.ok) {
-        const data = await res.json();
-        setWorkspaces(data);
-      }
-    } catch {
-      setErrorMsg('Failed to fetch workspaces.');
-    } finally {
-      setLoading(false);
-    }
+  // Handle project click
+  const handleProjectClick = (projectId: string) => {
+    router.push(`/workspaces/projects/${projectId}`);
   };
 
-  const createWorkspace = async () => {
-    setCreating(true);
-    setErrorMsg(null);
-    try {
-      const res = await fetch('/api/workspaces', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: 'New Project' }),
-      });
-      if (res.ok) {
-        const newWorkspace = await res.json();
-        router.push(`/workspaces/${newWorkspace.id}`);
-      } else {
-        const err = await res.json();
-        setErrorMsg(err.error || 'Failed to create project.');
-      }
-    } catch {
-      setErrorMsg('Failed to create project.');
-    } finally {
-      setCreating(false);
-    }
-  };
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="py-16 sm:py-20 text-white relative">
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-radial from-emerald-400/10 to-transparent blur-2xl pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <div className="text-center mb-16">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-4 text-center uppercase">
-              Explore Open Projects
-            </h1>
-            <p className="text-lg text-teal-100/80 font-medium max-w-2xl mx-auto">
-              Discover, remix, and contribute to breakthrough innovations. All projects here are community-powered and open by default.
-            </p>
-          </div>
-          {errorMsg && (
-            <div className="text-center text-red-400 font-semibold mb-6">{errorMsg}</div>
-          )}
-          {!authenticated ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-teal-100/80 mb-4">Login to create your own projects and access advanced features.</p>
-              <Link href="/auth" className="inline-block px-8 py-3 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg shadow-lg transition hover:scale-105">
-                Login to Get Started
-              </Link>
+    <div className="min-h-screen bg-zinc-950 pb-20">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="pt-16 pb-12 px-4 sm:px-6 lg:px-8 border-b border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row justify-between lg:items-end">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                Projects
+              </h1>
+              <p className="mt-2 text-lg text-zinc-400 max-w-3xl">
+                Manage and track your projects, collaborate with team members, and monitor progress.
+              </p>
             </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                {loading ? (
-                  Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="bg-[#192527]/90 p-6 rounded-xl border border-emerald-400/10 shadow-lg animate-pulse">
-                      <div className="h-6 bg-emerald-400/20 rounded mb-2"></div>
-                      <div className="h-4 bg-teal-100/20 rounded mb-1"></div>
-                      <div className="h-4 bg-teal-100/20 rounded mb-1 w-3/4"></div>
-                      <div className="h-8 bg-emerald-400/30 rounded mt-6 w-24"></div>
-                    </div>
-                  ))
-                ) : workspaces.length > 0 ? (
-                  workspaces.map((workspace, index) => {
-                    const colors = [
-                      { bg: 'bg-[#192527]/90', border: 'border-emerald-400/10', shadow: 'hover:shadow-[0_0_32px_#10b98145]', title: 'text-emerald-200', button: 'from-emerald-400 to-cyan-400' },
-                      { bg: 'bg-[#192535]/90', border: 'border-cyan-400/10', shadow: 'hover:shadow-[0_0_32px_#00d9ff45]', title: 'text-cyan-200', button: 'from-cyan-400 to-emerald-400' },
-                      { bg: 'bg-[#1a2531]/90', border: 'border-purple-400/10', shadow: 'hover:shadow-[0_0_32px_#c084fc45]', title: 'text-purple-200', button: 'from-purple-300 to-cyan-400' },
-                    ];
-                    const color = colors[index % colors.length];
-                    return (
-                      <div key={workspace.id} className={`${color.bg} p-6 rounded-xl border ${color.border} shadow-lg ${color.shadow} transition flex flex-col justify-between`}>
-                        <div>
-                          <h2 className={`text-xl font-bold ${color.title} mb-2`}>{workspace.title}</h2>
-                          <p className="text-teal-100/80 mb-2">
-                            Created by {workspace.owner.name || workspace.owner.email} • {new Date(workspace.createdAt).toLocaleDateString()}
-                          </p>
-                          <p className="text-teal-100/60 text-sm mb-4">
-                            {workspace._count.resources} resources • {workspace._count.shares} shares
-                          </p>
-                        </div>
-                        <Link
-                          href={`/workspaces/${workspace.id}`}
-                          className={`inline-block px-6 py-2 mt-auto bg-gradient-to-r ${color.button} text-gray-900 font-semibold rounded-md shadow transition hover:scale-105 text-sm text-center`}
-                        >
-                          Open Workspace
-                        </Link>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-teal-100/80 text-lg mb-4">No projects yet. Start your first project!</p>
-                  </div>
-                )}
-              </div>
-              <div className="mt-20 text-center">
+
+            {status === 'authenticated' && (
+              <div className="mt-6 lg:mt-0">
                 <button
-                  onClick={createWorkspace}
-                  disabled={creating}
-                  className="inline-block px-8 py-3 bg-gradient-to-r from-emerald-400 to-cyan-400 text-gray-900 font-semibold rounded-lg shadow-lg transition hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleCreateProject}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm text-sm font-medium"
                 >
-                  {creating ? 'Creating...' : 'Start a New Project'}
+                  <Plus className="w-4 h-4" />
+                  New Project
                 </button>
               </div>
-            </>
+            )}
+          </div>
+
+          {/* Search and Filters */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-grow">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-500 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-md py-2 pl-9 pr-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={cn(
+                  "px-3 py-2 border rounded-md flex items-center gap-2 text-sm",
+                  showFilters
+                    ? "bg-emerald-600 border-emerald-500 text-white"
+                    : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+                )}
+              >
+                <Filter className="w-4 h-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </button>
+
+              <div className="flex border border-zinc-700 rounded-md">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={cn(
+                    "px-3 py-2 text-sm border-r border-zinc-700",
+                    viewMode === 'grid'
+                      ? "bg-emerald-600 text-white"
+                      : "text-zinc-300 hover:bg-zinc-700"
+                  )}
+                >
+                  <Grid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={cn(
+                    "px-3 py-2 text-sm",
+                    viewMode === 'list'
+                      ? "bg-emerald-600 text-white"
+                      : "text-zinc-300 hover:bg-zinc-700"
+                  )}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters Panel */}
+          {showFilters && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mt-4 pt-4 border-t border-zinc-800 overflow-hidden"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <h3 className="text-sm font-medium text-zinc-300 mb-2">Status</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: 'all', name: 'All Projects' },
+                      { id: 'active', name: 'Active' },
+                      { id: 'completed', name: 'Completed' },
+                      { id: 'archived', name: 'Archived' },
+                      { id: 'draft', name: 'Draft' }
+                    ].map((status) => (
+                      <button
+                        key={status.id}
+                        onClick={() => setStatusFilter(status.id)}
+                        className={cn(
+                          "px-3 py-1.5 text-xs rounded-full border",
+                          statusFilter === status.id
+                            ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-300"
+                            : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+                        )}
+                      >
+                        {status.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-zinc-300 mb-2">Sort By</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: 'newest', name: 'Newest', icon: SortDesc },
+                      { id: 'oldest', name: 'Oldest', icon: SortAsc },
+                      { id: 'name', name: 'Name', icon: null },
+                      { id: 'progress', name: 'Progress', icon: null }
+                    ].map((sort) => (
+                      <button
+                        key={sort.id}
+                        onClick={() => setSortBy(sort.id as any)}
+                        className={cn(
+                          "px-3 py-1.5 text-xs rounded-full border flex items-center gap-1.5",
+                          sortBy === sort.id
+                            ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-300"
+                            : "bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+                        )}
+                      >
+                        {sort.icon && <sort.icon className="w-3 h-3" />}
+                        <span>{sort.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-zinc-300 mb-2">Quick Actions</h3>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => {
+                        setSearchQuery('');
+                        setStatusFilter('all');
+                        setSortBy('newest');
+                      }}
+                      className="px-3 py-1.5 text-xs rounded-full border bg-zinc-800 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           )}
         </div>
+      </motion.div>
+
+      {/* Projects Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        {/* Results Info */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between mb-6">
+          <div className="text-zinc-400 text-sm">
+            Showing {filteredAndSortedProjects.length} projects
+            {searchQuery && <span> for &ldquo;{searchQuery}&rdquo;</span>}
+            {statusFilter !== 'all' && <span> with status {statusFilter}</span>}
+          </div>
+        </div>
+
+        {/* Projects Grid/List */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 border-4 border-zinc-700 border-t-emerald-500 rounded-full animate-spin"></div>
+              <p className="text-zinc-400 mt-4">Loading projects...</p>
+            </div>
+          </div>
+        ) : filteredAndSortedProjects.length === 0 ? (
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-12 text-center">
+            <Plus className="w-12 h-12 text-zinc-700 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-zinc-300 mb-2">No projects found</h3>
+            <p className="text-zinc-500 max-w-md mx-auto mb-6">
+              {searchQuery || statusFilter !== 'all'
+                ? "Try adjusting your search or filter criteria to find what you're looking for."
+                : "Get started by creating your first project."
+              }
+            </p>
+            {(!searchQuery && statusFilter === 'all') && (
+              <button
+                onClick={handleCreateProject}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Create Your First Project
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className={cn(
+            viewMode === 'grid'
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              : "space-y-4"
+          )}>
+            {filteredAndSortedProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                viewMode={viewMode}
+                onClick={handleProjectClick}
+              />
+            ))}
+          </div>
+        )}
       </div>
-      <Footer />
     </div>
   );
 }

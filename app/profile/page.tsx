@@ -3,7 +3,7 @@ import { getCurrentUser } from '../../src/lib/auth';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
-import ProfileForm from '../components/profile/ProfileForm';
+import UserProfile from '../components/profile/UserProfile';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,22 +51,12 @@ export default async function ProfilePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow py-12">
-        <Container>
-          <div className="max-w-2xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Profile Settings
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Manage your account settings and preferences.
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <ProfileForm initialData={profile} />
-            </div>
-          </div>
+      <main className="flex-grow">
+        <Container className="px-0 sm:px-4">
+          <UserProfile 
+            userId={user.id} 
+            editable={true} 
+          />
         </Container>
       </main>
       <Footer />

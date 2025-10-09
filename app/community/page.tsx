@@ -1,6 +1,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Container } from '../components/ui/Container';
+import CommunityHub from '../components/workspace/CommunityHub';
 
 export default function CommunityPage() {
   return (
@@ -9,13 +10,18 @@ export default function CommunityPage() {
       <Container>
         <main className="flex-grow py-16">
           <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text mb-2 tracking-tight text-center uppercase">
             Join Our Community
           </h2>
           <p className="text-lg text-teal-100/80 font-medium max-w-2xl mx-auto">
             Connect with open-source builders, researchers, and innovators from 100+ countries. Share ideas, get help, and grow together!
           </p>
+        </div>
+        
+        {/* Community Hub Component */}
+        <div className="mb-12">
+          <CommunityHub />
         </div>
 
         {/* Example Community features */}

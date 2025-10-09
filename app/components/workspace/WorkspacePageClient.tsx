@@ -2,12 +2,13 @@
 
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Plus, FileText } from 'lucide-react'
+import { Plus, FileText, MessageCircle } from 'lucide-react'
 import WorkspaceHeader from './WorkspaceHeader'
 import ResourceCard from './ResourceCard'
 import AddResourceForm from './AddResourceForm'
 import ShareLinksPanel from './ShareLinksPanel'
 import ToastProvider from '../ui/ToastProvider'
+import WorkspaceChat from '../ai/EnhancedWorkspaceChat'
 
 interface Resource {
   id: string
@@ -32,7 +33,8 @@ interface WorkspacePageClientProps {
 }
 
 export default function WorkspacePageClient({ workspace }: WorkspacePageClientProps) {
-  const [showAddResourceModal, setShowAddResourceModal] = useState(false)
+  const [showAddResourceModal, setShowAddResourceModal] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   if (!workspace) {
     return (
@@ -47,7 +49,7 @@ export default function WorkspacePageClient({ workspace }: WorkspacePageClientPr
   const shareLinks = workspace.shareLinks || []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       <ToastProvider />
 
       <motion.div
@@ -103,6 +105,34 @@ export default function WorkspacePageClient({ workspace }: WorkspacePageClientPr
             </div>
           )}
         </div>
+      </motion.div>
+
+      {/* Chat button - fixed at the bottom right */}
+      <div className="fixed bottom-8 right-8">
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors"
+          title={showChat ? "Close chat" : "Open AI assistant"}
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Chat panel - slide in from the right when active */}
+      <motion.div
+        initial={{ x: '100%' }}
+        animate={{ x: showChat ? '0%' : '100%' }}
+        transition={{ type: 'spring', damping: 30 }}
+        className="fixed right-0 bottom-0 w-full md:w-96 h-[600px] max-h-[80vh] shadow-2xl rounded-tl-2xl overflow-hidden z-20"
+      >
+        <WorkspaceChat
+          workspaceId={workspace.id}
+          context={{
+            currentPage: 'workspace',
+            selectedText: undefined,
+            recentActions: []
+          }}
+        />
       </motion.div>
 
       {/* Add Resource Modal */}
