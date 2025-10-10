@@ -3,15 +3,15 @@
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
-// Dynamically import to avoid SSR issues with useSearchParams
-const ResourcesPageContent = dynamic(() => import('./ResourcesPageContent'), {
+// Dynamically import the existing ResourcesBrowser component
+const ResourcesPageContent = dynamic(() => import('../components/resources/ResourcesBrowser'), {
   ssr: false,
-  loading: () => <div>Loading...</div>
+  loading: () => <div>Loading resources...</div>
 });
 
 export default function ResourcesPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading resources...</div>}>
       <ResourcesPageContent />
     </Suspense>
   );

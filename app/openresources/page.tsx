@@ -8,6 +8,7 @@ import { Container } from '../components/ui/Container';
 import AuthModal from '../components/AuthModal';
 import SaveToWorkspace from '../components/workspace/SaveToWorkspace';
 import { useSupabaseUser } from '../../src/lib/useSupabaseUser';
+import KnowledgeGraph from '../components/KnowledgeGraph';
 
 const TABS = [
   { label: 'All', value: 'all' },
@@ -64,6 +65,8 @@ function OpenResourcesPage() {
     key: null,
     data: {},
   });
+  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const graphModalRef = useRef<HTMLDivElement | null>(null);
 
   // Authentication and modal state
   const { user, loading: authLoading } = useSupabaseUser();
@@ -73,6 +76,7 @@ function OpenResourcesPage() {
 
   // Handle save button click
   const handleSaveClick = (resource: any) => {
+    setIsGraphModalOpen(false); // Close graph modal
     if (!user) {
       setResourceToSave(resource);
       setAuthModalOpen(true);
@@ -95,7 +99,15 @@ function OpenResourcesPage() {
     setShowSaveModal(false);
     setResourceToSave(null);
   };
-  const modalRef = useRef<HTMLDivElement | null>(null);
+  const getFilteredResources = () => {
+    const typesToShow = ['paper', 'dataset', 'code', 'model', 'hardware', 'video'];
+    const filtered: any[] = [];
+    typesToShow.forEach(type => {
+      const typeResults = results.filter(r => r.type === type).sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 3);
+      filtered.push(...typeResults);
+    });
+    return filtered.slice(0, 9); // Limit total to 9 for graph performance
+  };
 
   // Friendly display names for providers
   const PROVIDER_LABELS: Record<string, string> = {
@@ -220,6 +232,8 @@ function OpenResourcesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
   // Focus trap for summary modal when open
   useEffect(() => {
     if (!summaryModal.open) return;
@@ -254,6 +268,40 @@ function OpenResourcesPage() {
     first?.focus();
     return () => panel.removeEventListener('keydown', onKeyDown);
   }, [summaryModal.open]);
+
+  // Focus trap for graph modal when open
+  useEffect(() => {
+    if (!isGraphModalOpen) return;
+    const panel = graphModalRef.current;
+    if (!panel) return;
+    const focusable = panel.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (!active || active === first) {
+          e.preventDefault();
+          (last || first).focus();
+        }
+      } else {
+        if (!active || active === last) {
+          e.preventDefault();
+          (first || last).focus();
+        }
+      }
+    };
+    panel.addEventListener('keydown', onKeyDown);
+    first?.focus();
+    return () => panel.removeEventListener('keydown', onKeyDown);
+  }, [isGraphModalOpen]);
 
   return (
   <div className="min-h-screen flex flex-col overflow-x-hidden pb-[calc(env(safe-area-inset-bottom)+16px)]">
@@ -324,6 +372,16 @@ function OpenResourcesPage() {
                   </div>
                 )}
                 {error && <div className="text-red-500 mb-4">{error}</div>}
+                {!loading && results.length > 0 && (
+                  <div className="mb-4 flex justify-center">
+                    <button
+                      onClick={() => setIsGraphModalOpen(true)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    >
+                      Show Knowledge Graph
+                    </button>
+                  </div>
+                )}
                 {!loading && results.length === 0 && (
                   <div className="text-gray-400 text-lg text-center">
                     No results.
@@ -331,207 +389,207 @@ function OpenResourcesPage() {
                 )}
                 <div className="space-y-4 sm:space-y-6">
                   {results.map((r, i) => {
-                    const resKey = String(r.id || r.url || i);
-                    return (
-                      <div key={r.id || i} className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3 relative">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
-                            {r.type && (
-                              <span className={`text-xs px-2 py-1 rounded font-bold border ${
-                                r.type === 'paper' ? 'bg-blue-900/30 text-blue-200 border-blue-800' :
-                                r.type === 'dataset' ? 'bg-yellow-900/30 text-yellow-200 border-yellow-800' :
-                                r.type === 'code' ? 'bg-purple-900/30 text-purple-200 border-purple-800' :
-                                r.type === 'model' ? 'bg-pink-900/30 text-pink-200 border-pink-800' :
-                                r.type === 'video' ? 'bg-red-900/30 text-red-200 border-red-800' :
-                                r.type === 'hardware' ? 'bg-green-900/30 text-green-200 border-green-800' :
-                                'bg-gray-800/80 text-gray-200 border-gray-700'
-                              }`}>
-                                {r.type === 'model' ? 'Model'
-                                  : r.type === 'video' ? 'Video'
-                                  : r.type === 'hardware' ? 'Hardware'
-                                  : r.type.charAt(0).toUpperCase() + r.type.slice(1)}
-                              </span>
-                            )}
-                            {r.license && <span className="text-xs px-2 py-1 rounded bg-emerald-900/30 text-emerald-200 border border-emerald-800">{r.license}</span>}
-                            <div className="ml-auto flex items-center gap-3 text-xs text-white/60 font-semibold">
-                              {r.year && <span>{r.year}</span>}
-                              {typeof r.score === 'number' && (
-                                <span className="text-gray-400">Score: {r.score.toFixed(2)}</span>
+                      const resKey = String(r.id || r.url || i);
+                      return (
+                        <div key={r.id || i} className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3 relative">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
+                              {r.type && (
+                                <span className={`text-xs px-2 py-1 rounded font-bold border ${
+                                  r.type === 'paper' ? 'bg-blue-900/30 text-blue-200 border-blue-800' :
+                                  r.type === 'dataset' ? 'bg-yellow-900/30 text-yellow-200 border-yellow-800' :
+                                  r.type === 'code' ? 'bg-purple-900/30 text-purple-200 border-purple-800' :
+                                  r.type === 'model' ? 'bg-pink-900/30 text-pink-200 border-pink-800' :
+                                  r.type === 'video' ? 'bg-red-900/30 text-red-200 border-red-800' :
+                                  r.type === 'hardware' ? 'bg-green-900/30 text-green-200 border-green-800' :
+                                  'bg-gray-800/80 text-gray-200 border-gray-700'
+                                }`}>
+                                  {r.type === 'model' ? 'Model'
+                                    : r.type === 'video' ? 'Video'
+                                    : r.type === 'hardware' ? 'Hardware'
+                                    : r.type.charAt(0).toUpperCase() + r.type.slice(1)}
+                                </span>
                               )}
-                            </div>
-                          </div>
-                          <div className="text-base sm:text-lg font-semibold text-white leading-snug mb-1">{r.title}</div>
-                          {/* Special fields for model/hardware/video */}
-                          {r.type === 'model' && r.meta?.pipeline && (
-                            <div className="text-xs text-pink-200 font-mono mb-1">Pipeline: {r.meta.pipeline}</div>
-                          )}
-                          {r.type === 'hardware' && r.meta?.cert_id && (
-                            <div className="text-xs text-green-200 font-mono mb-1">Cert ID: {r.meta.cert_id}</div>
-                          )}
-                          {r.type === 'video' && (r.meta?.duration || r.meta?.channel) && (
-                            <div className="text-xs text-red-200 font-mono mb-1">
-                              {r.meta?.duration && <>Duration: {r.meta.duration} </>}
-                              {r.meta?.channel && <>Channel: {r.meta.channel}</>}
-                            </div>
-                          )}
-                          <div className="text-xs sm:text-sm text-white/60 font-medium mb-1">{r.authors?.join(', ')}</div>
-                          {r.tags && r.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-1">
-                              {r.tags.map((tag: string, idx: number) => (
-                                <span key={idx} className="text-xs px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{tag}</span>
-                              ))}
-                            </div>
-                          )}
-                          <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{cleanDescription(r.description)}</div>
-                          <div className="flex gap-2 mt-2">
-                            {r.url ? (
-                              <a
-                                href={r.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition inline-flex items-center gap-1.5"
-                              >
-                                <span>Open</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 opacity-90" aria-hidden="true" focusable="false">
-                                  <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69l-6.72 6.72a.75.75 0 1 0 1.06 1.06l6.72-6.72V7.5a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 17.75 2h-5.25z" />
-                                  <path d="M6.25 4A2.25 2.25 0 0 0 4 6.25v7.5A2.25 2.25 0 0 0 6.25 16h7.5A2.25 2.25 0 0 0 16 13.75V10a.75.75 0 0 0-1.5 0v3.75c0 .414-.336.75-.75.75h-7.5a.75.75 0 0 1-.75-.75v-7.5c0-.414.336-.75.75-.75H10a.75.75 0 0 0 0-1.5H6.25z" />
-                                </svg>
-                              </a>
-                            ) : (
-                              <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed" title="No link available" disabled>Open</button>
-                            )}
-                            <button
-                              className="px-4 py-1.5 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
-                              disabled={authLoading}
-                              onClick={() => handleSaveClick(r)}
-                            >
-                              Save
-                            </button>
-                            {r.type === 'paper' ? (
-                              <button
-                                className="px-4 py-1.5 bg-blue-600/80 hover:bg-blue-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
-                                disabled={summarizingId === resKey}
-                                onClick={async () => {
-                                  setToast(null);
-                                  setSummarizingId(resKey);
-                                  const mode = (r.source === 'arxiv' || r.source === 'openalex' || r.source === 'zenodo') ? 'deep' : 'quick';
-                                  try {
-                                    // Stream via SSE (GET)
-                                    const usp = new URLSearchParams({
-                                      id: String(r.id || ''),
-                                      source: String(r.source || ''),
-                                      title: String(r.title || ''),
-                                      abstract: String(r.description || ''),
-                                      url: String(r.url || ''),
-                                      mode,
-                                    });
-                                    const es = new EventSource(`/api/summarize?${usp.toString()}`);
-                                    const state: any = { tldr: '', bullets: [] as string[], tags: [] as string[], modeUsed: mode, fromCache: false, cache: 'none' };
-                                    es.addEventListener('meta', (ev: MessageEvent) => {
-                                      try {
-                                        const m = JSON.parse(ev.data);
-                                        state.modeUsed = m.modeUsed || m.modeRequested || state.modeUsed;
-                                        state.fromCache = Boolean(m.fromCache);
-                                        state.cache = (m.cache || 'none');
-                                        setSummaryModal({ open: true, key: resKey, data: { ...state } });
-                                      } catch {}
-                                    });
-                                    es.addEventListener('tldr', (ev: MessageEvent) => {
-                                      state.tldr = sanitizeText(ev.data);
-                                      setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
-                                    });
-                                    es.addEventListener('bullets', (ev: MessageEvent) => {
-                                      try {
-                                        const arr = JSON.parse(ev.data);
-                                        state.bullets = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
-                                        setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
-                                      } catch {}
-                                    });
-                                    es.addEventListener('tags', (ev: MessageEvent) => {
-                                      try {
-                                        const arr = JSON.parse(ev.data);
-                                        state.tags = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
-                                        setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
-                                      } catch {}
-                                    });
-                                    es.addEventListener('error', (ev: MessageEvent) => {
-                                      try {
-                                        const d = JSON.parse(ev.data);
-                                        setToast({ type: 'error', message: d.message || 'Summarization failed' });
-                                      } catch {
-                                        setToast({ type: 'error', message: 'Summarization failed' });
-                                      }
-                                      es.close();
-                                      setSummarizingId(null);
-                                    });
-                                    es.addEventListener('done', () => {
-                                      es.close();
-                                      setSummaries(prev => ({ ...prev, [resKey]: { ...state } }));
-                                      setSummarizingId(null);
-                                    });
-                                  } catch (e: any) {
-                                    setToast({ type: 'error', message: e?.message || 'Summarization failed' });
-                                    setSummarizingId(null);
-                                  }
-                                }}
-                              >
-                                {summarizingId === resKey ? 'Summarizing…' : 'Summarize'}
-                              </button>
-                            ) : null}
-                          </div>
-                          {summaries[resKey] && (
-                            <div className="mt-3 rounded-lg glass-card glass-border p-3">
-                              <div className="flex items-center gap-2 mb-1">
-                                <div className="text-sm font-semibold text-emerald-300">Summary</div>
-                                <span className={`text-[10px] px-2 py-0.5 rounded border ${summaries[resKey].modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaries[resKey].modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
-                                {summaries[resKey].fromCache && (
-                                  <span className="text-[10px] px-2 py-0.5 rounded border bg-emerald-900/30 text-emerald-200 border-emerald-800">Cached: {summaries[resKey].cache}</span>
+                              {r.license && <span className="text-xs px-2 py-1 rounded bg-emerald-900/30 text-emerald-200 border border-emerald-800">{r.license}</span>}
+                              <div className="ml-auto flex items-center gap-3 text-xs text-white/60 font-semibold">
+                                {r.year && <span>{r.year}</span>}
+                                {typeof r.score === 'number' && (
+                                  <span className="text-gray-400">Score: {r.score.toFixed(2)}</span>
                                 )}
                               </div>
-                              <div className="text-sm text-white/80 mb-2">{sanitizeText(summaries[resKey].tldr)}</div>
-                              {Array.isArray(summaries[resKey].bullets) && (
-                                <ul className="list-disc pl-5 text-xs text-white/70 space-y-1">
-                                  {summaries[resKey].bullets.map((b: string, idx: number) => (
-                                    <li key={idx}>{sanitizeText(b)}</li>
-                                  ))}
-                                </ul>
-                              )}
-                              {Array.isArray(summaries[resKey].tags) && summaries[resKey].tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {summaries[resKey].tags.map((t: string, idx: number) => (
-                                    <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{sanitizeText(t)}</span>
-                                  ))}
-                                </div>
-                              )}
                             </div>
-                          )}
-                          {/* Score moved to header row to prevent overlap with year */}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {/* Skeletons while loading */}
-                  {loading && (
-                    <>
-                      {Array.from({ length: Math.min(3, Math.max(1, Math.ceil(limit / 10))) }).map((_, idx) => (
-                        <div key={`skeleton-${idx}`} className="rounded-xl glass-card glass-border p-4 sm:p-5 animate-pulse">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="h-4 w-16 bg-white/10 rounded" />
-                            <div className="h-4 w-12 bg-white/10 rounded" />
-                            <div className="ml-auto h-4 w-24 bg-white/10 rounded" />
+                            <div className="text-base sm:text-lg font-semibold text-white leading-snug mb-1">{r.title}</div>
+                            {/* Special fields for model/hardware/video */}
+                            {r.type === 'model' && r.meta?.pipeline && (
+                              <div className="text-xs text-pink-200 font-mono mb-1">Pipeline: {r.meta.pipeline}</div>
+                            )}
+                            {r.type === 'hardware' && r.meta?.cert_id && (
+                              <div className="text-xs text-green-200 font-mono mb-1">Cert ID: {r.meta.cert_id}</div>
+                            )}
+                            {r.type === 'video' && (r.meta?.duration || r.meta?.channel) && (
+                              <div className="text-xs text-red-200 font-mono mb-1">
+                                {r.meta?.duration && <>Duration: {r.meta.duration} </>}
+                                {r.meta?.channel && <>Channel: {r.meta.channel}</>}
+                              </div>
+                            )}
+                            <div className="text-xs sm:text-sm text-white/60 font-medium mb-1">{r.authors?.join(', ')}</div>
+                            {r.tags && r.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-1">
+                                {r.tags.map((tag: string, idx: number) => (
+                                  <span key={idx} className="text-xs px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{tag}</span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="text-xs sm:text-sm text-white/60 line-clamp-2 mb-2">{cleanDescription(r.description)}</div>
+                            <div className="flex gap-2 mt-2">
+                              {r.url ? (
+                                <a
+                                  href={r.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-semibold shadow hover:bg-emerald-700 transition inline-flex items-center gap-1.5"
+                                >
+                                  <span>Open</span>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5 opacity-90" aria-hidden="true" focusable="false">
+                                    <path d="M12.5 2a.75.75 0 0 0 0 1.5h2.69l-6.72 6.72a.75.75 0 1 0 1.06 1.06l6.72-6.72V7.5a.75.75 0 0 0 1.5 0V2.75A.75.75 0 0 0 17.75 2h-5.25z" />
+                                    <path d="M6.25 4A2.25 2.25 0 0 0 4 6.25v7.5A2.25 2.25 0 0 0 6.25 16h7.5A2.25 2.25 0 0 0 16 13.75V10a.75.75 0 0 0-1.5 0v3.75c0 .414-.336.75-.75.75h-7.5a.75.75 0 0 1-.75-.75v-7.5c0-.414.336-.75.75-.75H10a.75.75 0 0 0 0-1.5H6.25z" />
+                                  </svg>
+                                </a>
+                              ) : (
+                                <button className="px-4 py-1.5 bg-gray-800/60 rounded-lg text-xs text-gray-300 font-semibold cursor-not-allowed" title="No link available" disabled>Open</button>
+                              )}
+                              <button
+                                className="px-4 py-1.5 bg-purple-600/80 hover:bg-purple-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
+                                disabled={authLoading}
+                                onClick={() => handleSaveClick(r)}
+                              >
+                                Save
+                              </button>
+                              {r.type === 'paper' ? (
+                                <button
+                                  className="px-4 py-1.5 bg-blue-600/80 hover:bg-blue-600 rounded-lg text-xs text-white font-semibold disabled:opacity-60"
+                                  disabled={summarizingId === resKey}
+                                  onClick={async () => {
+                                    setToast(null);
+                                    setSummarizingId(resKey);
+                                    const mode = (r.source === 'arxiv' || r.source === 'openalex' || r.source === 'zenodo') ? 'deep' : 'quick';
+                                    try {
+                                      // Stream via SSE (GET)
+                                      const usp = new URLSearchParams({
+                                        id: String(r.id || ''),
+                                        source: String(r.source || ''),
+                                        title: String(r.title || ''),
+                                        abstract: String(r.description || ''),
+                                        url: String(r.url || ''),
+                                        mode,
+                                      });
+                                      const es = new EventSource(`/api/summarize?${usp.toString()}`);
+                                      const state: any = { tldr: '', bullets: [] as string[], tags: [] as string[], modeUsed: mode, fromCache: false, cache: 'none' };
+                                      es.addEventListener('meta', (ev: MessageEvent) => {
+                                        try {
+                                          const m = JSON.parse(ev.data);
+                                          state.modeUsed = m.modeUsed || m.modeRequested || state.modeUsed;
+                                          state.fromCache = Boolean(m.fromCache);
+                                          state.cache = (m.cache || 'none');
+                                          setSummaryModal({ open: true, key: resKey, data: { ...state } });
+                                        } catch {}
+                                      });
+                                      es.addEventListener('tldr', (ev: MessageEvent) => {
+                                        state.tldr = sanitizeText(ev.data);
+                                        setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                      });
+                                      es.addEventListener('bullets', (ev: MessageEvent) => {
+                                        try {
+                                          const arr = JSON.parse(ev.data);
+                                          state.bullets = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
+                                          setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                        } catch {}
+                                      });
+                                      es.addEventListener('tags', (ev: MessageEvent) => {
+                                        try {
+                                          const arr = JSON.parse(ev.data);
+                                          state.tags = Array.isArray(arr) ? arr.map((x: string) => sanitizeText(x)) : [];
+                                          setSummaryModal(prev => prev.open && prev.key === resKey ? { ...prev, data: { ...state } } : prev);
+                                        } catch {}
+                                      });
+                                      es.addEventListener('error', (ev: MessageEvent) => {
+                                        try {
+                                          const d = JSON.parse(ev.data);
+                                          setToast({ type: 'error', message: d.message || 'Summarization failed' });
+                                        } catch {
+                                          setToast({ type: 'error', message: 'Summarization failed' });
+                                        }
+                                        es.close();
+                                        setSummarizingId(null);
+                                      });
+                                      es.addEventListener('done', () => {
+                                        es.close();
+                                        setSummaries(prev => ({ ...prev, [resKey]: { ...state } }));
+                                        setSummarizingId(null);
+                                      });
+                                    } catch (e: any) {
+                                      setToast({ type: 'error', message: e?.message || 'Summarization failed' });
+                                      setSummarizingId(null);
+                                    }
+                                  }}
+                                >
+                                  {summarizingId === resKey ? 'Summarizing…' : 'Summarize'}
+                                </button>
+                              ) : null}
+                            </div>
+                            {summaries[resKey] && (
+                              <div className="mt-3 rounded-lg glass-card glass-border p-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="text-sm font-semibold text-emerald-300">Summary</div>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded border ${summaries[resKey].modeUsed === 'deep' ? 'bg-blue-900/30 text-blue-200 border-blue-800' : 'bg-gray-800/60 text-gray-200 border-gray-700'}`}>{summaries[resKey].modeUsed === 'deep' ? 'Deep summary' : 'Quick summary'}</span>
+                                  {summaries[resKey].fromCache && (
+                                    <span className="text-[10px] px-2 py-0.5 rounded border bg-emerald-900/30 text-emerald-200 border-emerald-800">Cached: {summaries[resKey].cache}</span>
+                                  )}
+                                </div>
+                                <div className="text-sm text-white/80 mb-2">{sanitizeText(summaries[resKey].tldr)}</div>
+                                {Array.isArray(summaries[resKey].bullets) && (
+                                  <ul className="list-disc pl-5 text-xs text-white/70 space-y-1">
+                                    {summaries[resKey].bullets.map((b: string, idx: number) => (
+                                      <li key={idx}>{sanitizeText(b)}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                                {Array.isArray(summaries[resKey].tags) && summaries[resKey].tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {summaries[resKey].tags.map((t: string, idx: number) => (
+                                      <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-cyan-900/30 text-cyan-200 border border-cyan-800">{sanitizeText(t)}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            {/* Score moved to header row to prevent overlap with year */}
                           </div>
-                          <div className="h-5 w-3/4 bg-white/10 rounded mb-2" />
-                          <div className="h-4 w-1/2 bg-white/10 rounded mb-1" />
-                          <div className="flex gap-2 mt-3">
-                            <div className="h-7 w-16 bg-white/10 rounded" />
-                            <div className="h-7 w-16 bg-white/10 rounded" />
-                          </div>
                         </div>
-                      ))}
-                    </>
-                  )}
-                </div>
+                      );
+                    })}
+                    {/* Skeletons while loading */}
+                    {loading && (
+                      <>
+                        {Array.from({ length: Math.min(3, Math.max(1, Math.ceil(limit / 10))) }).map((_, idx) => (
+                          <div key={`skeleton-${idx}`} className="rounded-xl glass-card glass-border p-4 sm:p-5 animate-pulse">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="h-4 w-16 bg-white/10 rounded" />
+                              <div className="h-4 w-12 bg-white/10 rounded" />
+                              <div className="ml-auto h-4 w-24 bg-white/10 rounded" />
+                            </div>
+                            <div className="h-5 w-3/4 bg-white/10 rounded mb-2" />
+                            <div className="h-4 w-1/2 bg-white/10 rounded mb-1" />
+                            <div className="flex gap-2 mt-3">
+                              <div className="h-7 w-16 bg-white/10 rounded" />
+                              <div className="h-7 w-16 bg-white/10 rounded" />
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
                 {/* Load more controls */}
                 {q && total > 0 && (
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-8">
@@ -720,6 +778,59 @@ function OpenResourcesPage() {
         onClose={() => setAuthModalOpen(false)}
         onSuccess={handleAuthSuccess}
       />
+
+      {/* Knowledge Graph Modal */}
+      {isGraphModalOpen && (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          onKeyDown={(e) => { if (e.key === 'Escape') setIsGraphModalOpen(false); }}
+          tabIndex={-1}
+        >
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsGraphModalOpen(false)} />
+          <div ref={graphModalRef} className="relative z-10 w-full max-w-5xl rounded-2xl glass-strong glass-border max-h-[90vh] flex flex-col" aria-labelledby="graph-modal-title">
+            {/* Top-right close button */}
+            <button
+              aria-label="Close"
+              className="absolute top-2 right-2 p-2 rounded-md bg-white/10 hover:bg-white/15 text-white"
+              onClick={() => setIsGraphModalOpen(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 opacity-90" aria-hidden="true" focusable="false">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+            {/* Header */}
+            <div className="p-5 sm:p-6 pb-3">
+              <h3 id="graph-modal-title" className="text-lg font-semibold text-white">Knowledge Graph for "{q}"</h3>
+              <p className="text-sm text-white/70 mt-1">Showing top resources from papers, datasets, code, models, hardware, and videos. Connections highlight relationships like authors, tags, and sources.</p>
+            </div>
+            {/* Legend */}
+            <div className="px-5 sm:px-6 pb-3">
+              <div className="text-sm text-white/80 mb-2 font-semibold">Legend:</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-purple-500 rounded"></div> Resource</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-blue-500 rounded"></div> Author</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div> Tag</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-orange-500 rounded"></div> Source</div>
+                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-yellow-500 rounded"></div> Type</div>
+                <div className="col-span-2 text-white/60">Edges: Relationships (e.g., AUTHORED, TAGGED). Click nodes to explore.</div>
+              </div>
+            </div>
+            {/* Graph */}
+            <div className="px-5 sm:px-6 pb-5 flex-1 overflow-hidden">
+              <KnowledgeGraph resources={getFilteredResources()} onSelect={(id, type) => console.log(`Selected ${type}: ${id}`)} onSave={handleSaveClick} />
+            </div>
+            {/* Footer */}
+            <div className="flex items-center justify-between gap-2 p-3 border-t border-white/10 bg-black/20">
+              <div className="text-[11px] text-white/50">
+                Tip: Click nodes for details. Close to return to results.
+              </div>
+              <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setIsGraphModalOpen(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Save to Workspace Modal */}
       {showSaveModal && resourceToSave && (

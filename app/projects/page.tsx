@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Plus, Search, Filter, Grid, List, SortAsc, SortDesc } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useSupabaseUser } from '@/src/lib/useSupabaseUser';
 import { cn } from '@/lib/ui';
 import ProjectCard, { Project } from '../components/projects/ProjectCard';
 
@@ -17,7 +17,7 @@ const ProjectsPageContent = dynamic(() => Promise.resolve(ProjectsPageComponent)
 
 function ProjectsPageComponent() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { user, loading } = useSupabaseUser();
 
   // State
   const [projects, setProjects] = useState<Project[]>([]);
@@ -134,7 +134,7 @@ function ProjectsPageComponent() {
               </p>
             </div>
 
-            {status === 'authenticated' && (
+            {user && (
               <div className="mt-6 lg:mt-0">
                 <button
                   onClick={handleCreateProject}

@@ -51,7 +51,20 @@ export async function getUid(): Promise<string> {
   if (user) {
     // Ensure user exists in our database
     await ensureUserInDb(user);
-    return user.id;
+    // IMPORTANT: Workspace.ownerId references Prisma User.id (cuid),
+    // not the Supabase user's UUID. Map Supabase user.id -> Prisma user.id.
+    try {
+      const prismaUser = await prisma.user.findUnique({
+        where: { supabaseId: user.id },
+        select: { id: true },
+      });
+      if (prismaUser?.id) {
+        return prismaUser.id;
+      }
+      console.error('Prisma user not found for supabaseId:', user.id);
+    } catch (e) {
+      console.error('Error fetching Prisma user for supabaseId:', e);
+    }
   }
 
   // Fallback to anonymous session for backwards compatibility
@@ -137,4 +150,21 @@ export async function ensureOwner(workspaceId: string) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   return ws;
+}
+
+export async function getUserWorkspaces() {
+  const uid = await getUid();
+  if (!uid) return [];
+
+  const workspaces = await prisma.workspace.findMany({
+    where: { ownerId: uid },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return workspaces;
 }

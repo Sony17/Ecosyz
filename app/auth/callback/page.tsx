@@ -54,7 +54,26 @@ export default function OAuthCallback() {
                 description: 'Welcome to Ecosyz',
                 duration: 3000,
               });
-              router.push('/dashboard');
+              
+              // Get user's workspace and redirect to it
+              try {
+                // Small delay to ensure session is established
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const workspaceResponse = await fetch('/api/auth/user-workspace');
+                if (workspaceResponse.ok) {
+                  const workspaceData = await workspaceResponse.json();
+                  if (workspaceData.workspaceId) {
+                    router.push(`/workspaces/${workspaceData.workspaceId}`);
+                    return;
+                  }
+                }
+              } catch (workspaceError) {
+                console.error('Error fetching user workspace:', workspaceError);
+              }
+              
+              // Fallback: redirect to workspaces page to create one
+              router.push('/workspaces');
               return;
             } else {
               const errorData = await response.json();
@@ -77,7 +96,26 @@ export default function OAuthCallback() {
               description: 'Welcome to Ecosyz',
               duration: 3000,
             });
-            router.push('/dashboard');
+            
+            // Get user's workspace and redirect to it
+            try {
+              // Small delay to ensure session is established
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              const workspaceResponse = await fetch('/api/auth/user-workspace');
+              if (workspaceResponse.ok) {
+                const workspaceData = await workspaceResponse.json();
+                if (workspaceData.workspaceId) {
+                  router.push(`/workspaces/${workspaceData.workspaceId}`);
+                  return;
+                }
+              }
+            } catch (workspaceError) {
+              console.error('Error fetching user workspace:', workspaceError);
+            }
+            
+            // Fallback: redirect to workspaces page to create one
+            router.push('/workspaces');
             return;
           } else {
             const errorData = await response.json();
