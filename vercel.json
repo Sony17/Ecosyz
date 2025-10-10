@@ -6,7 +6,7 @@
   },
   "framework": "nextjs",
   "buildCommand": "npm run vercel-build",
-  "installCommand": "npm ci",
+  "installCommand": "pnpm install",
   "env": {
     "PRISMA_GENERATE": "true",
     "NODE_ENV": "production",
