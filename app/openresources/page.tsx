@@ -9,6 +9,7 @@ import AuthModal from '../components/AuthModal';
 import SaveToWorkspace from '../components/workspace/SaveToWorkspace';
 import { useSupabaseUser } from '../../src/lib/useSupabaseUser';
 import KnowledgeGraph from '../components/KnowledgeGraph';
+import GenerateButtonWithAuth from '../components/GenerateButtonWithAuth';
 
 const TABS = [
   { label: 'All', value: 'all' },
@@ -73,6 +74,10 @@ function OpenResourcesPage() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [resourceToSave, setResourceToSave] = useState<any>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
+
+  // AI Generation state
+  const [selectedResources, setSelectedResources] = useState<any[]>([]);
+  const [aiGenerationMode, setAiGenerationMode] = useState(false);
 
   // Handle save button click
   const handleSaveClick = (resource: any) => {
@@ -373,13 +378,39 @@ function OpenResourcesPage() {
                 )}
                 {error && <div className="text-red-500 mb-4">{error}</div>}
                 {!loading && results.length > 0 && (
-                  <div className="mb-4 flex justify-center">
-                    <button
-                      onClick={() => setIsGraphModalOpen(true)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                    >
-                      Show Knowledge Graph
-                    </button>
+                  <div className="mb-6 flex flex-col items-center space-y-4">
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      <button
+                        onClick={() => setIsGraphModalOpen(true)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                      >
+                        Show Knowledge Graph
+                      </button>
+                      <button
+                        onClick={() => {
+                          setAiGenerationMode(!aiGenerationMode);
+                          setSelectedResources([]);
+                        }}
+                        className={`px-4 py-2 rounded-lg transition font-semibold ${
+                          aiGenerationMode 
+                            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' 
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        🚀 AI Generation Mode {aiGenerationMode ? '(ON)' : '(OFF)'}
+                      </button>
+                    </div>
+                    {aiGenerationMode && (
+                      <div className="flex flex-col items-center space-y-3 p-4 bg-gray-800/50 rounded-lg border border-purple-500/30">
+                        <p className="text-sm text-cyan-200 text-center">
+                          Select resources below, then generate complete applications from them
+                        </p>
+                        <GenerateButtonWithAuth resources={selectedResources} />
+                        <p className="text-xs text-gray-400 text-center">
+                          Selected: {selectedResources.length} resources
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
                 {!loading && results.length === 0 && (
@@ -392,6 +423,22 @@ function OpenResourcesPage() {
                       const resKey = String(r.id || r.url || i);
                       return (
                         <div key={r.id || i} className="rounded-xl glass-card glass-border p-4 sm:p-5 flex items-start gap-3 relative">
+                          {aiGenerationMode && (
+                            <div className="flex items-start pt-1">
+                              <input
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 rounded border-gray-700 bg-gray-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-gray-900"
+                                checked={selectedResources.some(selected => selected.id === r.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedResources(prev => [...prev, r]);
+                                  } else {
+                                    setSelectedResources(prev => prev.filter(selected => selected.id !== r.id));
+                                  }
+                                }}
+                              />
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs px-2 py-1 rounded bg-gray-800/80 font-mono text-gray-100 border border-gray-700">{PROVIDER_LABELS[r.source] || r.source}</span>
@@ -781,53 +828,17 @@ function OpenResourcesPage() {
 
       {/* Knowledge Graph Modal */}
       {isGraphModalOpen && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          onKeyDown={(e) => { if (e.key === 'Escape') setIsGraphModalOpen(false); }}
-          tabIndex={-1}
-        >
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsGraphModalOpen(false)} />
-          <div ref={graphModalRef} className="relative z-10 w-full max-w-5xl rounded-2xl glass-strong glass-border max-h-[90vh] flex flex-col" aria-labelledby="graph-modal-title">
-            {/* Top-right close button */}
-            <button
-              aria-label="Close"
-              className="absolute top-2 right-2 p-2 rounded-md bg-white/10 hover:bg-white/15 text-white"
-              onClick={() => setIsGraphModalOpen(false)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 opacity-90" aria-hidden="true" focusable="false">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-            {/* Header */}
-            <div className="p-5 sm:p-6 pb-3">
-              <h3 id="graph-modal-title" className="text-lg font-semibold text-white">Knowledge Graph for "{q}"</h3>
-              <p className="text-sm text-white/70 mt-1">Showing top resources from papers, datasets, code, models, hardware, and videos. Connections highlight relationships like authors, tags, and sources.</p>
-            </div>
-            {/* Legend */}
-            <div className="px-5 sm:px-6 pb-3">
-              <div className="text-sm text-white/80 mb-2 font-semibold">Legend:</div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-purple-500 rounded"></div> Resource</div>
-                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-blue-500 rounded"></div> Author</div>
-                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div> Tag</div>
-                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-orange-500 rounded"></div> Source</div>
-                <div className="flex items-center gap-1"><div className="w-3 h-3 bg-yellow-500 rounded"></div> Type</div>
-                <div className="col-span-2 text-white/60">Edges: Relationships (e.g., AUTHORED, TAGGED). Click nodes to explore.</div>
-              </div>
-            </div>
-            {/* Graph */}
-            <div className="px-5 sm:px-6 pb-5 flex-1 overflow-hidden">
-              <KnowledgeGraph resources={getFilteredResources()} onSelect={(id, type) => console.log(`Selected ${type}: ${id}`)} onSave={handleSaveClick} />
-            </div>
-            {/* Footer */}
-            <div className="flex items-center justify-between gap-2 p-3 border-t border-white/10 bg-black/20">
-              <div className="text-[11px] text-white/50">
-                Tip: Click nodes for details. Close to return to results.
-              </div>
-              <button className="px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/15" onClick={() => setIsGraphModalOpen(false)}>Close</button>
-            </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setIsGraphModalOpen(false)}>
+          <div 
+            className="bg-transparent w-full max-w-6xl h-[80vh] rounded-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <KnowledgeGraph 
+              resources={getFilteredResources()} 
+              onSelect={(id, type) => console.log(`Selected ${type}: ${id}`)} 
+              onSave={handleSaveClick}
+              onClose={() => setIsGraphModalOpen(false)}
+            />
           </div>
         </div>
       )}

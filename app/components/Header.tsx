@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Container } from "./ui/Container";
 import { toast } from "sonner";
+import { useAuth } from '../../src/lib/useAuth';
 
 // Central nav definition
 const NAV_LINKS = [
@@ -17,31 +18,15 @@ const NAV_LINKS = [
 ];
 
 export default function Header() {
+  const { user, loading, logout: authLogout, isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userData, setUserData] = useState<{ name?: string; email?: string; avatarUrl?: string } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
-  // Check auth status and fetch user data
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/session');
-        if (response.ok) {
-          const data = await response.json();
-          setIsAuthenticated(true);
-          setUserData(data.user);
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-      }
-    };
-    checkAuth();
-  }, []);
+
   
   // Close mobile nav on route change
   useEffect(() => { 
@@ -84,18 +69,10 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/auth/signout', {
-        method: 'POST',
-      });
-      if (response.ok) {
-        toast.success('Signed out successfully');
-        setIsAuthenticated(false);
-        setUserData(null);
-        setDropdownOpen(false);
-        router.push('/');
-      } else {
-        toast.error('Failed to sign out');
-      }
+      await authLogout();
+      toast.success('Signed out successfully');
+      setDropdownOpen(false);
+      router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to sign out');
@@ -167,7 +144,9 @@ export default function Header() {
 
           {/* User avatar, feedback, theme toggle */}
           <div className="hidden md:flex items-center gap-4">
-            {isAuthenticated && userData ? (
+            {loading ? (
+              <div className="w-9 h-9 rounded-full bg-gray-700 animate-pulse"></div>
+            ) : isAuthenticated && user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
@@ -178,15 +157,15 @@ export default function Header() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   onKeyDown={onDropdownKey}
                 >
-                  {userData.avatarUrl ? (
+                  {user.avatar ? (
                     <img
-                      src={userData.avatarUrl}
-                      alt={userData.name || userData.email || 'User'}
+                      src={user.avatar}
+                      alt={user.name || user.email || 'User'}
                       className="w-full h-full object-cover rounded-full"
                     />
                   ) : (
                     <span className="text-lg font-bold text-gray-500 dark:text-gray-300">
-                      {userData.name ? userData.name.charAt(0).toUpperCase() : userData.email?.charAt(0).toUpperCase() || 'U'}
+                      {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || 'U'}
                     </span>
                   )}
                 </button>
@@ -201,15 +180,15 @@ export default function Header() {
                     <div className="p-6 border-b border-gray-700/50">
                       <div className="flex items-center gap-4">
                         <div className="relative group">
-                          {userData.avatarUrl ? (
+                          {user.avatar ? (
                             <img
-                              src={userData.avatarUrl}
-                              alt={userData.name || userData.email || 'User'}
+                              src={user.avatar}
+                              alt={user.name || user.email || 'User'}
                               className="w-16 h-16 rounded-full object-cover ring-2 ring-emerald-400"
                             />
                           ) : (
                             <div className="w-16 h-16 rounded-full bg-emerald-600 ring-2 ring-emerald-400 flex items-center justify-center text-3xl font-bold text-white">
-                              {userData.name ? userData.name.charAt(0).toUpperCase() : userData.email?.charAt(0).toUpperCase() || 'U'}
+                              {user.name ? user.name.charAt(0).toUpperCase() : user.email?.charAt(0).toUpperCase() || 'U'}
                             </div>
                           )}
                           <button
@@ -223,8 +202,8 @@ export default function Header() {
                           </button>
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-lg font-semibold text-white">{userData.name || 'User'}</span>
-                          <span className="text-sm text-gray-400">{userData.email}</span>
+                          <span className="text-lg font-semibold text-white">{user.name || 'User'}</span>
+                          <span className="text-sm text-gray-400">{user.email}</span>
                         </div>
                       </div>
                     </div>

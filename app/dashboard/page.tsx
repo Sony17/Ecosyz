@@ -1,6 +1,6 @@
 "use client";
-import ChatGPTWorkspace from '../components/workspace/ChatGPTWorkspace';
+import UserDashboard from '../components/workspace/UserDashboard';
 
 export default function DashboardPage() {
-  return <ChatGPTWorkspace />;
+  return <UserDashboard />;
 }

@@ -87,7 +87,23 @@ export default function AuthPage() {
           fontWeight: '600',
         },
       });
-      router.push('/dashboard');
+      
+      // Trigger auth state refresh for other components
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth-login', Date.now().toString());
+        localStorage.removeItem('auth-login');
+      }
+      
+      // Redirect back to original page if stored, otherwise go to dashboard for authenticated users
+      const redirectUrl = typeof window !== 'undefined' 
+        ? sessionStorage.getItem('redirectAfterLogin') || '/dashboard'
+        : '/dashboard';
+      
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('redirectAfterLogin');
+      }
+      
+      router.push(redirectUrl);
     } catch (error) {
       console.error('Sign in error:', error);
       toast.error(error instanceof Error ? error.message : 'Sign in failed', {
@@ -122,18 +138,53 @@ export default function AuthPage() {
         throw new Error(result.error || 'Sign up failed');
       }
 
-      toast.success('Account created successfully!', {
-        description: 'Please check your email and click the confirmation link to complete your registration.',
-        duration: 6000,
-        style: {
-          background: 'linear-gradient(135deg, #10b981, #06b6d4)',
-          color: 'white',
-          border: 'none',
-          fontWeight: '600',
-        },
-      });
-      setIsSignUp(false);
-      signUpForm.reset();
+      // Check if user was auto-logged in
+      if (result.autoLoggedIn) {
+        toast.success('Account created and signed in successfully!', {
+          description: 'Welcome! Redirecting to your dashboard...',
+          duration: 4000,
+          style: {
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+        
+        // Trigger auth state refresh for other components
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('auth-login', Date.now().toString());
+          localStorage.removeItem('auth-login');
+        }
+        
+        // Redirect to dashboard for new users
+        setTimeout(() => {
+          const redirectUrl = typeof window !== 'undefined' 
+            ? sessionStorage.getItem('redirectAfterLogin') || '/dashboard'
+            : '/dashboard';
+          
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('redirectAfterLogin');
+          }
+          
+          router.push(redirectUrl);
+        }, 1000);
+      } else {
+        toast.success('Account created successfully!', {
+          description: 'You can now sign in with your credentials.',
+          duration: 4000,
+          style: {
+            background: 'linear-gradient(135deg, #10b981, #06b6d4)',
+            color: 'white',
+            border: 'none',
+            fontWeight: '600',
+          },
+        });
+        
+        // Switch to sign in mode
+        setIsSignUp(false);
+        signUpForm.reset();
+      }
     } catch (error) {
       console.error('Sign up error:', error);
       toast.error(error instanceof Error ? error.message : 'Sign up failed', {
@@ -261,8 +312,8 @@ export default function AuthPage() {
                   </h2>
                   <p className="text-teal-100/90">
                     {isSignUp
-                      ? 'Create your account to start innovating'
-                      : 'Sign in to continue your journey'
+                      ? 'Create your account to start innovating with AI-powered app generation'
+                      : 'Sign in to access your workspace and generate AI applications'
                     }
                   </p>
                 </div>

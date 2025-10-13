@@ -19,6 +19,7 @@ model User {
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
   workspaces            Workspace[]
+  projects              Project[]
   profile               Profile?
   subscriptionPlan      String?
   subscriptionStatus    String?
@@ -80,4 +81,22 @@ model ShareLink {
   readOnly    Boolean  @default(true)
   expiresAt   DateTime?
   createdAt   DateTime  @default(now())
+}
+
+model Project {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  framework      String   @default("react")
+  appType        String   @default("web")
+  files          Json?
+  resources      Json?
+  generationData Json?
+  status         String   @default("active")
+  deploymentUrl  String?
+  githubUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }

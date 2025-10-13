@@ -81,15 +81,41 @@ export async function POST(req: NextRequest) {
       // Don't fail the signup if DB creation fails, but log it
     }
 
+    // Check if we have a session (auto-login after signup)
+    if (data.session) {
+      // Auto-login the user by setting session cookies
+      const { cookies: cookieStore } = await import('next/headers');
+      const cookies = await cookieStore();
+      
+      cookies.set('sb-access-token', data.session.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: data.session.expires_in,
+        path: '/',
+      });
+
+      cookies.set('sb-refresh-token', data.session.refresh_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+      });
+    }
+
     // For testing: account created successfully
     return NextResponse.json({
-      message: 'Account created successfully! You can now sign in.',
+      message: data.session 
+        ? 'Account created and signed in successfully!'  
+        : 'Account created successfully! You can now sign in.',
       user: {
         id: data.user.id,
         email: data.user.email,
         name: data.user.user_metadata?.name,
         emailConfirmed: data.user.email_confirmed_at ? true : false,
       },
+      autoLoggedIn: !!data.session,
     });
   } catch (error) {
     console.error('Sign up error:', error);
