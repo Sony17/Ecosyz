@@ -57,7 +57,7 @@ export default function ResponsiveWorkspace({
   }, [isMobile, activeView]);
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-zinc-950">
+    <div className="flex flex-col lg:flex-row h-screen bg-gradient-to-br from-[#0c2321] via-[#121f22] to-[#0a1016]">
       {/* Sidebar */}
       <WorkspaceSidebar 
         selectedWorkspaceId={workspaceId}
@@ -73,7 +73,7 @@ export default function ResponsiveWorkspace({
       
       {/* Chat Panel */}
       {chatOpen && (
-        <div className={`flex-shrink-0 w-full lg:max-w-md border-l border-zinc-800 ${isMobile && activeView !== 'chat' ? 'hidden' : ''}`}>
+        <div className={`flex-shrink-0 w-full lg:max-w-md border-l border-white/10 glass ${isMobile && activeView !== 'chat' ? 'hidden' : ''}`}>
           <WorkspaceChat 
             workspaceId={workspaceId}
             context={{

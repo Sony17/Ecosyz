@@ -313,12 +313,12 @@ export default function WorkspaceSidebar({
         initial={false}
         animate={{ width: sidebarOpen ? '280px' : '0px' }}
         transition={{ duration: 0.2 }}
-        className="relative flex-shrink-0 border-r border-zinc-800 overflow-hidden h-screen bg-zinc-900/95 backdrop-blur-md z-20"
+        className="relative flex-shrink-0 border-r border-white/10 overflow-hidden h-screen glass backdrop-blur-xl z-20"
       >
         {/* Collapse/Expand Button */}
         <button
           onClick={() => setSidebarOpen && setSidebarOpen(!sidebarOpen)}
-          className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-30 bg-zinc-800 border border-zinc-700 p-1 rounded-full text-zinc-400 hover:text-white transition-colors duration-200"
+          className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-30 glass-strong border border-white/20 p-1 rounded-full text-gray-400 hover:text-neon-green transition-colors duration-200"
           aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
           {sidebarOpen ? (
@@ -331,7 +331,7 @@ export default function WorkspaceSidebar({
         {sidebarOpen && (
           <div className="flex flex-col h-full">
             {/* Header with User Profile */}
-            <div className="p-2 sm:p-3 border-b border-zinc-800 flex items-center gap-2 sm:gap-3">
+            <div className="p-2 sm:p-3 border-b border-white/10 flex items-center gap-2 sm:gap-3">
               <div 
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-600 flex items-center justify-center cursor-pointer"
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -343,11 +343,11 @@ export default function WorkspaceSidebar({
                 )}
               </div>
               <div className="flex-grow" onClick={() => setShowUserMenu(!showUserMenu)}>
-                <div className="text-xs sm:text-sm font-medium text-zinc-100 truncate cursor-pointer">{user?.name || 'User'}</div>
-                <div className="text-[10px] sm:text-xs text-zinc-400 truncate">{user?.email || ''}</div>
+                <div className="text-xs sm:text-sm font-medium text-white truncate cursor-pointer">{user?.name || 'User'}</div>
+                <div className="text-[10px] sm:text-xs text-gray-300 truncate">{user?.email || ''}</div>
               </div>
-              <button className="p-1 sm:p-1.5 hover:bg-zinc-800 rounded-md transition-colors">
-                <PanelLeft className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-400" />
+              <button className="p-1 sm:p-1.5 hover:bg-white/10 rounded-md transition-colors">
+                <PanelLeft className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
               </button>
               <AnimatePresence>
                 {showUserMenu && (
@@ -355,7 +355,7 @@ export default function WorkspaceSidebar({
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-14 left-3 right-3 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl z-30"
+                    className="absolute top-14 left-3 right-3 glass-strong rounded-lg shadow-xl z-30"
                   >
                     <div className="p-2">
                       <button 
@@ -363,16 +363,16 @@ export default function WorkspaceSidebar({
                           setShowProfileModal(true);
                           setShowUserMenu(false);
                         }}
-                        className="flex items-center gap-2 px-3 py-2 text-zinc-200 hover:bg-zinc-700/50 rounded-md transition-colors w-full text-left"
+                        className="flex items-center gap-2 px-3 py-2 text-white hover:bg-neon-green/20 hover:text-neon-green rounded-md transition-colors w-full text-left"
                       >
                         <User className="w-4 h-4" />
                         <span className="text-sm">Profile</span>
                       </button>
-                      <Link href="/settings" className="flex items-center gap-2 px-3 py-2 text-zinc-200 hover:bg-zinc-700/50 rounded-md transition-colors w-full text-left">
+                      <Link href="/settings" className="flex items-center gap-2 px-3 py-2 text-white hover:bg-neon-blue/20 hover:text-neon-blue rounded-md transition-colors w-full text-left">
                         <Settings className="w-4 h-4" />
                         <span className="text-sm">Settings</span>
                       </Link>
-                      <hr className="my-1 border-zinc-700" />
+                      <hr className="my-1 border-white/20" />
                       <button 
                         onClick={handleSignOut}
                         className="flex items-center gap-2 px-3 py-2 text-red-400 hover:bg-red-500/10 rounded-md transition-colors w-full text-left"
@@ -390,7 +390,7 @@ export default function WorkspaceSidebar({
             <div className="p-2 sm:p-3">
               <button 
                 onClick={onCreateWorkspace || (() => setShowCreateWorkspaceModal(true))}
-                className="w-full bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-600/30 rounded-md py-1.5 sm:py-2 px-2 sm:px-3 flex items-center justify-center gap-1.5 sm:gap-2 transition-colors hover:shadow-md hover:shadow-emerald-500/10"
+                className="w-full bg-gradient-to-r from-neon-green/20 to-neon-blue/20 hover:from-neon-green/30 hover:to-neon-blue/30 text-neon-green border border-neon-green/30 rounded-md py-1.5 sm:py-2 px-2 sm:px-3 flex items-center justify-center gap-1.5 sm:gap-2 transition-all hover:shadow-neon-green"
               >
                 <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> 
                 <span className="text-xs sm:text-sm font-medium">New Workspace</span>
@@ -400,27 +400,27 @@ export default function WorkspaceSidebar({
             {/* Search */}
             <div className="px-3 pb-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-md pl-9 pr-3 py-1.5 text-xs sm:text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50"
+                  className="w-full bg-dark-secondary/50 border border-white/10 rounded-md pl-9 pr-3 py-1.5 text-xs sm:text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-neon-green/50 focus:border-neon-green/50"
                 />
               </div>
             </div>
 
             {/* Navigation Tabs */}
             <div className="px-3 mb-1">
-              <div className="flex border-b border-zinc-800">
+              <div className="flex border-b border-white/10">
                 <button 
                   onClick={() => setActiveSection('workspaces')}
                   className={cn(
                     "flex-1 py-2 text-xs font-medium text-center transition-colors",
                     activeSection === 'workspaces' 
-                      ? "text-emerald-400 border-b-2 border-emerald-400" 
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "text-neon-green border-b-2 border-neon-green" 
+                      : "text-gray-400 hover:text-white"
                   )}
                 >
                   Workspaces
@@ -430,8 +430,8 @@ export default function WorkspaceSidebar({
                   className={cn(
                     "flex-1 py-2 text-xs font-medium text-center transition-colors",
                     activeSection === 'projects' 
-                      ? "text-emerald-400 border-b-2 border-emerald-400" 
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "text-neon-blue border-b-2 border-neon-blue" 
+                      : "text-gray-400 hover:text-white"
                   )}
                 >
                   Projects
@@ -441,8 +441,8 @@ export default function WorkspaceSidebar({
                   className={cn(
                     "flex-1 py-2 text-xs font-medium text-center transition-colors",
                     activeSection === 'recent' 
-                      ? "text-emerald-400 border-b-2 border-emerald-400" 
-                      : "text-zinc-400 hover:text-zinc-200"
+                      ? "text-neon-purple border-b-2 border-neon-purple" 
+                      : "text-gray-400 hover:text-white"
                   )}
                 >
                   Recent
@@ -457,7 +457,7 @@ export default function WorkspaceSidebar({
                 <div className="p-1">
                   {pinnedWorkspaces.length > 0 && (
                     <div className="mb-2">
-                      <h3 className="text-xs font-medium text-zinc-500 px-3 py-1">Pinned</h3>
+                      <h3 className="text-xs font-medium text-gray-400 px-3 py-1">Pinned</h3>
                       {pinnedWorkspaces.map((workspace) => (
                         <button
                           key={workspace.id}
@@ -465,8 +465,8 @@ export default function WorkspaceSidebar({
                           className={cn(
                             "w-full flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md transition-colors text-left mb-0.5",
                             selectedWorkspace === workspace.id
-                              ? "bg-emerald-500/20 text-emerald-300"
-                              : "hover:bg-zinc-800 text-zinc-300"
+                              ? "bg-neon-green/20 text-neon-green"
+                              : "hover:bg-white/10 text-white"
                           )}
                         >
                           <Folder className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -477,9 +477,9 @@ export default function WorkspaceSidebar({
                     </div>
                   )}
 
-                  <h3 className="text-xs font-medium text-zinc-500 px-3 py-1">All workspaces</h3>
+                  <h3 className="text-xs font-medium text-gray-400 px-3 py-1">All workspaces</h3>
                   {filteredWorkspaces.length === 0 ? (
-                    <div className="text-zinc-400 text-sm text-center py-4">
+                    <div className="text-gray-400 text-sm text-center py-4">
                       {searchQuery ? 'No matching workspaces' : 'No workspaces yet'}
                     </div>
                   ) : (
@@ -490,8 +490,8 @@ export default function WorkspaceSidebar({
                         className={cn(
                           "w-full flex items-center gap-1.5 sm:gap-2.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md transition-colors text-left mb-0.5 group",
                           selectedWorkspace === workspace.id
-                            ? "bg-emerald-500/20 text-emerald-300"
-                            : "hover:bg-zinc-800 text-zinc-300"
+                            ? "bg-neon-green/20 text-neon-green"
+                            : "hover:bg-white/10 text-white"
                         )}
                       >
                         <Folder className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -508,7 +508,7 @@ export default function WorkspaceSidebar({
                             });
                           }}
                         >
-                          <MoreHorizontal className="w-4 h-4 text-zinc-500 hover:text-zinc-300" />
+                          <MoreHorizontal className="w-4 h-4 text-gray-400 hover:text-white" />
                         </div>
                       </button>
                     ))
@@ -520,22 +520,22 @@ export default function WorkspaceSidebar({
               {activeSection === 'projects' && (
                 <div className="p-1">
                   <div className="flex items-center justify-between px-3 py-1">
-                    <h3 className="text-xs font-medium text-zinc-500">Projects</h3>
+                    <h3 className="text-xs font-medium text-gray-400">Projects</h3>
                     <button 
                       onClick={() => setShowProjectsManager(true)} 
-                      className="text-zinc-500 hover:text-zinc-300 p-0.5 rounded"
+                      className="text-gray-400 hover:text-neon-blue p-0.5 rounded"
                     >
                       <FolderPlus className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   
                   {projects.length === 0 ? (
-                    <div className="text-zinc-400 text-sm text-center py-6 px-3">
-                      <FileQuestion className="w-10 h-10 mx-auto mb-2 text-zinc-500" />
+                    <div className="text-gray-400 text-sm text-center py-6 px-3">
+                      <FileQuestion className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                       <p>No projects in this workspace yet</p>
                       <button 
                         onClick={() => setShowProjectsManager(true)}
-                        className="mt-3 text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-md transition-colors"
+                        className="mt-3 text-xs bg-neon-blue/20 hover:bg-neon-blue/30 text-neon-blue px-3 py-1.5 rounded-md transition-colors"
                       >
                         Create your first project
                       </button>
@@ -544,7 +544,7 @@ export default function WorkspaceSidebar({
                     projects.map((project) => (
                       <button
                         key={project.id}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors text-left mb-0.5 hover:bg-zinc-800 text-zinc-300"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors text-left mb-0.5 hover:bg-white/10 text-white"
                       >
                         <FileText className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm truncate">{project.title}</span>
@@ -557,17 +557,17 @@ export default function WorkspaceSidebar({
               {/* Recent Section */}
               {activeSection === 'recent' && (
                 <div className="p-1">
-                  <h3 className="text-xs font-medium text-zinc-500 px-3 py-1">Recently opened</h3>
+                  <h3 className="text-xs font-medium text-gray-400 px-3 py-1">Recently opened</h3>
                   {recentWorkspaces.map((workspace) => (
                     <button
                       key={workspace.id}
                       onClick={() => handleWorkspaceSelect(workspace.id)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors text-left mb-0.5 hover:bg-zinc-800 text-zinc-300"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition-colors text-left mb-0.5 hover:bg-white/10 text-white"
                     >
                       <Clock className="w-4 h-4 flex-shrink-0" />
                       <div className="overflow-hidden flex-grow">
                         <span className="text-sm truncate block">{workspace.title}</span>
-                        <span className="text-xs text-zinc-500 truncate block">
+                        <span className="text-xs text-gray-400 truncate block">
                           {new Date(workspace.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -578,8 +578,8 @@ export default function WorkspaceSidebar({
             </div>
 
             {/* Footer */}
-            <div className="border-t border-zinc-800 p-3">
-              <Link href="/trash" className="flex items-center gap-2.5 px-3 py-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-md transition-colors">
+            <div className="border-t border-white/10 p-3">
+              <Link href="/trash" className="flex items-center gap-2.5 px-3 py-2 text-gray-400 hover:text-white hover:bg-red-500/20 rounded-md transition-colors">
                 <Trash2 className="w-4 h-4" />
                 <span className="text-sm">Trash</span>
               </Link>
@@ -596,12 +596,12 @@ export default function WorkspaceSidebar({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-6 w-full max-w-md"
+              className="glass-strong rounded-xl shadow-2xl p-6 w-full max-w-md"
             >
-              <h2 className="text-xl font-semibold text-zinc-100 mb-4">Create New Workspace</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">Create New Workspace</h2>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="title" className="block text-sm text-zinc-400 mb-1">
+                  <label htmlFor="title" className="block text-sm text-gray-300 mb-1">
                     Workspace Name
                   </label>
                   <input
@@ -610,11 +610,11 @@ export default function WorkspaceSidebar({
                     value={newWorkspaceTitle}
                     onChange={(e) => setNewWorkspaceTitle(e.target.value)}
                     placeholder="My Awesome Workspace"
-                    className="w-full bg-zinc-800/50 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
+                    className="w-full bg-dark-secondary/50 border border-white/10 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neon-green/50 focus:border-neon-green/50"
                   />
                 </div>
                 <div>
-                  <label htmlFor="description" className="block text-sm text-zinc-400 mb-1">
+                  <label htmlFor="description" className="block text-sm text-gray-300 mb-1">
                     Description (Optional)
                   </label>
                   <textarea
@@ -622,7 +622,7 @@ export default function WorkspaceSidebar({
                     value={newWorkspaceDesc}
                     onChange={(e) => setNewWorkspaceDesc(e.target.value)}
                     placeholder="What is this workspace for?"
-                    className="w-full bg-zinc-800/50 border border-zinc-700 text-zinc-100 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
+                    className="w-full bg-dark-secondary/50 border border-white/10 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-neon-green/50 focus:border-neon-green/50"
                     rows={3}
                   ></textarea>
                 </div>
@@ -630,14 +630,14 @@ export default function WorkspaceSidebar({
               <div className="mt-6 flex justify-end gap-3">
                 <button 
                   onClick={() => setShowCreateWorkspaceModal(false)}
-                  className="px-4 py-2 text-zinc-300 hover:bg-zinc-800 rounded-md transition-colors"
+                  className="px-4 py-2 text-white hover:bg-white/10 rounded-md transition-colors"
                 >
                   Cancel
                 </button>
                 <button 
                   onClick={handleCreateWorkspace}
                   disabled={!newWorkspaceTitle.trim() || loading}
-                  className="px-4 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-zinc-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-emerald-500/30"
+                  className="px-4 py-2 bg-gradient-to-r from-neon-green to-neon-blue hover:shadow-neon-green text-gray-900 font-semibold rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Creating...' : 'Create Workspace'}
                 </button>
