@@ -9,7 +9,6 @@ import { normTitle, normAuthors } from './normalize';
 function titleSimilarity(a: string, b: string): number {
   const tokensA = normTitle(a).split(' ').filter(t => t.length > 2);
   const tokensB = normTitle(b).split(' ').filter(t => t.length > 2);
-  const setA = new Set(tokensA);
   const setB = new Set(tokensB);
   const overlap = tokensA.filter(t => setB.has(t)).length;
   return Math.min(1, overlap / Math.max(tokensA.length, tokensB.length, 1));
