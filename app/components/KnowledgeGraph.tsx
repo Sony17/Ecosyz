@@ -31,98 +31,75 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
   } | null>(null);
 
   useEffect(() => {
-    if (!resources.length) return;
-
-    // Reset selection on data change
-    setSelectedNode(null);
-    setExpanded(false);
-
-    // Destroy previous instance if exists
-    if (cy) {
-      cy.stop(); // Stop any animations
-      cy.destroy();
-    }
-
+    if (!resources.length || !containerRef.current) return;
+    
     const { nodes, edges } = buildGraph(resources);
     renderGraph(nodes, edges, onSelect);
 
-    // Cleanup on unmount
     return () => {
-      if (cy) {
-        cy.stop();
+      if (cy && !cy.destroyed()) {
         cy.destroy();
-        setCy(null);
       }
     };
   }, [resources, onSelect]);
 
-  // Keep the exact main branch buildGraph and renderGraph functions intact
-
-  const buildGraph = (resources: Resource[]): { nodes: KGNode[]; edges: KGEdge[] } => {
+  const buildGraph = (resources: Resource[]) => {
     const nodes: KGNode[] = [];
     const edges: KGEdge[] = [];
     const seen = new Set<string>();
 
     for (const res of resources) {
-      // Resource node with curated label (title + score/year)
-      const truncatedTitle = res.title.length > 50 ? `${res.title.substring(0, 50)}...` : res.title;
-      const resLabel = `${truncatedTitle}${res.score ? ` (Score: ${res.score.toFixed(1)})` : ''}${res.year ? ` (${res.year})` : ''}`;
-      nodes.push({ 
-        id: res.id, 
-        label: resLabel, 
-        type: 'resource',
-        meta: {
-          fullTitle: res.title,
-          description: res.description,
-          url: res.url,
-          year: res.year,
-          source: res.source,
-          score: res.score
-        }
-      });
+      // Main resource node
+      if (!seen.has(res.id)) {
+        nodes.push({ 
+          id: res.id, 
+          label: res.title.length > 50 ? `${res.title.substring(0, 50)}...` : res.title, 
+          type: 'resource',
+          meta: { fullTitle: res.title }
+        });
+        seen.add(res.id);
+      }
 
-      // Authors (use first author for simplicity, or all if few)
-      if (res.authors) {
-        const topAuthors = res.authors.slice(0, 2); // Limit to top 2 authors
-        for (const author of topAuthors) {
+      // Authors
+      if (res.authors && res.authors.length > 0) {
+        for (const author of res.authors) {
           const authorId = `author:${author}`;
           if (!seen.has(authorId)) {
             nodes.push({ 
-            id: authorId, 
-            label: author, 
-            type: 'author',
-            meta: { name: author }
-          });
+              id: authorId, 
+              label: author, 
+              type: 'author',
+              meta: { authorName: author }
+            });
             seen.add(authorId);
           }
-          edges.push({ id: `${res.id}-authored-${authorId}`, source: res.id, target: authorId, rel: 'AUTHORED' });
+          edges.push({ id: `${res.id}-authored-by-${authorId}`, source: res.id, target: authorId, rel: 'AUTHORED_BY' });
         }
       }
 
-      // Tags (limit to top 3 for curation)
-      if (res.tags) {
-        const topTags = res.tags.slice(0, 3);
-        for (const tag of topTags) {
+      // Tags
+      if (res.tags && res.tags.length > 0) {
+        for (const tag of res.tags) {
           const tagId = `tag:${tag}`;
           if (!seen.has(tagId)) {
             nodes.push({ 
-            id: tagId, 
-            label: tag, 
-            type: 'tag',
-            meta: { tagName: tag }
-          });
+              id: tagId, 
+              label: tag, 
+              type: 'tag',
+              meta: { tagName: tag }
+            });
             seen.add(tagId);
           }
           edges.push({ id: `${res.id}-tagged-${tagId}`, source: res.id, target: tagId, rel: 'TAGGED' });
         }
       }
 
-      // Source (provider)
-      const sourceId = `source:${res.source}`;
+      // Source
+      const sourceId = `source:${res.source || 'Unknown'}`;
       if (!seen.has(sourceId)) {
         nodes.push({ 
           id: sourceId, 
-          label: res.source, 
+          label: res.source || 'Unknown', 
           type: 'source',
           meta: { sourceName: res.source }
         });
@@ -506,11 +483,11 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                         className="w-3 h-3 rounded" 
                         style={{ 
                           backgroundColor: 
-                            selectedNode.type === 'resource' ? '#6c5ce7' :
-                            selectedNode.type === 'author' ? '#0984e3' :
-                            selectedNode.type === 'tag' ? '#00b894' :
-                            selectedNode.type === 'source' ? '#e17055' :
-                            selectedNode.type === 'type' ? '#fdcb6e' : '#6c5ce7'
+                            selectedNode.type === 'resource' ? '#8b5cf6' :
+                            selectedNode.type === 'author' ? '#3b82f6' :
+                            selectedNode.type === 'tag' ? '#10b981' :
+                            selectedNode.type === 'source' ? '#f97316' :
+                            selectedNode.type === 'type' ? '#eab308' : '#8b5cf6'
                         }}
                       ></div>
                       <span className="text-xs px-2 py-1 bg-gray-700/60 border border-emerald-500/30 rounded text-slate-300 font-medium">
@@ -550,17 +527,16 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
-                        className="text-xs text-slate-300 space-y-2 border-t border-white/10 pt-3"
+                        className="space-y-3 text-xs overflow-hidden"
                       >
                         {selectedNode.type === 'resource' && getResourceDetails() && (
                           <div className="space-y-2">
-                            {getResourceDetails()?.description && (
+                            {getResourceDetails()?.summary && (
                               <div>
-                                <span className="font-medium text-slate-200">Description:</span>
-                                <p className="mt-1 text-slate-400 text-xs leading-relaxed">
-                                  {getResourceDetails()?.description.length > 150 
-                                    ? `${getResourceDetails()?.description.substring(0, 150)}...` 
-                                    : getResourceDetails()?.description}
+                                <span className="font-medium text-slate-200">Summary:</span>
+                                <p className="text-slate-400 mt-1 leading-relaxed">
+                                  {getResourceDetails()?.summary.substring(0, 200)}
+                                  {getResourceDetails()?.summary && getResourceDetails()?.summary.length > 200 ? '...' : ''}
                                 </p>
                               </div>
                             )}
@@ -570,8 +546,8 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                                 <a 
                                   href={getResourceDetails()?.url} 
                                   target="_blank" 
-                                  rel="noopener" 
-                                  className="block mt-1 text-emerald-400 hover:text-emerald-300 transition-colors break-all"
+                                  rel="noopener noreferrer"
+                                  className="ml-2 text-blue-400 hover:text-blue-300 underline break-all"
                                 >
                                   {getResourceDetails()?.url.length > 40 
                                     ? `${getResourceDetails()?.url.substring(0, 40)}...` 
