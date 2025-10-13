@@ -355,16 +355,16 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-sm text-slate-300 flex items-center gap-4"
                 >
-                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs">
                     {stats.resources} resources
                   </span>
-                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs">
                     {stats.authors} authors
                   </span>
-                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs">
                     {stats.tags} tags
                   </span>
-                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs">
                     {stats.nodes} nodes total
                   </span>
                 </motion.div>
