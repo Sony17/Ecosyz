@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
 // Name of the anonymous session cookie
 const SESSION_COOKIE = 'anon_session';
@@ -42,19 +43,51 @@ function isValidSessionId(id: string) {
   return uuidV4.test(id) || b64url16.test(id);
 }
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (isAsset(pathname)) {
     return NextResponse.next();
   }
 
-  const res = NextResponse.next();
-  const existing = req.cookies.get(SESSION_COOKIE)?.value;
+  let response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  });
 
+  // Handle Supabase authentication with SSR
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value))
+          response = NextResponse.next({
+            request: {
+              headers: req.headers,
+            },
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  );
+
+  // Refresh the session if it exists
+  await supabase.auth.getUser();
+
+  // Handle anonymous session for non-authenticated users
+  const existing = req.cookies.get(SESSION_COOKIE)?.value;
   if (!existing || !isValidSessionId(existing)) {
     const sid = newSessionId();
-    res.cookies.set({
+    response.cookies.set({
       name: SESSION_COOKIE,
       value: sid,
       httpOnly: true,
@@ -65,7 +98,7 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  return res;
+  return response;
 }
 
 export const config = {

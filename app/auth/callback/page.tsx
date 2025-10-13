@@ -55,25 +55,14 @@ export default function OAuthCallback() {
                 duration: 3000,
               });
               
-              // Get user's workspace and redirect to it
-              try {
-                // Small delay to ensure session is established
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                const workspaceResponse = await fetch('/api/auth/user-workspace');
-                if (workspaceResponse.ok) {
-                  const workspaceData = await workspaceResponse.json();
-                  if (workspaceData.workspaceId) {
-                    router.push(`/workspaces/${workspaceData.workspaceId}`);
-                    return;
-                  }
-                }
-              } catch (workspaceError) {
-                console.error('Error fetching user workspace:', workspaceError);
-              }
+              // Check for stored redirect URL and redirect back to original page
+              const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
+              sessionStorage.removeItem('redirectAfterLogin');
               
-              // Fallback: redirect to workspaces page to create one
-              router.push('/workspaces');
+              // Small delay to ensure session is established
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              router.push(redirectUrl);
               return;
             } else {
               const errorData = await response.json();
@@ -97,25 +86,14 @@ export default function OAuthCallback() {
               duration: 3000,
             });
             
-            // Get user's workspace and redirect to it
-            try {
-              // Small delay to ensure session is established
-              await new Promise(resolve => setTimeout(resolve, 500));
-              
-              const workspaceResponse = await fetch('/api/auth/user-workspace');
-              if (workspaceResponse.ok) {
-                const workspaceData = await workspaceResponse.json();
-                if (workspaceData.workspaceId) {
-                  router.push(`/workspaces/${workspaceData.workspaceId}`);
-                  return;
-                }
-              }
-            } catch (workspaceError) {
-              console.error('Error fetching user workspace:', workspaceError);
-            }
+            // Check for stored redirect URL and redirect back to original page
+            const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
+            sessionStorage.removeItem('redirectAfterLogin');
             
-            // Fallback: redirect to workspaces page to create one
-            router.push('/workspaces');
+            // Small delay to ensure session is established
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            router.push(redirectUrl);
             return;
           } else {
             const errorData = await response.json();

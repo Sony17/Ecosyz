@@ -19,10 +19,10 @@ export default function ClientWorkspaceWrapper() {
   
   if (!mounted) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-zinc-950">
-        <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-zinc-700 border-t-emerald-500 rounded-full animate-spin"></div>
-          <p className="text-zinc-400 mt-4">Loading workspace...</p>
+      <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#0c2321] via-[#121f22] to-[#0a1016]">
+        <div className="flex flex-col items-center glass-card p-8 rounded-2xl">
+          <div className="w-12 h-12 border-4 border-gray-600 border-t-neon-green rounded-full animate-spin"></div>
+          <p className="text-white mt-4">Loading workspace...</p>
         </div>
       </div>
     );
