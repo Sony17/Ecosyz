@@ -157,33 +157,32 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
         ...edges.map(e => ({ data: e })),
       ],
       style: [
-        // Default node style with transparent, rounded, small design
+        // Default node style - perfect circles with vibrant colors like the screenshot
         {
           selector: 'node',
           style: {
-            'background-color': 'rgba(108, 92, 231, 0.4)',
+            'background-color': '#8b5cf6',
             label: 'data(label)',
-            'font-size': 8,
+            'font-size': 10,
             color: '#fff',
             'text-outline-color': '#000',
             'text-outline-width': 1,
             'text-wrap': 'wrap',
-            'text-max-width': 40,
-            'width': 12,
-            'height': 12,
-            'padding': '2px',
+            'text-max-width': 60,
+            'width': 20,
+            'height': 20,
             'shape': 'ellipse',
-            'border-width': 1,
+            'border-width': 2,
             'border-color': 'rgba(255, 255, 255, 0.3)',
             'transition-property': 'background-color, border-width, border-color, width, height',
             'transition-duration': '0.2s'
           }
         },
-        // Node type specific transparent colors
-        { selector: 'node[type="author"]', style: { 'background-color': 'rgba(9, 132, 227, 0.4)' } },
-        { selector: 'node[type="tag"]', style: { 'background-color': 'rgba(0, 184, 148, 0.4)' } },
-        { selector: 'node[type="source"]', style: { 'background-color': 'rgba(225, 112, 85, 0.4)' } },
-        { selector: 'node[type="type"]', style: { 'background-color': 'rgba(253, 203, 110, 0.4)' } },
+        // Node type specific vibrant colors matching the screenshot
+        { selector: 'node[type="author"]', style: { 'background-color': '#3b82f6' } },
+        { selector: 'node[type="tag"]', style: { 'background-color': '#10b981' } },
+        { selector: 'node[type="source"]', style: { 'background-color': '#f97316' } },
+        { selector: 'node[type="type"]', style: { 'background-color': '#eab308' } },
         // Enhanced edge style
         {
           selector: 'edge',
@@ -202,33 +201,33 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
             'opacity': 0.8
           }
         },
-        // Interactive hover effects
+        // Interactive hover effects - elegant scaling like the screenshot
         {
           selector: 'node:hover',
           style: {
-            'width': 18,
-            'height': 18,
-            'border-width': 2,
-            'border-color': 'rgba(255, 255, 255, 0.8)',
-            'shadow-blur': 8,
-            'shadow-color': 'rgba(255, 255, 255, 0.6)',
-            'shadow-opacity': 0.7,
+            'width': 28,
+            'height': 28,
+            'border-width': 3,
+            'border-color': 'rgba(255, 255, 255, 0.9)',
+            'shadow-blur': 10,
+            'shadow-color': 'rgba(16, 185, 129, 0.6)',
+            'shadow-opacity': 0.8,
             'z-index': 999
           }
         },
-        // Selected node style
+        // Selected node style - prominent selection with emerald glow
         {
           selector: 'node:selected',
           style: {
-            'width': 22,
-            'height': 22,
-            'border-width': 3,
-            'border-color': 'rgba(255, 71, 87, 0.8)',
-            'shadow-blur': 12,
-            'shadow-color': 'rgba(255, 71, 87, 0.6)',
-            'shadow-opacity': 0.8,
+            'width': 32,
+            'height': 32,
+            'border-width': 4,
+            'border-color': 'rgba(16, 185, 129, 0.9)',
+            'shadow-blur': 15,
+            'shadow-color': 'rgba(16, 185, 129, 0.8)',
+            'shadow-opacity': 1,
             'shadow-offset-x': 0,
-            'shadow-offset-y': 2,
+            'shadow-offset-y': 3,
             'z-index': 1000
           }
         },
@@ -326,7 +325,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
   }, [cy]);
 
   return (
-    <div className="flex flex-col h-full relative bg-white/5 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full relative bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-emerald-500/30 overflow-hidden shadow-2xl">
       {!resources.length ? (
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -343,7 +342,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5 backdrop-blur-sm"
+            className="flex items-center justify-between p-4 border-b border-emerald-500/20 bg-gray-800/60 backdrop-blur-sm"
           >
             <div className="flex items-center gap-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -356,16 +355,16 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-sm text-slate-300 flex items-center gap-4"
                 >
-                  <span className="bg-white/10 border border-white/20 px-2 py-1 rounded text-xs">
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
                     {stats.resources} resources
                   </span>
-                  <span className="bg-white/10 border border-white/20 px-2 py-1 rounded text-xs">
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
                     {stats.authors} authors
                   </span>
-                  <span className="bg-white/10 border border-white/20 px-2 py-1 rounded text-xs">
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
                     {stats.tags} tags
                   </span>
-                  <span className="bg-white/10 border border-white/20 px-2 py-1 rounded text-xs">
+                  <span className="bg-gray-700/60 border border-emerald-500/30 px-2 py-1 rounded text-xs"
                     {stats.nodes} nodes total
                   </span>
                 </motion.div>
@@ -381,7 +380,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   placeholder="Search nodes..."
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="pl-10 pr-4 py-2 bg-slate-700/50 border border-slate-600/50 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400/50 w-48"
+                  className="pl-10 pr-4 py-2 bg-gray-800/60 border border-emerald-500/30 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400/50 w-48"
                 />
               </div>
               
@@ -391,7 +390,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={zoomIn}
-                  className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+                  className="p-2 text-slate-300 hover:text-white hover:bg-emerald-500/20 rounded-lg transition-all"
                   title="Zoom In"
                 >
                   <ZoomIn className="h-4 w-4" />
@@ -400,7 +399,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={zoomOut}
-                  className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+                  className="p-2 text-slate-300 hover:text-white hover:bg-emerald-500/20 rounded-lg transition-all"
                   title="Zoom Out"
                 >
                   <ZoomOut className="h-4 w-4" />
@@ -409,7 +408,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={resetView}
-                  className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+                  className="p-2 text-slate-300 hover:text-white hover:bg-emerald-500/20 rounded-lg transition-all"
                   title="Reset View"
                 >
                   <RotateCcw className="h-4 w-4" />
@@ -418,7 +417,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setShowLegend(!showLegend)}
-                  className="p-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all"
+                  className="p-2 text-slate-300 hover:text-white hover:bg-emerald-500/20 rounded-lg transition-all"
                   title="Toggle Legend"
                 >
                   <Eye className="h-4 w-4" />
@@ -445,10 +444,10 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
               ref={containerRef}
-              className="w-full h-full bg-white/5 backdrop-blur-sm"
+              className="w-full h-full bg-gray-900/40 backdrop-blur-sm"
               style={{ 
                 minHeight: '400px',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
                 borderRadius: '12px'
               }}
             />
@@ -460,7 +459,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="absolute top-4 left-4 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-xl"
+                  className="absolute top-4 left-4 bg-gray-800/80 backdrop-blur-md rounded-xl p-4 border border-emerald-500/30 shadow-xl"
                 >
                   <h4 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                     <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
@@ -468,23 +467,23 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   </h4>
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: '#6c5ce7' }}></div>
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#8b5cf6' }}></div>
                       <span className="text-slate-300">Resources</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#0984e3' }}></div>
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#3b82f6' }}></div>
                       <span className="text-slate-300">Authors</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: '#00b894' }}></div>
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10b981' }}></div>
                       <span className="text-slate-300">Tags</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: '#e17055' }}></div>
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f97316' }}></div>
                       <span className="text-slate-300">Sources</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{ backgroundColor: '#fdcb6e' }}></div>
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#eab308' }}></div>
                       <span className="text-slate-300">Types</span>
                     </div>
                   </div>
@@ -499,7 +498,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                  className="absolute bottom-4 right-4 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-xl max-w-sm"
+                  className="absolute bottom-4 right-4 bg-gray-800/80 backdrop-blur-md rounded-xl p-4 border border-emerald-500/30 shadow-xl max-w-sm"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -514,7 +513,7 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                             selectedNode.type === 'type' ? '#fdcb6e' : '#6c5ce7'
                         }}
                       ></div>
-                      <span className="text-xs px-2 py-1 bg-white/10 border border-white/20 rounded text-slate-300 font-medium">
+                      <span className="text-xs px-2 py-1 bg-gray-700/60 border border-emerald-500/30 rounded text-slate-300 font-medium">
                         {selectedNode.type.charAt(0).toUpperCase() + selectedNode.type.slice(1)}
                       </span>
                     </div>
@@ -599,11 +598,11 @@ export default function KnowledgeGraph({ resources, onSelect, onSave, onClose }:
                                     className="w-2 h-2 rounded" 
                                     style={{ 
                                       backgroundColor: 
-                                        item.type === 'resource' ? '#6c5ce7' :
-                                        item.type === 'author' ? '#0984e3' :
-                                        item.type === 'tag' ? '#00b894' :
-                                        item.type === 'source' ? '#e17055' :
-                                        item.type === 'type' ? '#fdcb6e' : '#6c5ce7'
+                                        item.type === 'resource' ? '#8b5cf6' :
+                                        item.type === 'author' ? '#3b82f6' :
+                                        item.type === 'tag' ? '#10b981' :
+                                        item.type === 'source' ? '#f97316' :
+                                        item.type === 'type' ? '#eab308' : '#8b5cf6'
                                     }}
                                   ></div>
                                   <span className="text-slate-400">
